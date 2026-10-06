@@ -1,15 +1,13 @@
 # Enterprise Knowledge Navigator
 
-> **A 60-Day Real-World Enterprise GraphRAG & Semantic Retrieval Platform**  
-> *Developed continuously across 10 Sprints × 6 Days*
+> **Enterprise GraphRAG & Semantic Retrieval Platform**  
+> *A production-grade, end-to-end intelligent retrieval and knowledge graph platform*
 
 ---
 
 ## 1. Project Overview
 
 **Enterprise Knowledge Navigator** is a production-grade, end-to-end enterprise knowledge retrieval and synthesis system. It bridges dense vector semantic retrieval with structured knowledge graph traversal (GraphRAG) to eliminate hallucinations, preserve institutional relationships, and deliver grounded citations across complex organizational documents.
-
-This repository is built continuously from Sprint 1 to Sprint 10 without mockups, hardcoded answers, or disconnected prototypes.
 
 ---
 
@@ -112,17 +110,17 @@ pytest tests -v
 
 ---
 
-## 7. Development Roadmap (10 Sprints × 6 Days)
+## 7. Platform Capabilities Roadmap
 
-| Sprint | Days | Focus Area | Status |
-|---|---|---|---|
-| **Sprint 1** | Days 1–6 | Project Foundation & Architecture | **COMPLETED** |
-| **Sprint 2** | Days 7–12 | Real Document Ingestion (PDF, DOCX, TXT) | *Next* |
-| **Sprint 3** | Days 13–18 | Chunking Strategy & Embedding Pipeline | Planned |
-| **Sprint 4** | Days 19–24 | Vector Database & Semantic Search | Planned |
-| **Sprint 5** | Days 25–30 | Real Grounded RAG Assistant | Planned |
-| **Sprint 6** | Days 31–36 | Real Knowledge Graph Construction | Planned |
-| **Sprint 7** | Days 37–42 | Real GraphRAG Hybrid Fusion Engine | Planned |
-| **Sprint 8** | Days 43–48 | Enterprise Security, RBAC & Audit Trails | Planned |
-| **Sprint 9** | Days 49–54 | Evaluation Framework & Polished UI | Planned |
-| **Sprint 10** | Days 55–60 | Hardening, Production Deployment & Release v1.0.0 | Planned |
+| Subsystem | Scope & Capability | Status |
+|---|---|---|
+| **Core Architecture & Health** | FastAPI, SQLite, Pydantic configuration, structured logging, UI | **COMPLETED** |
+| **Document Ingestion** | Multi-format ingestion (PDF, DOCX, TXT), validation, metadata extraction | In Progress |
+| **Chunking & Semantic Embeddings** | Recursive chunking, overlap control, dense embedding vectors | Planned |
+| **Vector Search Engine** | Persistent vector store, top-K cosine similarity retrieval | Planned |
+| **RAG Assistant Engine** | Grounded prompt synthesis, context injection, source citations | Planned |
+| **Knowledge Graph Builder** | Automated entity & relationship extraction, graph persistence | Planned |
+| **GraphRAG Fusion Engine** | Multi-hop reasoning, hybrid vector + graph context fusion | Planned |
+| **Enterprise Security & RBAC** | Role-based access control, secure authentication, audit logging | Planned |
+| **Evaluation & Monitoring** | Groundedness evaluation, retrieval latency & accuracy metrics | Planned |
+| **Production Hardening** | Scalability optimizations, containerization, deployment readiness | Planned |
