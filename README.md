@@ -43,6 +43,7 @@
 ## 3. Technology Stack
 
 - **Backend Framework**: Python 3.14+, FastAPI, Uvicorn
+- **Machine Learning & NLP Engine**: Scikit-Learn (TF-IDF Vectorization, Cosine Similarity, K-Means Clustering), NumPy, Pandas
 - **Configuration & Validation**: Pydantic v2, Pydantic-Settings, Python-Dotenv
 - **Relational Persistence**: SQLAlchemy, SQLite (production ready for PostgreSQL)
 - **Document Storage**: Persistent structured filesystem (`data/raw`, `data/processed`, `data/vector_store`, `data/graph_store`)
@@ -51,17 +52,17 @@
 
 ---
 
-## 4. Current Milestone: Sprint 1 (Foundation)
+## 4. Current State: System Foundation
 
-Sprint 1 delivers the production-ready foundation:
-- [x] Structured modular project layout
-- [x] Git repository initialization and `.gitignore` preventing secret leaks
-- [x] Pydantic-Settings environment loading from `.env` with template `.env.example`
+The foundational platform architecture is operational:
+- [x] Modular project layout and secure configuration management
 - [x] Structured file & console rotating logging system
-- [x] SQLAlchemy persistence models (`DocumentRecord`, `SystemLogRecord`)
-- [x] Live operational health checks (`/api/v1/health`, `/api/v1/system/info`, `/api/v1/ping`)
-- [x] Interactive web dashboard mounted at `/app/`
-- [x] Complete automated test coverage passing 100%
+- [x] SQLAlchemy persistence layer with SQLite backing (`data/knowledge_navigator.db`)
+- [x] Machine Learning Core Engine (`scikit-learn` TF-IDF vectorization, Cosine Similarity ranking, K-Means semantic clustering)
+- [x] Verified persistent filesystem storage structures (`data/raw`, `data/processed`, `data/vector_store`, `data/graph_store`)
+- [x] Live operational health probing endpoints (`/api/v1/health`, `/api/v1/system/info`, `/api/v1/ping`, `/api/v1/ml/similarity`, `/api/v1/ml/cluster`)
+- [x] Administrative system console dashboard with interactive ML diagnostics mounted at `/app/`
+- [x] Automated test suite verifying system foundation and machine learning pipeline integrity
 
 ---
 
@@ -71,11 +72,10 @@ Sprint 1 delivers the production-ready foundation:
 - Python 3.11+ (Python 3.14 supported)
 - Git
 
-### Installation
+### Installation & Setup
 
-1. **Clone the repository:**
+1. **Navigate to the project root:**
    ```bash
-   git clone https://github.com/shweeta1015/enterprise-knowledge-navigator.git
    cd enterprise-knowledge-navigator
    ```
 

@@ -17,26 +17,30 @@
         <div class="brand-icon">⚡</div>
         <div class="brand-text">
           <h2>EK Navigator</h2>
-          <span class="badge badge-subtle">Core System • v0.1.0</span>
+          <span class="badge badge-subtle">System Console</span>
         </div>
       </div>
 
       <nav class="sidebar-nav">
         <a href="#overview" class="nav-item active">
           <span class="icon">📊</span>
-          <span>System Overview</span>
+          <span>System Status</span>
         </a>
-        <a href="#pipeline" class="nav-item">
-          <span class="icon">🔄</span>
-          <span>Pipeline Roadmap</span>
+        <a href="#system-info" class="nav-item">
+          <span class="icon">⚙️</span>
+          <span>Environment & Storage</span>
+        </a>
+        <a href="#ml-lab" class="nav-item">
+          <span class="icon">🤖</span>
+          <span>ML & NLP Engine</span>
         </a>
         <a href="#api" class="nav-item">
           <span class="icon">🔌</span>
-          <span>Live API Test</span>
+          <span>API Diagnostics</span>
         </a>
         <a href="#architecture" class="nav-item">
           <span class="icon">🏛️</span>
-          <span>Architecture</span>
+          <span>Architecture Overview</span>
         </a>
       </nav>
 
@@ -54,14 +58,14 @@
       <header class="top-header">
         <div class="header-title">
           <h1>Enterprise Knowledge Navigator</h1>
-          <p>Real-World Enterprise GraphRAG, Vector Retrieval & Semantic Search</p>
+          <p>Intelligent Enterprise Knowledge Discovery Platform</p>
         </div>
         <div class="header-actions">
           <a href="/docs" target="_blank" class="btn btn-secondary">
             <span>Swagger API Docs</span> ↗
           </a>
           <button id="refreshStatusBtn" class="btn btn-primary">
-            <span>Refresh Health</span> ⟳
+            <span>Refresh Status</span> ⟳
           </button>
         </div>
       </header>
@@ -73,126 +77,108 @@
         <section class="card health-banner" id="overview">
           <div class="health-header">
             <div>
-              <h3>Backend Service Health</h3>
-              <p class="subtitle">Real-time status probe to FastAPI backend</p>
+              <h3>Core System Status</h3>
+              <p class="subtitle">Live operational status probe connected to FastAPI backend</p>
             </div>
             <div id="healthBadge" class="status-pill status-loading">Checking...</div>
           </div>
 
           <div class="stats-grid">
             <div class="stat-box">
-              <span class="stat-label">FastAPI Engine</span>
+              <span class="stat-label">FastAPI Backend</span>
               <span class="stat-value" id="engineStatus">—</span>
             </div>
             <div class="stat-box">
-              <span class="stat-label">SQLite Persistence</span>
+              <span class="stat-label">Database Connection</span>
               <span class="stat-value" id="dbStatus">—</span>
             </div>
             <div class="stat-box">
-              <span class="stat-label">Storage Directories</span>
+              <span class="stat-label">Persistent Storage</span>
               <span class="stat-value" id="storageStatus">—</span>
             </div>
             <div class="stat-box">
-              <span class="stat-label">API Version</span>
+              <span class="stat-label">Platform Version</span>
               <span class="stat-value" id="versionStatus">—</span>
             </div>
           </div>
         </section>
 
-        <!-- Sprint Pipeline Roadmap -->
-        <section class="card" id="pipeline">
+        <!-- System Information & Storage Diagnostics -->
+        <section class="card" id="system-info">
           <div class="card-title-group">
-            <h3>Enterprise Capabilities Roadmap</h3>
-            <span class="badge badge-accent">Core Platform Architecture</span>
+            <div>
+              <h3>Environment & Storage Verification</h3>
+              <p class="subtitle">Real persistence storage paths and runtime configuration</p>
+            </div>
           </div>
-          <div class="timeline-grid">
-            <div class="timeline-step completed">
-              <div class="step-num">S1</div>
-              <div class="step-content">
-                <h4>Foundation & Architecture</h4>
-                <p>FastAPI, SQLite, Logging, CORS, UI, Repo setup</p>
-                <span class="pill pill-success">Active / Complete</span>
-              </div>
+          <div class="info-grid">
+            <div class="info-card">
+              <h4>Runtime Environment</h4>
+              <ul class="info-list">
+                <li><span>Application Name:</span> <strong id="infoAppName">Enterprise Knowledge Navigator</strong></li>
+                <li><span>Environment:</span> <strong id="infoEnv">development</strong></li>
+                <li><span>Python Runtime:</span> <strong id="infoPython">—</strong></li>
+                <li><span>Database Target:</span> <strong id="infoDb">SQLite (knowledge_navigator.db)</strong></li>
+              </ul>
             </div>
-            <div class="timeline-step pending">
-              <div class="step-num">S2</div>
-              <div class="step-content">
-                <h4>Real Document Ingestion</h4>
-                <p>PDF/DOCX extraction, validation, metadata storage</p>
-                <span class="pill pill-pending">Next Sprint</span>
-              </div>
+            <div class="info-card">
+              <h4>Persistent Storage Status</h4>
+              <ul class="info-list" id="storageList">
+                <li><span>Raw Documents Path:</span> <strong class="badge-status">Verified</strong></li>
+                <li><span>Processed Documents Path:</span> <strong class="badge-status">Verified</strong></li>
+                <li><span>Vector Store Path:</span> <strong class="badge-status">Verified</strong></li>
+                <li><span>Graph Store Path:</span> <strong class="badge-status">Verified</strong></li>
+                <li><span>Application Logs Path:</span> <strong class="badge-status">Verified</strong></li>
+              </ul>
             </div>
-            <div class="timeline-step pending">
-              <div class="step-num">S3</div>
-              <div class="step-content">
-                <h4>Chunking & Embeddings</h4>
-                <p>Recursive splitting, overlap, embedding models</p>
-                <span class="pill pill-muted">Planned</span>
-              </div>
+          </div>
+        </section>
+
+        <!-- Machine Learning Engine Lab -->
+        <section class="card" id="ml-lab">
+          <div class="card-title-group">
+            <div>
+              <h3>Machine Learning & Statistical NLP Engine</h3>
+              <p class="subtitle">Scikit-Learn vectorization, Cosine Similarity mathematical ranking & K-Means clustering</p>
             </div>
-            <div class="timeline-step pending">
-              <div class="step-num">S4</div>
-              <div class="step-content">
-                <h4>Vector Database Search</h4>
-                <p>ChromaDB/FAISS top-K retrieval, similarity scoring</p>
-                <span class="pill pill-muted">Planned</span>
+            <span class="badge badge-accent">scikit-learn 1.9.0</span>
+          </div>
+          
+          <div class="ml-controls">
+            <div class="ml-box">
+              <h4>1. TF-IDF Cosine Similarity Ranking</h4>
+              <p class="subtitle">Evaluates vector space angles between target query and enterprise document corpus</p>
+              <div class="input-group">
+                <label>Query String:</label>
+                <input type="text" id="mlQueryInput" value="work from home remote work policy" class="text-input" />
               </div>
+              <button id="runSimilarityBtn" class="btn btn-primary" style="margin-top: 0.75rem;">
+                Run TF-IDF Cosine Similarity
+              </button>
             </div>
-            <div class="timeline-step pending">
-              <div class="step-num">S5</div>
-              <div class="step-content">
-                <h4>Real RAG Assistant</h4>
-                <p>Grounded prompt synthesis, context injection, citations</p>
-                <span class="pill pill-muted">Planned</span>
-              </div>
+
+            <div class="ml-box">
+              <h4>2. Unsupervised K-Means Semantic Clustering</h4>
+              <p class="subtitle">Clusters documents into groups (K=2) and computes dominant centroid keywords</p>
+              <button id="runClusterBtn" class="btn btn-secondary" style="margin-top: 1.85rem;">
+                Run K-Means Document Clustering
+              </button>
             </div>
-            <div class="timeline-step pending">
-              <div class="step-num">S6</div>
-              <div class="step-content">
-                <h4>Knowledge Graph Engine</h4>
-                <p>Entity/relation extraction, graph store, cypher queries</p>
-                <span class="pill pill-muted">Planned</span>
-              </div>
+          </div>
+
+          <div class="console-output" style="margin-top: 1.25rem;">
+            <div class="output-header">
+              <span id="mlOutputStatus">ML Engine: Ready</span>
+              <button id="copyMlJsonBtn" class="btn-xs">Copy Result</button>
             </div>
-            <div class="timeline-step pending">
-              <div class="step-num">S7</div>
-              <div class="step-content">
-                <h4>Real GraphRAG Fusion</h4>
-                <p>Hybrid vector + graph retrieval, multi-hop reasoning</p>
-                <span class="pill pill-muted">Planned</span>
-              </div>
-            </div>
-            <div class="timeline-step pending">
-              <div class="step-num">S8</div>
-              <div class="step-content">
-                <h4>Enterprise RBAC & Auth</h4>
-                <p>JWT auth, role-based access control, audit logging</p>
-                <span class="pill pill-muted">Planned</span>
-              </div>
-            </div>
-            <div class="timeline-step pending">
-              <div class="step-num">S9</div>
-              <div class="step-content">
-                <h4>Evaluation & Full UI</h4>
-                <p>RAG triad metrics, latency benchmarks, full dashboard</p>
-                <span class="pill pill-muted">Planned</span>
-              </div>
-            </div>
-            <div class="timeline-step pending">
-              <div class="step-num">S10</div>
-              <div class="step-content">
-                <h4>Hardening & Production</h4>
-                <p>Deployment readiness, security audit, v1.0.0 release</p>
-                <span class="pill pill-muted">Planned</span>
-              </div>
-            </div>
+            <pre><code id="mlJsonDisplay">// Click one of the buttons above to run the live Machine Learning algorithms...</code></pre>
           </div>
         </section>
 
         <!-- Live API Explorer -->
         <section class="card" id="api">
           <h3>Interactive API Diagnostics</h3>
-          <p class="subtitle">Test live endpoints directly from the browser</p>
+          <p class="subtitle">Execute live queries against available backend endpoints</p>
           <div class="api-console">
             <div class="endpoint-selector">
               <button class="endpoint-btn active" data-url="/api/v1/health">GET /api/v1/health</button>
@@ -211,35 +197,34 @@
 
         <!-- Architecture Overview -->
         <section class="card" id="architecture">
-          <h3>Architecture Blueprint</h3>
-          <p class="subtitle">End-to-End Enterprise Knowledge Navigator System Design</p>
+          <h3>System Architecture Overview</h3>
+          <p class="subtitle">Enterprise Knowledge Navigator Structural Blueprint</p>
           <div class="architecture-diagram">
             <div class="arch-layer">
-              <div class="layer-title">UI & Presentation Layer</div>
+              <div class="layer-title">Presentation Layer</div>
               <div class="layer-boxes">
-                <div class="box">Web Dashboard</div>
-                <div class="box">Document Manager</div>
-                <div class="box">Interactive RAG & Graph Explorer</div>
+                <div class="box">Web Dashboard Console</div>
+                <div class="box">API Diagnostics Interface</div>
+                <div class="box">Interactive OpenAPI / Swagger UI</div>
               </div>
             </div>
             <div class="arch-arrow">↓ REST API / OpenAPI v3 ↓</div>
             <div class="arch-layer">
               <div class="layer-title">FastAPI Backend Service Layer</div>
               <div class="layer-boxes">
-                <div class="box">Ingestion & ETL Controller</div>
-                <div class="box">Vector Retrieval Engine</div>
-                <div class="box">Knowledge Graph Navigator</div>
-                <div class="box">Context Fusion & LLM Orchestrator</div>
+                <div class="box">API v1 Routing Controller</div>
+                <div class="box">Pydantic Validation & Config</div>
+                <div class="box">Structured Rotating Logging</div>
+                <div class="box">Service Health & Lifecycle Manager</div>
               </div>
             </div>
-            <div class="arch-arrow">↓ Persistent Data & Index Stores ↓</div>
+            <div class="arch-arrow">↓ Data Persistence & Index Stores ↓</div>
             <div class="arch-layer">
-              <div class="layer-title">Persistence & Storage Layer</div>
+              <div class="layer-title">Database & Storage Layer</div>
               <div class="layer-boxes">
-                <div class="box">SQLite / PostgreSQL (Metadata & RBAC)</div>
-                <div class="box">Vector Store (Embeddings)</div>
-                <div class="box">Graph Store (Entities & Relations)</div>
-                <div class="box">Local Persistent Documents (Raw & Cleaned)</div>
+                <div class="box">SQLAlchemy Relational Store (SQLite)</div>
+                <div class="box">Raw & Processed Document Repositories</div>
+                <div class="box">Vector & Graph Index Directories</div>
               </div>
             </div>
           </div>

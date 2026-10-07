@@ -63,13 +63,15 @@ def get_system_info():
         python_version=sys.version.split()[0],
         database_url=settings.DATABASE_URL.split("///")[-1],
         features_available=[
-            "Document Ingestion Architecture",
-            "Chunking & Embeddings Pipeline",
-            "Vector Database Search",
-            "RAG Assistant Engine",
-            "Knowledge Graph Extraction",
-            "GraphRAG Fusion Engine",
-            "Enterprise Security & Access Control"
+            "Core FastAPI Application Engine",
+            "Pydantic Validation & Configuration",
+            "Relational Storage & Schema Verification (SQLite)",
+            "Machine Learning TF-IDF Vectorization & Cosine Similarity (scikit-learn)",
+            "Unsupervised K-Means Semantic Clustering (scikit-learn)",
+            "Storage & Directory Readiness Verification",
+            "Structured File & Console Event Logging",
+            "Health & Diagnostics API Layer",
+            "Operational Administration Interface"
         ],
         storage_status={
             "raw_docs_dir": settings.RAW_DOCS_DIR.exists(),
