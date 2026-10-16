@@ -28,14 +28,16 @@ jobs:
 
       - name: Execute Pytest Suite
         env:
+          PYTHONPATH: .
           ENVIRONMENT: test
           DEBUG: "false"
           SECRET_KEY: "test-secret-key-knowledge-navigator"
         run: |
-          pytest tests -v --tb=short
+          python -m pytest tests -v --tb=short
 
       - name: Execute End-to-End Audit Script
         env:
+          PYTHONPATH: .
           ENVIRONMENT: test
           DEBUG: "false"
           SECRET_KEY: "test-secret-key-knowledge-navigator"
