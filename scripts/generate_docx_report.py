@@ -506,15 +506,39 @@ def build_word_report():
     # =========================================================================
     add_h1("Chapter 10: Database and Persistent Storage")
     add_p(
-        "In cloud environments, understanding storage persistence is vital. Free cloud servers operate on "
-        "**ephemeral containers**: this means if the server is restarted or redeployed, any new files written inside "
-        "the temporary container are wiped clean back to the state of the Git repository."
+        "In cloud environments, understanding storage persistence is vital. Modern PaaS platforms like Render operate "
+        "using containerized Linux environments. By default, standard web containers run on **ephemeral filesystems**: "
+        "this means that whenever a container restarts (due to inactivity, redeployment, or configuration changes), "
+        "any files created on the local container disk during runtime are destroyed and reset back to the original Git repository state."
     )
     add_p(
-        "To solve this problem permanently, Enterprise Knowledge Navigator was architected with two robust layers:"
+        "For an enterprise knowledge platform, three runtime artifacts must be preserved permanently:"
     )
-    add_bullet("Layer 1 - Dynamic Data Volume Redirection", "In backend/app/core/config.py, the system dynamically checks the DATA_DIR environment variable. When running on Render with a Persistent Disk mounted at /var/data, setting DATA_DIR=/var/data automatically redirects SQLite, raw document uploads, and vector indexes to the permanent disk.")
-    add_bullet("Layer 2 - Idempotent Document Seeding", "If the database is running on an ephemeral free-tier container and resets, the seed_initial_documents() routine automatically detects zero documents and repopulates foundational enterprise documents on startup, ensuring the website never appears broken or empty.")
+    add_bullet("1. SQLite Database", "Stored at data/knowledge_navigator.db containing users, custom roles, access permissions, audit logs, and document metadata.")
+    add_bullet("2. Uploaded Document Files", "Stored at data/raw/ containing user-uploaded PDF, Word (.docx), and text (.txt) files.")
+    add_bullet("3. Vector Indexes & Graph Caches", "Stored at data/vector_store/ (hybrid_index.pkl, chunks_metadata.json) and data/graph_store/ (knowledge_graph.json).")
+
+    add_h2("10.1 The Implemented Persistent Storage Solution")
+    add_p(
+        "To guarantee that all three runtime artifacts survive server redeployments without data loss, "
+        "the project's configuration was updated with a production-grade Persistent Storage architecture:"
+    )
+    add_bullet("Render Persistent Disk Specification", "In render.yaml, a dedicated 1 GB SSD persistent disk is declared under 'disk: name: enterprise-data, mountPath: /var/data, sizeGB: 1'.")
+    add_bullet("Environment Redirection", "In render.yaml, the environment variable 'DATA_DIR' is set to '/var/data', pointing to the mounted SSD volume.")
+    add_bullet("Dynamic Application Pathing", "In backend/app/core/config.py, the settings system automatically detects DATA_DIR and routes all storage: RAW_DOCS_DIR to /var/data/raw, VECTOR_STORE_DIR to /var/data/vector_store, GRAPH_STORE_DIR to /var/data/graph_store, and DATABASE_URL to sqlite:////var/data/knowledge_navigator.db.")
+    add_bullet("Automated Directory Provisioning", "On startup, ensure_directories_exist() checks the mounted volume and automatically creates any missing subdirectories.")
+    add_bullet("Idempotent Baseline Seeding", "If the system ever starts on an empty disk, seed_initial_documents() detects doc_count == 0 and automatically seeds the foundational enterprise manuals and graph entities so the system is fully operational immediately.")
+
+    add_h2("10.2 Render Plan & Billing Considerations (Free vs. Starter)")
+    add_p(
+        "Render imposes a strict architectural constraint: **Render Disks are an advanced infrastructure feature available "
+        "only on paid plans (Starter plan at $7/month plus $0.25/GB/month for SSD storage)**. Render does not permit attached disks on its Free plan."
+    )
+    add_p(
+        "For students and academic evaluators, two deployment pathways are supported:"
+    )
+    add_bullet("Option A: Full Production with Persistent Disk (Configured in render.yaml)", "Deploying with 'plan: starter' attaches the 1 GB SSD disk. All user-uploaded documents, newly created user accounts, and vector indices persist indefinitely across all restarts and redeployments.")
+    add_bullet("Option B: 100% Free Tier Academic Demonstration", "If you prefer to deploy with zero cost and no credit card, simply edit render.yaml: change 'plan: starter' to 'plan: free', delete the 'disk' block, and set 'DATA_DIR' to 'data'. The application runs fully for free with baseline documents automatically seeded, though any newly uploaded files will be ephemeral upon server cold restart.")
 
     # =========================================================================
     # CHAPTER 11: TESTING AND FINAL VERIFICATION RESULTS

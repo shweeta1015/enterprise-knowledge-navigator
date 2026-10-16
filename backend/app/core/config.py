@@ -122,7 +122,7 @@ class Settings(BaseSettings):
             self.PROCESSED_DOCS_DIR = self.DATA_DIR / "processed"
             self.VECTOR_STORE_DIR = self.DATA_DIR / "vector_store"
             self.GRAPH_STORE_DIR = self.DATA_DIR / "graph_store"
-            if self.DATABASE_URL == "sqlite:///./data/knowledge_navigator.db":
+            if "sqlite" in self.DATABASE_URL.lower() and "knowledge_navigator.db" in self.DATABASE_URL:
                 self.DATABASE_URL = f"sqlite:///{self.DATA_DIR}/knowledge_navigator.db"
 
     def ensure_directories_exist(self) -> None:

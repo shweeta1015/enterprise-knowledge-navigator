@@ -8,7 +8,15 @@ services:
     name: enterprise-knowledge-navigator
     runtime: python
     region: oregon
-    plan: free
+    # Note on Plans & Storage:
+    # Render Disks require at least the 'starter' plan ($7/mo + $0.25/GB/mo).
+    # If deploying on Render's 'free' plan, remove the 'disk' block, set 'plan: free',
+    # and set 'DATA_DIR' to 'data' (ephemeral container filesystem).
+    plan: starter
+    disk:
+      name: enterprise-data
+      mountPath: /var/data
+      sizeGB: 1
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /api/v1/health
@@ -20,10 +28,10 @@ services:
         value: "false"
       - key: BACKEND_HOST
         value: 0.0.0.0
+      - key: DATA_DIR
+        value: /var/data
       - key: SECRET_KEY
         generateValue: true
-      - key: DATABASE_URL
-        value: sqlite:///./data/knowledge_navigator.db
       - key: CORS_ORIGINS
         value: "*"
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
