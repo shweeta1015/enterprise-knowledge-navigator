@@ -3,6 +3,11 @@
 > **Enterprise Semantic Retrieval, GraphRAG & Institutional Intelligence Platform**  
 > *A production-ready, multi-role knowledge management system bridging dense vector semantic retrieval with interactive knowledge graph traversal.*
 
+[![CI & Deployment Pipeline](https://github.com/shweeta1015/enterprise-knowledge-navigator/actions/workflows/ci.yml/badge.svg)](https://github.com/shweeta1015/enterprise-knowledge-navigator/actions/workflows/ci.yml)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/shweeta1015/enterprise-knowledge-navigator)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+
 ---
 
 ## 1. Introduction
