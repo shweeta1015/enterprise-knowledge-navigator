@@ -63,3 +63,9 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Local-only deployment documents & notes
+LOCAL_RENDER_DEPLOYMENT_GUIDE.md
+LOCAL_DEPLOYMENT_*.md
+*Render_Deployment_Guide.docx
+*Technical_Audit_Guide.docx

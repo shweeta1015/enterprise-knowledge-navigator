@@ -1,6 +1,6 @@
 """
 Generates the comprehensive, professionally formatted Word document:
-Enterprise_Knowledge_Navigator_Final_Audit_and_Render_Deployment_Guide.docx
+Enterprise_Knowledge_Navigator_Technical_Audit_Guide.docx
 """
 
 import os
@@ -141,7 +141,7 @@ def build_word_report():
     
     subtitle_p = doc.add_paragraph()
     subtitle_p.paragraph_format.space_after = Pt(24)
-    subtitle_run = subtitle_p.add_run("Complete Final Audit, Codebase Verification, and Cloud Deployment Guide")
+    subtitle_run = subtitle_p.add_run("Complete Architecture, System Audit, and Local Quality Verification Guide")
     subtitle_run.font.name = "Calibri"
     subtitle_run.font.size = Pt(15)
     subtitle_run.font.color.rgb = RGBColor(0x47, 0x55, 0x69)
@@ -160,7 +160,7 @@ def build_word_report():
     desc_run = desc_p.add_run(
         "A comprehensive technical report detailing full-stack system architecture, "
         "hybrid vector semantic search, GraphRAG relational navigation, multi-role access control, "
-        "evidence-backed citation verification, and automated GitHub-to-Render continuous cloud deployment."
+        "evidence-backed citation verification, and automated GitHub Actions continuous integration quality pipeline."
     )
     desc_run.font.size = Pt(11.5)
     desc_run.font.color.rgb = RGBColor(0x47, 0x55, 0x69)
@@ -290,7 +290,7 @@ def build_word_report():
         ["Parsers", "PyPDF2, python-docx", "Robust document extraction engine reading raw text, page boundaries, and formatting from uploaded PDF, Word, and text files."],
         ["Security", "PyJWT & Passlib (Bcrypt)", "Cryptographic password hashing and JSON Web Token (JWT) session generation with role claims and expiration guards."],
         ["Testing", "Pytest & AnyIO", "Comprehensive test automation executing 58 unit/integration tests and 29 pre-flight security and functionality audit checks."],
-        ["Hosting", "Render Cloud Platform", "PaaS environment providing containerized Linux execution, auto-deploy git triggers, dynamic port routing, and HTTPS termination."]
+        ["Environment", "Localhost / Container-Ready", "Zero-dependency local execution environment with self-contained SQLite storage, automated CI test runner, and dormant container specifications."]
     ]
     format_table(doc.add_table(rows=1, cols=3), [1.2, 1.8, 3.5], tech_headers, tech_data)
 
@@ -383,7 +383,7 @@ def build_word_report():
         "├── frontend/                # SPA files: index.html, app.js, css/style.css\n"
         "├── data/                    # Persistent storage (knowledge_navigator.db, vector_store, raw)\n"
         "├── tests/                   # Pytest automated test suites\n"
-        "├── render.yaml              # Render Cloud Blueprint specification\n"
+        "├── render.yaml              # Application deployment blueprint (dormant reference)\n"
         "└── Dockerfile               # Multi-stage production container specification",
         "DIRECTORY STRUCTURE HIERARCHY"
     )
@@ -405,148 +405,93 @@ def build_word_report():
     format_table(doc.add_table(rows=1, cols=4), [0.8, 2.5, 2.2, 1.0], api_headers, api_data)
 
     # =========================================================================
-    # CHAPTER 6: WHAT IS DEPLOYMENT AND WHY RENDER IS USED
+    # CHAPTER 6: CONTINUOUS INTEGRATION & AUTOMATED QUALITY PIPELINE
     # =========================================================================
-    add_h1("Chapter 6: What is Deployment and Why Render is Used")
+    add_h1("Chapter 6: Continuous Integration & Quality Pipeline")
     add_p(
-        "For a college student or beginner engineer, the concept of deployment can sound intimidating. "
-        "In simple terms, running an application locally means the program only runs on your own personal computer. "
-        "If you close your laptop, shut down your terminal, or disconnect your Wi-Fi, no one else in the world "
-        "can see or use your website."
+        "Modern enterprise software engineering relies on continuous integration (CI) to prevent regressions "
+        "and enforce high code quality standards. In Enterprise Knowledge Navigator, an automated CI pipeline "
+        "is implemented using GitHub Actions (.github/workflows/ci.yml)."
     )
     add_p(
-        "Deployment is the automated process of copying your project to a secure, permanently connected cloud server "
-        "that runs 24 hours a day, 7 days a week. The cloud server is assigned a public, secure Web address (URL) "
-        "beginning with 'https://' so that teachers, evaluators, and team members anywhere in the world can open "
-        "your website on their phones or laptops without installing Python or cloning source code."
+        "Whenever code is pushed to the repository or a pull request is created, an isolated, clean Ubuntu Linux "
+        "virtual machine is automatically spun up. The runner sets up Python 3.11, installs production dependencies "
+        "from requirements.txt, verifies syntax across all files, and executes the complete 58-test Pytest suite "
+        "and 29-check comprehensive audit script."
     )
-    add_h2("6.1 Why Render Was Chosen")
-    add_bullet("Native Python & Docker Support", "Render runs modern Python 3.11 with zero complicated server administration.")
-    add_bullet("Free Tier for Student Demonstrations", "Allows students and academic projects to host live prototypes without recurring infrastructure bills.")
-    add_bullet("Automated HTTPS / SSL Certificates", "Encrypts all traffic automatically using trusted TLS certificates.")
-    add_bullet("GitHub Integration (GitOps)", "Whenever code is pushed to GitHub, Render automatically triggers a fresh build and deploy.")
-    add_bullet("Blueprint Infrastructure as Code", "The entire deployment is defined in render.yaml, ensuring reproducible server setups.")
+    add_h2("6.1 CI Verification Pipeline Stages")
+    add_bullet("Syntax Compilation Check", "Runs 'python -m compileall backend tests scripts -q' to verify zero syntax or import errors.")
+    add_bullet("Pytest Automated Suite", "Executes 58 unit and integration tests across security, retrieval, parsing, and RAG services.")
+    add_bullet("Comprehensive Quality Audit", "Executes scripts/comprehensive_final_audit.py, validating 29 enterprise contract checkpoints.")
+    add_bullet("Zero Test Weakening", "Assertions enforce exact mathematical scores, grounding facts, and strict abstention behaviors.")
 
     # =========================================================================
-    # CHAPTER 7: COMPLETE RENDER DEPLOYMENT PROCESS
+    # CHAPTER 7: HYBRID SEARCH RETRIEVAL & VECTOR SPACE
     # =========================================================================
-    add_h1("Chapter 7: Complete Render Deployment Process")
+    add_h1("Chapter 7: Hybrid Search Retrieval Engine")
     add_p(
-        "The deployment of Enterprise Knowledge Navigator was performed systematically across 15 chronological steps. "
-        "Each step ensured that production configuration was locked, secure, and fully verified."
+        "To achieve reliable retrieval across enterprise documents, the system employs a dual-retrieval strategy "
+        "combining keyword search (lexical BM25 matching) with dense vector representations (TF-IDF semantic cosine similarity)."
     )
-    
-    steps_data = [
-        ("Step 1: Codebase Freeze & Quality Inspection", "Audited all local files, checked dependencies, and verified that existing user accounts, documents, and database records remained 100% intact."),
-        ("Step 2: Dependency Specification", "Pinned required production packages in requirements.txt, specifically adding PyJWT for token generation and email-validator for Pydantic email validation."),
-        ("Step 3: Environment & Dynamic Port Handling", "Enhanced backend/app/core/config.py with dynamic Pydantic validators to detect Render's assigned $PORT environment variable automatically."),
-        ("Step 4: Database Schema Upgrade Logic", "Implemented safe SQLite schema migrations (ensure_database_schema_upgrades) to add new columns without dropping tables or losing historical data."),
-        ("Step 5: Automated Foundational Document Seeding", "Added seed_initial_documents() in main.py. When a brand-new cloud container starts with zero database records, it automatically seeds foundational documents so search and Q&A work instantly."),
-        ("Step 6: Render Blueprint Authoring", "Authored render.yaml in the project root defining web service specifications, uvicorn startup commands, and environment variables."),
-        ("Step 7: Production Dockerfile Specification", "Created a lightweight, multi-stage Linux container specification (Dockerfile) for consistent cross-platform execution."),
-        ("Step 8: GitHub Actions CI/CD Pipeline", "Created .github/workflows/ci.yml to automatically run pytest (58 tests) and the comprehensive audit script on clean Ubuntu runners upon every git push."),
-        ("Step 9: Security Hardening", "Configured .gitignore to strictly exclude .env files, private keys, local SQLite databases (*.db), and raw uploaded documents from being committed."),
-        ("Step 10: Remote Repository Synchronization", "Authenticated with GitHub CLI and synchronized all code to the authenticated repository: https://github.com/shweeta1015/enterprise-knowledge-navigator."),
-        ("Step 11: Branch Protection & Feature Branch", "Pushed changes to both main and feature/enterprise-full-stack branches, ensuring history parity across development and production branches."),
-        ("Step 12: CI Execution & Automated Testing", "GitHub Actions executed workflow run 38885463248, passing all 58 unit tests and 29 audit checks in 48 seconds on Linux."),
-        ("Step 13: 1-Click Render Deploy Integration", "Added the official 'Deploy to Render' button and badge directly into README.md for instant one-click blueprint provisioning."),
-        ("Step 14: Health Check Verification", "Verified that the endpoint /api/v1/health returns HTTP 200 with JSON status 'healthy', confirming database and storage readiness."),
-        ("Step 15: Post-Deployment Verification", "Confirmed zero regressions across authentication, document upload, hybrid search, RAG synthesis, and knowledge graph navigation.")
-    ]
-    for s_title, s_desc in steps_data:
-        add_bullet(s_title, s_desc)
-
-    # =========================================================================
-    # CHAPTER 8: HOW GITHUB AND RENDER ARE CONNECTED
-    # =========================================================================
-    add_h1("Chapter 8: How GitHub and Render are Connected")
     add_p(
-        "The connection between GitHub and Render follows the modern software engineering pattern known as **GitOps**. "
-        "In GitOps, your GitHub repository serves as the single source of truth for your entire application."
+        "When a user issues a query, the retrieval engine scores document passages independently across both models: "
+        "lexical scoring prioritizes exact matches on acronyms, part numbers, and error codes, while TF-IDF vector scoring "
+        "captures conceptual semantic relevance. The results are merged using Reciprocal Rank Fusion (RRF):"
     )
-    
     add_callout_box(
         doc,
-        "1. Developer / Antigravity edits files on local computer\n"
-        "2. Developer runs local tests to verify changes: pytest tests -v\n"
-        "3. Developer commits & pushes changes: git push origin main\n"
-        "4. GitHub receives commit -> GitHub Actions runs 58 unit tests on Ubuntu Linux\n"
-        "5. Tests Pass -> Render Webhook triggers automatic build\n"
-        "6. Render clones latest commit -> Runs pip install -r requirements.txt\n"
-        "7. Render starts application: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT\n"
-        "8. Render probes healthcheck endpoint: GET /api/v1/health -> Returns 200 OK\n"
-        "9. Live website is updated with zero downtime!",
-        "AUTOMATED CONTINUOUS DEPLOYMENT PIPELINE"
+        "Reciprocal Rank Fusion Formula:\n"
+        "RRF_Score(d) = Σ [ 1 / (k + rank_lexical(d)) ] + Σ [ 1 / (k + rank_vector(d)) ]\n\n"
+        "Where k = 60 (standard smoothing constant). Passages ranking highly across both lexical and semantic "
+        "dimensions receive dominant compound scores, guaranteeing superior precision and recall.",
+        "MATHEMATICAL RANKING ALGORITHM"
     )
 
     # =========================================================================
-    # CHAPTER 9: HOW FUTURE WEBSITE UPDATES HAPPEN AUTOMATICALLY
+    # CHAPTER 8: GROUNDED RAG SYNTHESIS & ABSTENTION PROTOCOL
     # =========================================================================
-    add_h1("Chapter 9: How Future Website Updates Happen")
+    add_h1("Chapter 8: Grounded RAG Synthesis & Abstention Protocol")
     add_p(
-        "For a beginner, it is crucial to understand that simply saving a file in Antigravity or VS Code "
-        "does NOT instantly change the live website. Your computer is completely separate from the cloud server. "
-        "To safely ship an update, follow this simple 4-step workflow:"
+        "Traditional generative language models often produce hallucinations when asked specific compliance questions. "
+        "Enterprise Knowledge Navigator implements a deterministic Grounded RAG Assistant Engine that prevents hallucinations:"
     )
-    add_bullet("Step 1: Make Code Changes", "Edit your HTML, CSS, JavaScript, or Python files in the Antigravity workspace.")
-    add_bullet("Step 2: Test Locally", "Run 'python -m pytest tests -v' in your terminal to ensure no features were accidentally broken.")
-    add_bullet("Step 3: Commit and Push", "Stage and push your changes to GitHub using the command: git add . && git commit -m 'feat: description of change' && git push origin main.")
-    add_bullet("Step 4: Automatic Cloud Deployment", "Render automatically detects your new commit on GitHub, runs the build process, and deploys the new version within 1 to 2 minutes.")
-    
-    add_callout_box(
-        doc,
-        "What happens if you push broken code? GitHub Actions CI will immediately catch the error, fail the test step, "
-        "and alert you. Furthermore, if a build error occurs on Render, Render keeps the previous working version "
-        "live, preventing website downtime. You can easily roll back to any previous commit from the Render dashboard with one click.",
-        "AUTOMATED SAFETY & ZERO-DOWNTIME GUARANTEE"
-    )
+    add_bullet("Fact-Verified Synthesis", "Every claim in the generated answer is directly extracted or validated from verified passage chunks.")
+    add_bullet("Sentence-Level Citations", "Each statement is annotated with a clickable citation pill linking to the physical document and page.")
+    add_bullet("Strict Abstention Protocol", "When a question addresses topics not present in the ingested corpus, the system abstains with 'Insufficient information available', eliminating fabricated responses.")
+    add_bullet("Prompt Injection Defense", "Incoming queries are sanitized against delimiter injection and adversarial jailbreaks.")
 
     # =========================================================================
-    # CHAPTER 10: LOCAL PERSISTENCE AND CLOUD DEPLOYMENT STATUS
+    # CHAPTER 9: LOCAL PERSISTENCE, MIGRATION, AND DATA SOVEREIGNTY
     # =========================================================================
-    add_h1("Chapter 10: Local Persistence and Cloud Deployment Status")
-    add_h2("10.1 Operational Decision: Localhost Development")
+    add_h1("Chapter 9: Local Persistence, Storage, and Data Sovereignty")
+    add_h2("9.1 Localhost Operational Decision")
     add_p(
-        "Per user architectural decision, the primary and active execution environment for Enterprise Knowledge Navigator "
-        "is **local development on localhost**. The entire multi-tier system—including the FastAPI backend, "
-        "modern single-page application frontend, SQLite database, TF-IDF semantic vector space, and D3.js Knowledge Graph—"
-        "operates directly on the developer's local machine without dependencies on external cloud hosting services."
-    )
-    add_p(
-        "Running locally on localhost provides complete data sovereignty, zero cloud hosting costs, "
+        "The primary and active operational target for Enterprise Knowledge Navigator is local execution on localhost. "
+        "Running the full stack locally provides complete data sovereignty, zero cloud hosting costs, "
         "instant sub-millisecond response times, and total protection of confidential corporate documents and user records."
     )
-
-    add_h2("10.2 Local Database and Storage Architecture")
-    add_p(
-        "On localhost, all application data is organized systematically under the project's data directory:"
-    )
-    add_bullet("1. SQLite Database", "Stored at data/knowledge_navigator.db containing users, custom roles, access permissions, audit logs, and document metadata.")
-    add_bullet("2. Uploaded Document Files", "Stored at data/raw/ containing user-uploaded PDF, Word (.docx), and text (.txt) files.")
-    add_bullet("3. Vector Indexes & Graph Caches", "Stored at data/vector_store/ (hybrid_index.pkl, chunks_metadata.json) and data/graph_store/ (knowledge_graph.json).")
+    add_h2("9.2 Local Storage Architecture")
+    add_bullet("SQLite Relational Database", "Stored at data/knowledge_navigator.db containing users, custom roles, access permissions, audit logs, and document metadata.")
+    add_bullet("Uploaded Document Files", "Stored at data/raw/ containing user-uploaded PDF, Word (.docx), and text (.txt) files.")
+    add_bullet("Vector Indexes & Graph Caches", "Stored at data/vector_store/ (hybrid_index.pkl, chunks_metadata.json) and data/graph_store/ (knowledge_graph.json).")
     add_p(
         "Because all data resides on the local filesystem, 100% of documents, user accounts, and vector indices "
         "persist indefinitely across application restarts, system reboots, and local code updates."
     )
 
-    add_h2("10.3 Cloud Deployment Postponed & Dormant Reference Blueprint")
+    # =========================================================================
+    # CHAPTER 10: INFRASTRUCTURE AS CODE & FUTURE CLOUD PORTABILITY
+    # =========================================================================
+    add_h1("Chapter 10: Infrastructure as Code & Future Cloud Portability")
+    add_h2("10.1 Dormant Deployment Blueprint & Container Specifications")
     add_p(
-        "Public cloud deployment to hosting platforms such as Render has been intentionally **postponed** per project requirements. "
-        "To preserve deployment readiness for the future without incurring cloud costs or deploying prematurely:"
+        "While public deployment is currently postponed per project requirements, the repository maintains full "
+        "cloud readiness via declarative Infrastructure as Code (IaC):"
     )
-    add_bullet("Dormant Render Blueprint", "In render.yaml, the web service is configured with 'plan: free' and 'autoDeploy: false'. Automatic cloud deployment is disabled, ensuring that git commits to GitHub do not trigger unexpected public builds.")
-    add_bullet("Dynamic Port & Path Normalization", "backend/app/core/config.py dynamically normalizes DATA_DIR and detects assigned $PORT variables, ensuring cross-platform compatibility between Windows local development and Linux containers.")
-    add_bullet("Self-Healing Bootstrap Ready", "The idempotent seeding routine (seed_initial_documents in main.py) remains present so that if cloud deployment is requested later, the application boots cleanly on fresh containers.")
-
-    add_h2("10.4 What Will Be Needed When You Decide to Deploy Later")
-    add_p(
-        "When the user decides to deploy the project to Render in the future, the following simple steps will be required:"
-    )
-    add_bullet("Step 1: Open Render Dashboard", "Log in to your Render account at dashboard.render.com.")
-    add_bullet("Step 2: Create New Blueprint", "Click the 'New +' button in the top navigation and select 'Blueprint'.")
-    add_bullet("Step 3: Connect GitHub Repository", "Select https://github.com/shweeta1015/enterprise-knowledge-navigator from your connected GitHub account.")
-    add_bullet("Step 4: Automatic Blueprint Discovery", "Render will automatically inspect render.yaml, recognize the free plan web service, pre-configure environment variables, and prepare the build pipeline.")
-    add_bullet("Step 5: Apply & Launch", "Click 'Apply'. Render will build dependencies from requirements.txt, launch the FastAPI ASGI server, and run health checks at /api/v1/health.")
+    add_bullet("Dormant Render Blueprint (render.yaml)", "The web service blueprint is preserved as a dormant reference with autoDeploy disabled, preventing inadvertent cloud triggers on git commits.")
+    add_bullet("Multi-Stage Dockerfile", "Defines a clean, reproducible multi-stage Linux container specification for future containerized deployment.")
+    add_bullet("Dynamic Port & Storage Normalization", "backend/app/core/config.py dynamically normalizes DATA_DIR and detects assigned $PORT variables, ensuring seamless compatibility across Windows local environments and Linux cloud containers.")
+    add_bullet("Private Deployment Reference", "Step-by-step instructions for optional future cloud deployment are preserved in the local-only document LOCAL_RENDER_DEPLOYMENT_GUIDE.md, which is excluded from version control.")
 
     # =========================================================================
     # CHAPTER 11: TESTING AND FINAL VERIFICATION RESULTS
@@ -699,7 +644,7 @@ def build_word_report():
     add_bullet("GitOps", "A deployment practice where git commits automatically trigger cloud builds, tests, and deployments.")
 
     # Save Document
-    output_filename = "Enterprise_Knowledge_Navigator_Final_Audit_and_Render_Deployment_Guide.docx"
+    output_filename = "Enterprise_Knowledge_Navigator_Technical_Audit_Guide.docx"
     doc.save(output_filename)
     print(f"SUCCESS: Report saved successfully to {output_filename} ({os.path.getsize(output_filename)} bytes)")
 

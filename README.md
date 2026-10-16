@@ -39,7 +39,7 @@ Enterprise internal knowledge bases suffer from three critical bottlenecks:
 3. **Operational Role Isolation**: Provide dedicated, secure interfaces tailored to Administrators, Knowledge Analysts, and Knowledge Workers.
 4. **Flexible & Extensible RBAC**: Support built-in system roles and enable administrators to configure dynamic custom roles with granular platform capabilities.
 5. **Zero-Key Local Capability with Cloud LLM Extension**: Provide deterministic local extractive synthesis out-of-the-box without requiring third-party API keys, while supporting optional cloud LLM providers (Groq, Gemini, OpenAI).
-6. **Production-Ready Portability**: Support cloud deployment on platforms like Render with reproducible dependencies, database persistence, and automated CI/CD deployment pipelines.
+6. **Production-Ready Portability**: Designed for containerized and reproducible environments with clean dependency isolation, automated CI/CD validation pipelines, and portable SQLite storage.
 
 ---
 
@@ -321,9 +321,9 @@ enterprise-knowledge-navigator/
 ├── .env.example                 # Safe environment template with placeholder values
 ├── .gitignore                   # Comprehensive exclusion of secrets, DBs, and runtime data
 ├── Dockerfile                   # Multi-stage production container definition
-├── render.yaml                  # Render Blueprint deployment specification
+├── render.yaml                  # Application deployment blueprint (dormant reference)
 ├── requirements.txt             # Pinned production Python dependencies
-└── run.py                       # Local and cloud server startup launcher
+└── run.py                       # Application startup launcher
 ```
 
 ---
@@ -451,47 +451,7 @@ python scripts/comprehensive_final_audit.py
 
 ---
 
-## 15. Cloud Deployment Guide (Preserved for Future Deployment)
-
-> [!NOTE]
-> **Operational Status: Deployment Currently Postponed**
-> The current intended environment is **local development on localhost**. Deployment to cloud hosting platforms (such as Render) is intentionally postponed until explicitly authorized. The [`render.yaml`](render.yaml) specification and [`Dockerfile`](Dockerfile) are preserved in the repository and kept fully compatible for future deployment.
-
-### How to Use the Preserved Render Configuration Later
-
-When you are ready to deploy to Render in the future, follow these simple steps:
-
-1. **Log in to Render**: Navigate to [dashboard.render.com](https://dashboard.render.com/).
-2. **Select Blueprint Deployment**: Click the **New +** button in the top navigation and select **Blueprint**.
-3. **Connect Repository**: Select or connect your GitHub repository:
-   ```
-   https://github.com/shweeta1015/enterprise-knowledge-navigator
-   ```
-4. **Automatic Detection**: Render automatically detects the root [`render.yaml`](render.yaml) and populates the service configuration:
-   - **Service Name**: `enterprise-knowledge-navigator`
-   - **Runtime**: `Python`
-   - **Plan**: `free` ($0/mo)
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1`
-   - **Health Check Path**: `/api/v1/health`
-5. **Deploy**: Review the configuration and click **Apply** to launch your live cloud service.
-
-### Understanding Free Render Plan Limitations & Ephemeral Storage
-
-Before deploying to Render's free tier, keep in mind these operational characteristics:
-
-- **Zero Cost ($0/month)**: The free plan requires no subscription or credit card.
-- **Inactivity Spin-Down (Cold Starts)**: Free web services automatically spin down after 15 minutes of inactivity. When a new user request arrives, the service wakes up with a cold start that takes approximately 50 seconds.
-- **Ephemeral Container Filesystem**:
-  - The free plan uses an ephemeral container disk. When the service spins down or restarts during redeployment, files written at runtime reset back to the Git repository state.
-  - **Self-Healing Bootstrap**: The backend handles this automatically. On startup, `seed_initial_documents()` detects an empty database, initializes SQLite tables, seeds baseline enterprise documents and graph entities, and rebuilds the TF-IDF vector space, ensuring the service is operational immediately.
-  - **New Runtime Uploads**: Any new documents uploaded by users during an active container session will reset if the container restarts.
-- **Persistent Storage Upgrade Path (Optional)**:
-  - If you require persistent storage that preserves newly uploaded documents across cold restarts and redeployments, Render requires an attached persistent disk (which requires upgrading to the Starter plan at \$7/month + \$0.25/GB/month for SSD storage) or an external database (such as managed PostgreSQL).
-
----
-
-## 16. Local Development & Git Synchronization Workflow
+## 15. Local Development & Git Synchronization Workflow
 
 The project follows a disciplined local engineering and version control workflow:
 
@@ -532,7 +492,7 @@ The project follows a disciplined local engineering and version control workflow
 
 ---
 
-## 17. Security & Privacy Notes
+## 16. Security & Privacy Notes
 
 - **Password Security**: All user passwords are encrypted using bcrypt with per-user salt.
 - **Signed Tokens**: JWT session tokens are signed with HS256 and subject to strict expiration (`ACCESS_TOKEN_EXPIRE_MINUTES`).
@@ -542,14 +502,14 @@ The project follows a disciplined local engineering and version control workflow
 
 ---
 
-## 18. Current Limitations
+## 17. Current Limitations
 
 - **OCR for Scanned Documents**: Documents lacking digital text streams (pure rasterized scanned images) are flagged with an unprocessable warning (`status: error`). Optical Character Recognition (Tesseract) can be integrated in future releases.
 - **Vector Space Scaling**: The built-in TF-IDF hybrid retrieval engine is optimized for single-node deployments up to 25,000 document passages. For ultra-scale corpora (>100,000 documents), horizontal vector backends such as `pgvector` or `HNSWLib` can be connected.
 
 ---
 
-## 19. Troubleshooting
+## 18. Troubleshooting
 
 | Symptom | Cause | Resolution |
 | :--- | :--- | :--- |
@@ -560,6 +520,6 @@ The project follows a disciplined local engineering and version control workflow
 
 ---
 
-## 20. License
+## 19. License
 
 This project is licensed under the [MIT License](LICENSE).
