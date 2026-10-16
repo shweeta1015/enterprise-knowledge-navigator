@@ -451,28 +451,43 @@ python scripts/comprehensive_final_audit.py
 
 ---
 
-## 15. Cloud Deployment Reference (Postponed)
+## 15. Cloud Deployment Guide (Preserved for Future Deployment)
 
 > [!NOTE]
-> **Operational Status: Public Cloud Deployment Postponed**
-> The current intended environment for Enterprise Knowledge Navigator is **local development on localhost**. Public deployment to cloud hosting platforms (such as Render) has been intentionally postponed per user decision. The [`render.yaml`](render.yaml) specification and [`Dockerfile`](Dockerfile) are preserved in the repository strictly as dormant reference blueprints. Automatic deployment has been disabled (`autoDeploy: false`).
+> **Operational Status: Deployment Currently Postponed**
+> The current intended environment is **local development on localhost**. Deployment to cloud hosting platforms (such as Render) is intentionally postponed until explicitly authorized. The [`render.yaml`](render.yaml) specification and [`Dockerfile`](Dockerfile) are preserved in the repository and kept fully compatible for future deployment.
 
-If public cloud deployment is ever requested in the future, the repository is already pre-configured for **Render's Free Web Service Plan** (`plan: free`, zero cost):
+### How to Use the Preserved Render Configuration Later
 
-### Dormant Cloud Architecture Reference
+When you are ready to deploy to Render in the future, follow these simple steps:
 
-- **Zero Cost**: Render's free tier runs at \$0/month.
-- **Inactivity Spin-down (Cold Starts)**: Free web services automatically spin down after 15 minutes of inactivity, requiring ~50 seconds to boot on subsequent requests.
-- **Ephemeral Storage**: Free-tier containers use an ephemeral local filesystem.
-- **Automatic Self-Healing**: To maintain readiness after cold boots, the backend initializes missing directories, creates database tables, seeds foundational documents, and re-indexes the semantic vector space automatically on startup.
-- **Blueprint Service Settings**:
-  - **Service Name**: `enterprise-knowledge-navigator`
-  - **Runtime**: `Python`
-  - **Plan**: `free`
-  - **Auto Deploy**: `false` (dormant)
-  - **Build Command**: `pip install -r requirements.txt`
-  - **Start Command**: `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1`
-  - **Health Check**: `/api/v1/health`
+1. **Log in to Render**: Navigate to [dashboard.render.com](https://dashboard.render.com/).
+2. **Select Blueprint Deployment**: Click the **New +** button in the top navigation and select **Blueprint**.
+3. **Connect Repository**: Select or connect your GitHub repository:
+   ```
+   https://github.com/shweeta1015/enterprise-knowledge-navigator
+   ```
+4. **Automatic Detection**: Render automatically detects the root [`render.yaml`](render.yaml) and populates the service configuration:
+   - **Service Name**: `enterprise-knowledge-navigator`
+   - **Runtime**: `Python`
+   - **Plan**: `free` ($0/mo)
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1`
+   - **Health Check Path**: `/api/v1/health`
+5. **Deploy**: Review the configuration and click **Apply** to launch your live cloud service.
+
+### Understanding Free Render Plan Limitations & Ephemeral Storage
+
+Before deploying to Render's free tier, keep in mind these operational characteristics:
+
+- **Zero Cost ($0/month)**: The free plan requires no subscription or credit card.
+- **Inactivity Spin-Down (Cold Starts)**: Free web services automatically spin down after 15 minutes of inactivity. When a new user request arrives, the service wakes up with a cold start that takes approximately 50 seconds.
+- **Ephemeral Container Filesystem**:
+  - The free plan uses an ephemeral container disk. When the service spins down or restarts during redeployment, files written at runtime reset back to the Git repository state.
+  - **Self-Healing Bootstrap**: The backend handles this automatically. On startup, `seed_initial_documents()` detects an empty database, initializes SQLite tables, seeds baseline enterprise documents and graph entities, and rebuilds the TF-IDF vector space, ensuring the service is operational immediately.
+  - **New Runtime Uploads**: Any new documents uploaded by users during an active container session will reset if the container restarts.
+- **Persistent Storage Upgrade Path (Optional)**:
+  - If you require persistent storage that preserves newly uploaded documents across cold restarts and redeployments, Render requires an attached persistent disk (which requires upgrading to the Starter plan at \$7/month + \$0.25/GB/month for SSD storage) or an external database (such as managed PostgreSQL).
 
 ---
 

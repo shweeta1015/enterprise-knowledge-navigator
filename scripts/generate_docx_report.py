@@ -538,6 +538,16 @@ def build_word_report():
     add_bullet("Dynamic Port & Path Normalization", "backend/app/core/config.py dynamically normalizes DATA_DIR and detects assigned $PORT variables, ensuring cross-platform compatibility between Windows local development and Linux containers.")
     add_bullet("Self-Healing Bootstrap Ready", "The idempotent seeding routine (seed_initial_documents in main.py) remains present so that if cloud deployment is requested later, the application boots cleanly on fresh containers.")
 
+    add_h2("10.4 What Will Be Needed When You Decide to Deploy Later")
+    add_p(
+        "When the user decides to deploy the project to Render in the future, the following simple steps will be required:"
+    )
+    add_bullet("Step 1: Open Render Dashboard", "Log in to your Render account at dashboard.render.com.")
+    add_bullet("Step 2: Create New Blueprint", "Click the 'New +' button in the top navigation and select 'Blueprint'.")
+    add_bullet("Step 3: Connect GitHub Repository", "Select https://github.com/shweeta1015/enterprise-knowledge-navigator from your connected GitHub account.")
+    add_bullet("Step 4: Automatic Blueprint Discovery", "Render will automatically inspect render.yaml, recognize the free plan web service, pre-configure environment variables, and prepare the build pipeline.")
+    add_bullet("Step 5: Apply & Launch", "Click 'Apply'. Render will build dependencies from requirements.txt, launch the FastAPI ASGI server, and run health checks at /api/v1/health.")
+
     # =========================================================================
     # CHAPTER 11: TESTING AND FINAL VERIFICATION RESULTS
     # =========================================================================
