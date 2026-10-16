@@ -1,6 +1,14 @@
 # ==============================================================================
 # Render Blueprint Specification for Enterprise Knowledge Navigator
+# Free Plan (Reference Specification - Cloud Deployment Postponed)
 # Documentation: https://render.com/docs/blueprint-spec
+# ==============================================================================
+# CURRENT OPERATIONAL STATUS:
+# Cloud deployment is currently POSTPONED per user decision.
+# The application is configured and operated locally on localhost.
+# Automatic deployment is disabled (autoDeploy: false).
+# This blueprint is preserved as a dormant reference if cloud deployment is
+# requested at a future date.
 # ==============================================================================
 
 services:
@@ -8,19 +16,12 @@ services:
     name: enterprise-knowledge-navigator
     runtime: python
     region: oregon
-    # Note on Plans & Storage:
-    # Render Disks require at least the 'starter' plan ($7/mo + $0.25/GB/mo).
-    # If deploying on Render's 'free' plan, remove the 'disk' block, set 'plan: free',
-    # and set 'DATA_DIR' to 'data' (ephemeral container filesystem).
-    plan: starter
-    disk:
-      name: enterprise-data
-      mountPath: /var/data
-      sizeGB: 1
+    plan: free
+    branch: main
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /api/v1/health
-    autoDeploy: true
+    autoDeploy: false
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -29,7 +30,7 @@ services:
       - key: BACKEND_HOST
         value: 0.0.0.0
       - key: DATA_DIR
-        value: /var/data
+        value: data
       - key: SECRET_KEY
         generateValue: true
       - key: CORS_ORIGINS

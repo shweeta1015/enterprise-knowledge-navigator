@@ -117,13 +117,22 @@ class Settings(BaseSettings):
 
         if isinstance(self.DATA_DIR, str):
             self.DATA_DIR = Path(self.DATA_DIR)
-        if self.DATA_DIR != self.BASE_DIR / "data":
-            self.RAW_DOCS_DIR = self.DATA_DIR / "raw"
-            self.PROCESSED_DOCS_DIR = self.DATA_DIR / "processed"
-            self.VECTOR_STORE_DIR = self.DATA_DIR / "vector_store"
-            self.GRAPH_STORE_DIR = self.DATA_DIR / "graph_store"
-            if "sqlite" in self.DATABASE_URL.lower() and "knowledge_navigator.db" in self.DATABASE_URL:
-                self.DATABASE_URL = f"sqlite:///{self.DATA_DIR}/knowledge_navigator.db"
+        if not self.DATA_DIR.is_absolute():
+            self.DATA_DIR = (self.BASE_DIR / self.DATA_DIR).resolve()
+
+        self.RAW_DOCS_DIR = self.DATA_DIR / "raw"
+        self.PROCESSED_DOCS_DIR = self.DATA_DIR / "processed"
+        self.VECTOR_STORE_DIR = self.DATA_DIR / "vector_store"
+        self.GRAPH_STORE_DIR = self.DATA_DIR / "graph_store"
+
+        if isinstance(self.LOG_DIR, str):
+            self.LOG_DIR = Path(self.LOG_DIR)
+        if not self.LOG_DIR.is_absolute():
+            self.LOG_DIR = (self.BASE_DIR / self.LOG_DIR).resolve()
+
+        if "sqlite" in self.DATABASE_URL.lower() and "knowledge_navigator.db" in self.DATABASE_URL:
+            db_file = self.DATA_DIR / "knowledge_navigator.db"
+            self.DATABASE_URL = f"sqlite:///{db_file.as_posix()}"
 
     def ensure_directories_exist(self) -> None:
         """Ensure all required persistent directories exist on startup."""

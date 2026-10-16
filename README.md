@@ -3,8 +3,8 @@
 > **Enterprise Semantic Retrieval, GraphRAG & Institutional Intelligence Platform**  
 > *A production-ready, multi-role knowledge management system bridging dense vector semantic retrieval with interactive knowledge graph traversal.*
 
-[![CI & Deployment Pipeline](https://github.com/shweeta1015/enterprise-knowledge-navigator/actions/workflows/ci.yml/badge.svg)](https://github.com/shweeta1015/enterprise-knowledge-navigator/actions/workflows/ci.yml)
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/shweeta1015/enterprise-knowledge-navigator)
+[![CI Suite](https://github.com/shweeta1015/enterprise-knowledge-navigator/actions/workflows/ci.yml/badge.svg)](https://github.com/shweeta1015/enterprise-knowledge-navigator/actions/workflows/ci.yml)
+[![Environment: Localhost](https://img.shields.io/badge/environment-localhost-brightgreen.svg)](#12-local-installation--setup)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
@@ -330,11 +330,15 @@ enterprise-knowledge-navigator/
 
 ## 12. Local Installation & Setup
 
-### Prerequisites
-- Python 3.11 or higher (Python 3.14 fully supported)
-- Git
+Enterprise Knowledge Navigator is designed to run seamlessly in a local development environment. Both the FastAPI backend and modern single-page frontend (HTML5/CSS3/JavaScript/D3.js) are served concurrently through a unified ASGI web server on localhost.
 
-### Installation Steps
+### Prerequisites
+- **Python**: Version 3.11 or higher (Python 3.12, 3.13, and 3.14 fully supported)
+- **Git**: Version 2.30+
+- **Operating System**: Windows 10/11, macOS, or modern Linux distribution (Ubuntu 22.04+)
+- **Hardware**: Minimum 4 GB RAM (8 GB recommended for local vector indexing)
+
+### Step-by-Step Installation
 
 1. **Clone the repository:**
    ```bash
@@ -342,7 +346,7 @@ enterprise-knowledge-navigator/
    cd enterprise-knowledge-navigator
    ```
 
-2. **Create and activate a virtual environment:**
+2. **Create and activate a dedicated virtual environment:**
    - **Linux / macOS:**
      ```bash
      python3 -m venv venv
@@ -354,25 +358,68 @@ enterprise-knowledge-navigator/
      .\venv\Scripts\Activate.ps1
      ```
 
-3. **Install dependencies:**
+3. **Install pinned dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Configure environment variables:**
-   ```bash
-   cp .env.example .env
-   ```
+4. **Initialize local environment configuration:**
+   Copy the safe `.env.example` template to `.env`:
+   - **Linux / macOS:**
+     ```bash
+     cp .env.example .env
+     ```
+   - **Windows (PowerShell):**
+     ```powershell
+     Copy-Item .env.example .env
+     ```
+   *(The default settings in `.env.example` are pre-configured for instant zero-key localhost execution with SQLite).*
 
-5. **Start the application:**
+5. **Start the local server:**
+   Launch the unified application launcher:
    ```bash
    python run.py
    ```
+   *Alternative direct Uvicorn command:*
+   ```bash
+   uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
+   ```
 
-6. **Access the application in your browser:**
-   - Web Application: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-   - Interactive API Documentation: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-   - Health Probe: [http://127.0.0.1:8000/api/v1/health](http://127.0.0.1:8000/api/v1/health)
+6. **Localhost Application URLs & Health Verification:**
+   Once started, access the running application using the following local addresses:
+
+   | Destination | Localhost URL | Description |
+   | :--- | :--- | :--- |
+   | **Web Application UI** | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | Full single-page enterprise web application |
+   | **Alternative UI URL** | [http://localhost:8000/](http://localhost:8000/) | Same application interface via hostname |
+   | **Interactive Swagger API** | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) | OpenAPI interactive endpoint test console |
+   | **ReDoc API Documentation** | [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) | Clean offline API specification reference |
+   | **System Health Probe** | [http://127.0.0.1:8000/api/v1/health](http://127.0.0.1:8000/api/v1/health) | Real-time database and storage health status |
+
+7. **Verifying System Health via Terminal:**
+   You can verify that the local server is healthy and fully operational using `curl` or PowerShell:
+   - **PowerShell:**
+     ```powershell
+     Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/v1/health" | ConvertTo-Json
+     ```
+   - **Bash / curl:**
+     ```bash
+     curl -s http://127.0.0.1:8000/api/v1/health | jq .
+     ```
+   Expected response:
+   ```json
+   {
+     "status": "healthy",
+     "version": "0.1.0",
+     "environment": "development",
+     "database_connected": true,
+     "storage_directories_ready": true,
+     "active_providers": {
+       "llm_provider": "groq",
+       "embedding_provider": "huggingface"
+     }
+   }
+   ```
 
 ---
 
@@ -404,71 +451,69 @@ python scripts/comprehensive_final_audit.py
 
 ---
 
-## 15. Deployment on Render
+## 15. Cloud Deployment Reference (Postponed)
 
-Enterprise Knowledge Navigator is ready for cloud deployment on **Render**.
+> [!NOTE]
+> **Operational Status: Public Cloud Deployment Postponed**
+> The current intended environment for Enterprise Knowledge Navigator is **local development on localhost**. Public deployment to cloud hosting platforms (such as Render) has been intentionally postponed per user decision. The [`render.yaml`](render.yaml) specification and [`Dockerfile`](Dockerfile) are preserved in the repository strictly as dormant reference blueprints. Automatic deployment has been disabled (`autoDeploy: false`).
 
-### Option A: Deploy via Render Blueprint (`render.yaml`) — Recommended
-1. Log in to your [Render Dashboard](https://dashboard.render.com/).
-2. Click **New +** and select **Blueprint**.
-3. Connect your repository: `https://github.com/shweeta1015/enterprise-knowledge-navigator`.
-4. Render automatically detects [`render.yaml`](file:///c:/Users/Shweta/Desktop/anti_gravity_workspace/enterprise-knowledge-navigator/render.yaml), provisions the web service, configures environment variables, and deploys the application.
+If public cloud deployment is ever requested in the future, the repository is already pre-configured for **Render's Free Web Service Plan** (`plan: free`, zero cost):
 
-### Option B: Deploy as a Standard Python Web Service
-1. In the Render Dashboard, click **New +** → **Web Service**.
-2. Connect your repository.
-3. Configure the following service settings:
-   - **Environment**: `Python`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1`
-   - **Health Check Path**: `/api/v1/health`
-4. Set the required environment variables:
-   - `ENVIRONMENT`: `production`
-   - `DEBUG`: `false`
-   - `BACKEND_HOST`: `0.0.0.0`
-   - `SECRET_KEY`: *(Click Generate)*
-   - `DATABASE_URL`: `sqlite:///./data/knowledge_navigator.db`
-   - `CORS_ORIGINS`: `*`
+### Dormant Cloud Architecture Reference
 
-### Option C: Deploy via Docker Container
-- Render will build from the multi-stage [`Dockerfile`](file:///c:/Users/Shweta/Desktop/anti_gravity_workspace/enterprise-knowledge-navigator/Dockerfile) and bind dynamically to the assigned `$PORT`.
-
-### Data Persistence on Render
-- **Free Tier**: The application runs with SQLite. Initial system roles, default users, workspace collections, and vector indices are automatically seeded on startup if not present.
-- **Persistent Disk (Render Paid Plans)**: Add an attached persistent disk mounted at `/var/data` and configure `DATA_DIR=/var/data` in the environment settings. The application dynamically routes SQLite databases, uploaded files, and vector indices to the persistent volume.
+- **Zero Cost**: Render's free tier runs at \$0/month.
+- **Inactivity Spin-down (Cold Starts)**: Free web services automatically spin down after 15 minutes of inactivity, requiring ~50 seconds to boot on subsequent requests.
+- **Ephemeral Storage**: Free-tier containers use an ephemeral local filesystem.
+- **Automatic Self-Healing**: To maintain readiness after cold boots, the backend initializes missing directories, creates database tables, seeds foundational documents, and re-indexes the semantic vector space automatically on startup.
+- **Blueprint Service Settings**:
+  - **Service Name**: `enterprise-knowledge-navigator`
+  - **Runtime**: `Python`
+  - **Plan**: `free`
+  - **Auto Deploy**: `false` (dormant)
+  - **Build Command**: `pip install -r requirements.txt`
+  - **Start Command**: `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --workers 1`
+  - **Health Check**: `/api/v1/health`
 
 ---
 
-## 16. Automatic CI/CD & Deployment Workflow
+## 16. Local Development & Git Synchronization Workflow
 
-The project establishes a reliable automated continuous delivery workflow:
+The project follows a disciplined local engineering and version control workflow:
 
 ```
-┌─────────────────────────┐
-│ Antigravity Local Code  │
-└────────────┬────────────┘
-             │ 1. Validate & Run Tests (pytest tests -v)
-             ▼
-┌─────────────────────────┐
-│ Commit & Push to 'main' │
-└────────────┬────────────┘
-             │ 2. GitHub Webhook Notification
-             ▼
-┌─────────────────────────┐     ┌─────────────────────────┐
-│ GitHub Actions CI Suite ├────►│ Render Cloud Platform   │
-│ (Automated Tests on CI) │     │ (Builds & Auto-Deploys) │
-└─────────────────────────┘     └────────────┬────────────┘
-                                             │ 3. Zero-Downtime Rollout
-                                             ▼
-                                ┌─────────────────────────┐
-                                │ Live Production Website │
-                                └─────────────────────────┘
+┌──────────────────────────────────────────────┐
+│ Local Development in Antigravity Workspace   │
+│ - Backend: FastAPI, SQLAlchemy, Scikit-Learn │
+│ - Frontend: HTML5, CSS3, ES6 JS, D3.js       │
+└──────────────────────┬───────────────────────┘
+                       │ 1. Local Code Updates & Verification
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Local Automated Quality & Verification Suite │
+│ - pytest tests -v (58 Unit & Integration)    │
+│ - python scripts/comprehensive_final_audit.py│
+└──────────────────────┬───────────────────────┘
+                       │ 2. Stage verified code (excluding secrets, DBs, uploads)
+                       ▼
+┌──────────────────────────────────────────────┐
+│ Commit & Push to GitHub (main branch)        │
+│ git push origin main                         │
+└──────────────────────┬───────────────────────┘
+                       │ 3. Automated CI Validation on Ubuntu Linux
+                       ▼
+┌──────────────────────────────────────────────┐
+│ GitHub Actions CI Pipeline (Passing 100%)    │
+│ - Compiles syntax across all modules         │
+│ - Executes full pytest suite                 │
+│ - Runs 29-check comprehensive audit script   │
+└──────────────────────────────────────────────┘
 ```
 
-1. **Local Validation**: Make changes, execute tests, and confirm zero regressions.
-2. **Git Commit & Push**: Push approved changes to the `main` deployment branch.
-3. **GitHub Actions Verification**: The automated CI suite runs all 58 pytest tests on Ubuntu.
-4. **Render Auto-Deployment**: Render detects the new commit on `main`, triggers the build command, executes health checks at `/api/v1/health`, and updates the live website with zero downtime.
+1. **Local Development**: Develop and test features directly against the local SQLite database and ASGI server on `http://127.0.0.1:8000/`.
+2. **Local Validation**: Run `pytest tests -v` and `python scripts/comprehensive_final_audit.py` to confirm zero regressions.
+3. **Data Protection**: Ensure private databases (`*.db`), `.env` files, logs, and user-uploaded raw files remain strictly untracked and excluded via `.gitignore`.
+4. **Git Synchronization**: Push clean commits to `https://github.com/shweeta1015/enterprise-knowledge-navigator.git`.
+5. **Continuous Integration**: GitHub Actions CI independently tests every pushed commit on a clean Ubuntu Linux container to guarantee portability.
 
 ---
 

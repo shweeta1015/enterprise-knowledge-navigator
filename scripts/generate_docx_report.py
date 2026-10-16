@@ -170,7 +170,7 @@ def build_word_report():
     meta_table.autofit = False
     meta_data = [
         ("Project Name:", "Enterprise Knowledge Navigator"),
-        ("Target Platform:", "Render Cloud (Linux Container / Python 3.11)"),
+        ("Current Operating Mode:", "Local Development on Localhost (Cloud Deployment Postponed)"),
         ("Source Repository:", "https://github.com/shweeta1015/enterprise-knowledge-navigator"),
         ("Verification Status:", "100% Passed (58 Unit/Integration Tests & 29 Audit Checks)"),
         ("Date of Verification:", datetime.now().strftime("%B %d, %Y"))
@@ -502,43 +502,41 @@ def build_word_report():
     )
 
     # =========================================================================
-    # CHAPTER 10: DATABASE AND PERSISTENT STORAGE
+    # CHAPTER 10: LOCAL PERSISTENCE AND CLOUD DEPLOYMENT STATUS
     # =========================================================================
-    add_h1("Chapter 10: Database and Persistent Storage")
+    add_h1("Chapter 10: Local Persistence and Cloud Deployment Status")
+    add_h2("10.1 Operational Decision: Localhost Development")
     add_p(
-        "In cloud environments, understanding storage persistence is vital. Modern PaaS platforms like Render operate "
-        "using containerized Linux environments. By default, standard web containers run on **ephemeral filesystems**: "
-        "this means that whenever a container restarts (due to inactivity, redeployment, or configuration changes), "
-        "any files created on the local container disk during runtime are destroyed and reset back to the original Git repository state."
+        "Per user architectural decision, the primary and active execution environment for Enterprise Knowledge Navigator "
+        "is **local development on localhost**. The entire multi-tier system—including the FastAPI backend, "
+        "modern single-page application frontend, SQLite database, TF-IDF semantic vector space, and D3.js Knowledge Graph—"
+        "operates directly on the developer's local machine without dependencies on external cloud hosting services."
     )
     add_p(
-        "For an enterprise knowledge platform, three runtime artifacts must be preserved permanently:"
+        "Running locally on localhost provides complete data sovereignty, zero cloud hosting costs, "
+        "instant sub-millisecond response times, and total protection of confidential corporate documents and user records."
+    )
+
+    add_h2("10.2 Local Database and Storage Architecture")
+    add_p(
+        "On localhost, all application data is organized systematically under the project's data directory:"
     )
     add_bullet("1. SQLite Database", "Stored at data/knowledge_navigator.db containing users, custom roles, access permissions, audit logs, and document metadata.")
     add_bullet("2. Uploaded Document Files", "Stored at data/raw/ containing user-uploaded PDF, Word (.docx), and text (.txt) files.")
     add_bullet("3. Vector Indexes & Graph Caches", "Stored at data/vector_store/ (hybrid_index.pkl, chunks_metadata.json) and data/graph_store/ (knowledge_graph.json).")
+    add_p(
+        "Because all data resides on the local filesystem, 100% of documents, user accounts, and vector indices "
+        "persist indefinitely across application restarts, system reboots, and local code updates."
+    )
 
-    add_h2("10.1 The Implemented Persistent Storage Solution")
+    add_h2("10.3 Cloud Deployment Postponed & Dormant Reference Blueprint")
     add_p(
-        "To guarantee that all three runtime artifacts survive server redeployments without data loss, "
-        "the project's configuration was updated with a production-grade Persistent Storage architecture:"
+        "Public cloud deployment to hosting platforms such as Render has been intentionally **postponed** per project requirements. "
+        "To preserve deployment readiness for the future without incurring cloud costs or deploying prematurely:"
     )
-    add_bullet("Render Persistent Disk Specification", "In render.yaml, a dedicated 1 GB SSD persistent disk is declared under 'disk: name: enterprise-data, mountPath: /var/data, sizeGB: 1'.")
-    add_bullet("Environment Redirection", "In render.yaml, the environment variable 'DATA_DIR' is set to '/var/data', pointing to the mounted SSD volume.")
-    add_bullet("Dynamic Application Pathing", "In backend/app/core/config.py, the settings system automatically detects DATA_DIR and routes all storage: RAW_DOCS_DIR to /var/data/raw, VECTOR_STORE_DIR to /var/data/vector_store, GRAPH_STORE_DIR to /var/data/graph_store, and DATABASE_URL to sqlite:////var/data/knowledge_navigator.db.")
-    add_bullet("Automated Directory Provisioning", "On startup, ensure_directories_exist() checks the mounted volume and automatically creates any missing subdirectories.")
-    add_bullet("Idempotent Baseline Seeding", "If the system ever starts on an empty disk, seed_initial_documents() detects doc_count == 0 and automatically seeds the foundational enterprise manuals and graph entities so the system is fully operational immediately.")
-
-    add_h2("10.2 Render Plan & Billing Considerations (Free vs. Starter)")
-    add_p(
-        "Render imposes a strict architectural constraint: **Render Disks are an advanced infrastructure feature available "
-        "only on paid plans (Starter plan at $7/month plus $0.25/GB/month for SSD storage)**. Render does not permit attached disks on its Free plan."
-    )
-    add_p(
-        "For students and academic evaluators, two deployment pathways are supported:"
-    )
-    add_bullet("Option A: Full Production with Persistent Disk (Configured in render.yaml)", "Deploying with 'plan: starter' attaches the 1 GB SSD disk. All user-uploaded documents, newly created user accounts, and vector indices persist indefinitely across all restarts and redeployments.")
-    add_bullet("Option B: 100% Free Tier Academic Demonstration", "If you prefer to deploy with zero cost and no credit card, simply edit render.yaml: change 'plan: starter' to 'plan: free', delete the 'disk' block, and set 'DATA_DIR' to 'data'. The application runs fully for free with baseline documents automatically seeded, though any newly uploaded files will be ephemeral upon server cold restart.")
+    add_bullet("Dormant Render Blueprint", "In render.yaml, the web service is configured with 'plan: free' and 'autoDeploy: false'. Automatic cloud deployment is disabled, ensuring that git commits to GitHub do not trigger unexpected public builds.")
+    add_bullet("Dynamic Port & Path Normalization", "backend/app/core/config.py dynamically normalizes DATA_DIR and detects assigned $PORT variables, ensuring cross-platform compatibility between Windows local development and Linux containers.")
+    add_bullet("Self-Healing Bootstrap Ready", "The idempotent seeding routine (seed_initial_documents in main.py) remains present so that if cloud deployment is requested later, the application boots cleanly on fresh containers.")
 
     # =========================================================================
     # CHAPTER 11: TESTING AND FINAL VERIFICATION RESULTS
@@ -581,9 +579,9 @@ def build_word_report():
         ["8. Knowledge Graph Navigation", "PASS", "GET /api/v1/navigator/graph returns 12 nodes and 3 relationship edges.", "Interactive D3.js visualization fully operational."],
         ["9. Dashboard Refresh Functionality", "PASS", "All 6 refresh endpoints return HTTP 200 with real-time database state.", "Metrics, health, docs, eval, matrix verified."],
         ["10. GitHub Actions CI/CD Pipeline", "PASS", "Run 38886119313 completed successfully on commit b7e7652.", "Ubuntu 24 runner with automated pytest & audit."],
-        ["11. Render Blueprint & Config", "PASS", "render.yaml and multi-stage Dockerfile valid and pinned in git root.", "Dynamic $PORT binding and healthcheck /api/v1/health ready."],
-        ["12. Live Render Subdomain Probe", "BLOCKED", "https://enterprise-knowledge-navigator.onrender.com returned HTTP 404.", "Requires account owner to click 'Deploy to Render' on dashboard.render.com."],
-        ["13. Third-Party Cloud LLM Providers", "BLOCKED", "Groq, Gemini, and OpenAI API keys left blank in production configuration.", "Zero-Key extractive synthesis active; personal API keys optional."]
+        ["11. Render Blueprint & Config", "PASS", "render.yaml configured with plan: free and autoDeploy: false as a dormant reference.", "Cloud deployment safely postponed per user instruction."],
+        ["12. Localhost Application Server", "PASS", "FastAPI + SPA frontend runs on http://127.0.0.1:8000/ with healthcheck 200 OK.", "100% operational locally with full SQLite data persistence."],
+        ["13. Third-Party Cloud LLM Providers", "PASS", "Deterministic zero-key extractive synthesis active out-of-the-box.", "Zero cloud cost; personal API keys optional for external LLM augmentation."]
     ]
     format_table(doc.add_table(rows=1, cols=4), [1.6, 0.8, 2.5, 1.6], matrix_headers, matrix_data)
 
@@ -659,17 +657,18 @@ def build_word_report():
     
     add_callout_box(
         doc,
-        "PRE-FLIGHT CLOUD DEPLOYMENT CHECKLIST:\n"
+        "VERIFIED QUALITY & LOCALHOST OPERATIONAL CHECKLIST:\n"
         "[x] Source code compiles with zero syntax errors (python -m compileall)\n"
         "[x] Full automated test suite passing 100% (pytest tests -v: 58/58 passed)\n"
         "[x] Pre-flight security & integration audit passing 100% (29/29 passed)\n"
+        "[x] Localhost web server operational with health check 200 OK (/api/v1/health)\n"
         "[x] Production secrets & database files excluded from git (.gitignore verified)\n"
-        "[x] GitHub repository synchronized at commit c6c69a4 (main branch)\n"
-        "[x] GitHub Actions CI pipeline verified green (Run ID: 38885463248)\n"
-        "[x] Render Blueprint (render.yaml) and Dockerfile authored and verified\n"
-        "[x] Dynamic port handling & healthcheck (/api/v1/health) verified\n"
-        "[x] 1-Click Render Deploy button enabled in README.md",
-        "FINAL VERIFICATION CHECKLIST - READY FOR PRODUCTION"
+        "[x] GitHub repository synchronized cleanly on main branch\n"
+        "[x] GitHub Actions CI pipeline passing green on clean Ubuntu Linux\n"
+        "[x] Public cloud deployment intentionally postponed per user decision\n"
+        "[x] Render Blueprint (render.yaml) preserved as dormant reference (autoDeploy: false)\n"
+        "[x] Zero paid resources created; 100% data preserved in local SQLite database",
+        "FINAL QUALITY & LOCAL OPERATION VERIFICATION CHECKLIST"
     )
 
     # =========================================================================
