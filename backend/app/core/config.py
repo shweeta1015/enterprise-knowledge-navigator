@@ -4,7 +4,7 @@ Loads settings from environment variables or .env file with validated types.
 """
 
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Any
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
 
@@ -57,12 +57,73 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
 
+    # Email / SMTP Configuration for Password Recovery
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "noreply@eknavigator.com"
+    SMTP_TLS: bool = True
+
+    # SMS / Twilio Configuration for Phone OTP
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    TWILIO_FROM_NUMBER: str = ""
+
+    # OTP Security Settings
+    OTP_EXPIRE_MINUTES: int = 10
+    OTP_RESEND_COOLDOWN_SECONDS: int = 60
+    OTP_MAX_ATTEMPTS: int = 5
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore"
     )
+
+    @field_validator("BACKEND_PORT", mode="before")
+    @classmethod
+    def resolve_backend_port(cls, v: Any) -> int:
+        import os
+        port_env = os.environ.get("PORT")
+        if port_env:
+            try:
+                return int(port_env)
+            except ValueError:
+                pass
+        return int(v) if v is not None else 8000
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def resolve_cors_origins(cls, v: Any) -> List[str]:
+        if isinstance(v, str):
+            if v.strip() == "*":
+                return ["*"]
+            if v.startswith("[") and v.endswith("]"):
+                import json
+                try:
+                    return json.loads(v)
+                except Exception:
+                    pass
+            return [i.strip() for i in v.split(",") if i.strip()]
+        elif isinstance(v, list):
+            return v
+        return ["*"]
+
+    def model_post_init(self, __context: Any) -> None:
+        if self.ENVIRONMENT.lower() == "production" and "DEBUG" not in self.model_fields_set:
+            self.DEBUG = False
+
+        if isinstance(self.DATA_DIR, str):
+            self.DATA_DIR = Path(self.DATA_DIR)
+        if self.DATA_DIR != self.BASE_DIR / "data":
+            self.RAW_DOCS_DIR = self.DATA_DIR / "raw"
+            self.PROCESSED_DOCS_DIR = self.DATA_DIR / "processed"
+            self.VECTOR_STORE_DIR = self.DATA_DIR / "vector_store"
+            self.GRAPH_STORE_DIR = self.DATA_DIR / "graph_store"
+            if self.DATABASE_URL == "sqlite:///./data/knowledge_navigator.db":
+                self.DATABASE_URL = f"sqlite:///{self.DATA_DIR}/knowledge_navigator.db"
 
     def ensure_directories_exist(self) -> None:
         """Ensure all required persistent directories exist on startup."""

@@ -1,0 +1,27 @@
+# Production Caddyfile for Enterprise Knowledge Navigator
+# Provides automated Let's Encrypt SSL/TLS certificates and reverse proxying
+
+{$DOMAIN:localhost} {
+    # Reverse proxy to backend application container
+    reverse_proxy 127.0.0.1:8000 {
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Enable compression
+    encode gzip zstd
+
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    }
+
+    # Custom logging
+    log {
+        output file /var/log/caddy/access.log
+    }
+}
