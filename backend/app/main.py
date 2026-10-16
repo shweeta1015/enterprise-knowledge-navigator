@@ -219,6 +219,207 @@ def seed_initial_workspace_data():
         db.close()
 
 
+def seed_initial_documents():
+    """Seeds foundational enterprise documents, chunks, and graph entities if database is completely empty."""
+    db = SessionLocal()
+    try:
+        from backend.app.models.document import DocumentRecord, ChunkRecord, EntityRecord, RelationRecord
+        doc_count = db.query(DocumentRecord).count()
+        if doc_count > 0:
+            return
+
+        logger.info("Database contains zero documents. Seeding foundational enterprise documents and graph entities...")
+        now = datetime.now(timezone.utc)
+
+        # Ensure raw docs dir exists
+        settings.RAW_DOCS_DIR.mkdir(parents=True, exist_ok=True)
+
+        docs_data = [
+            {
+                "id": "doc_b20b7a0d-107",
+                "filename": "test_governance_manual.docx",
+                "file_type": "docx",
+                "file_size_bytes": 14200,
+                "file_path": str(settings.RAW_DOCS_DIR / "doc_b20b7a0d-107_test_governance_manual.docx"),
+                "status": "indexed",
+                "page_count": 1,
+                "chunk_count": 1,
+                "entity_count": 3,
+                "chunks": [
+                    {
+                        "id": "doc_b20b7a0d-107_0",
+                        "chunk_index": 0,
+                        "page_number": 1,
+                        "content": "Enterprise Data Governance Manual Dr. Marcus Brody directs the Enterprise Security Division. The Enterprise Security Division establishes governance policies for PostgreSQL databases, Redis caching layers, and Docker container deployments. Data Encryption Standards All enterprise data at rest must employ AES-256 encryption without exception. The Cloud Architecture Council conducts biannual vulnerability assessments and penetration audits. Production database access requires hardware multi-factor authentication. Role | Responsibility | Compliance Target Security Officer | Key rotation every 90 days | ISO 27001",
+                        "token_count": 85
+                    }
+                ],
+                "entities": [
+                    {"id": "ent_doc_b20b7a0d-107_189882", "name": "Marcus Brody", "category": "PERSON", "mention_count": 1, "source_context": "Enterprise Data Governance Manual Dr. Marcus Brody directs the Enterprise Security Division."},
+                    {"id": "ent_doc_b20b7a0d-107_1654182", "name": "PostgreSQL", "category": "TECH", "mention_count": 1, "source_context": "The Enterprise Security Division establishes governance policies for PostgreSQL databases, Redis caching layers, and Docker container deployments."},
+                    {"id": "ent_doc_b20b7a0d-107_8128908", "name": "Docker", "category": "TECH", "mention_count": 1, "source_context": "governance policies for PostgreSQL databases, Redis caching layers, and Docker container deployments."}
+                ],
+                "relations": []
+            },
+            {
+                "id": "doc_2468756b-7da",
+                "filename": "test_ai_ethics.pdf",
+                "file_type": "pdf",
+                "file_size_bytes": 8400,
+                "file_path": str(settings.RAW_DOCS_DIR / "doc_2468756b-7da_test_ai_ethics.pdf"),
+                "status": "indexed",
+                "page_count": 1,
+                "chunk_count": 1,
+                "entity_count": 1,
+                "chunks": [
+                    {
+                        "id": "doc_2468756b-7da_0",
+                        "chunk_index": 0,
+                        "page_number": 1,
+                        "content": "Enterprise AI Ethics and Operational Guidelines. Professor Elena Gilbert oversees the AI Ethics Board. The AI Ethics Board evaluates machine learning pipelines and deep neural models. Knowledge Navigator operates under AI Ethics Board supervision.",
+                        "token_count": 36
+                    }
+                ],
+                "entities": [
+                    {"id": "ent_doc_2468756b-7da_461425", "name": "Knowledge Navigator", "category": "PRODUCT", "mention_count": 1, "source_context": "machine learning pipelines and deep neural models. Knowledge Navigator operates under AI Ethics Board supervision."}
+                ],
+                "relations": []
+            },
+            {
+                "id": "doc_eaefc824-5b0",
+                "filename": "architecture_overview.txt",
+                "file_type": "txt",
+                "file_size_bytes": 2500,
+                "file_path": str(settings.RAW_DOCS_DIR / "doc_eaefc824-5b0_architecture_overview.txt"),
+                "status": "indexed",
+                "page_count": 1,
+                "chunk_count": 1,
+                "entity_count": 8,
+                "chunks": [
+                    {
+                        "id": "doc_eaefc824-5b0_0",
+                        "chunk_index": 0,
+                        "page_number": 1,
+                        "content": "Enterprise Knowledge Navigator Architecture Overview. Dr. Alice Vance leads the Artificial Intelligence Engineering Department. The Artificial Intelligence Engineering Department develops the Knowledge Navigator platform. Knowledge Navigator integrates with PostgreSQL and Docker for enterprise operations. Remote Work Policy: Employees are permitted to work remotely up to two days per week with manager approval. Health insurance benefits cover medical examinations, hospitalization, and prescription drugs.",
+                        "token_count": 65
+                    }
+                ],
+                "entities": [
+                    {"id": "ent_doc_eaefc824-5b0_3997549", "name": "Alice Vance", "category": "PERSON", "mention_count": 1, "source_context": "Dr. Alice Vance leads the Artificial Intelligence Engineering Department."},
+                    {"id": "ent_doc_eaefc824-5b0_4647946", "name": "Artificial Intelligence Engineering Department", "category": "ORG", "mention_count": 1, "source_context": "Dr. Alice Vance leads the Artificial Intelligence Engineering Department."},
+                    {"id": "ent_doc_eaefc824-5b0_6616", "name": "The Artificial Intelligence Engineering Department", "category": "ORG", "mention_count": 1, "source_context": "The Artificial Intelligence Engineering Department develops the Knowledge Navigator platform."},
+                    {"id": "ent_doc_eaefc824-5b0_1654182", "name": "PostgreSQL", "category": "TECH", "mention_count": 1, "source_context": "Knowledge Navigator integrates with PostgreSQL and Docker for enterprise operations."},
+                    {"id": "ent_doc_eaefc824-5b0_8128908", "name": "Docker", "category": "TECH", "mention_count": 1, "source_context": "Knowledge Navigator integrates with PostgreSQL and Docker for enterprise operations."},
+                    {"id": "ent_doc_eaefc824-5b0_3657640", "name": "Artificial Intelligence", "category": "TECH", "mention_count": 1, "source_context": "Dr. Alice Vance leads the Artificial Intelligence Engineering Department."},
+                    {"id": "ent_doc_eaefc824-5b0_1190623", "name": "Remote Work Policy", "category": "POLICY", "mention_count": 1, "source_context": "Remote Work Policy: Employees are permitted to work remotely up to two days per week with manager approval."},
+                    {"id": "ent_doc_eaefc824-5b0_461425", "name": "Knowledge Navigator", "category": "PRODUCT", "mention_count": 1, "source_context": "Enterprise Knowledge Navigator Architecture Overview."}
+                ],
+                "relations": [
+                    {"id": "rel_doc_eaefc824-5b0_5127976", "source_entity": "Alice Vance", "relation_type": "MANAGES", "target_entity": "Artificial Intelligence Engineering Department"},
+                    {"id": "rel_doc_eaefc824-5b0_270346", "source_entity": "Artificial Intelligence Engineering Department", "relation_type": "DEVELOPS", "target_entity": "Knowledge Navigator"},
+                    {"id": "rel_doc_eaefc824-5b0_3546010", "source_entity": "Knowledge Navigator", "relation_type": "INTEGRATES_WITH", "target_entity": "PostgreSQL"}
+                ]
+            },
+            {
+                "id": "doc_88a1a8b0-1ae",
+                "filename": "zero_text_scanned.pdf",
+                "file_type": "pdf",
+                "file_size_bytes": 0,
+                "file_path": str(settings.RAW_DOCS_DIR / "doc_88a1a8b0-1ae_zero_text_scanned.pdf"),
+                "status": "error",
+                "page_count": 1,
+                "chunk_count": 0,
+                "entity_count": 0,
+                "error_message": "Document contains 0 readable text characters (empty or scanned image without OCR text layer).",
+                "chunks": [],
+                "entities": [],
+                "relations": []
+            },
+            {
+                "id": "doc_e58b5a3d-8da",
+                "filename": "blank_scanned_doc.pdf",
+                "file_type": "pdf",
+                "file_size_bytes": 0,
+                "file_path": str(settings.RAW_DOCS_DIR / "doc_e58b5a3d-8da_blank_scanned_doc.pdf"),
+                "status": "error",
+                "page_count": 1,
+                "chunk_count": 0,
+                "entity_count": 0,
+                "error_message": "No extractable text found in uploaded document.",
+                "chunks": [],
+                "entities": [],
+                "relations": []
+            }
+        ]
+
+        for d in docs_data:
+            doc_rec = DocumentRecord(
+                id=d["id"],
+                filename=d["filename"],
+                file_type=d["file_type"],
+                file_size_bytes=d["file_size_bytes"],
+                file_path=d["file_path"],
+                content_hash=None,
+                status=d["status"],
+                page_count=d["page_count"],
+                chunk_count=d["chunk_count"],
+                entity_count=d["entity_count"],
+                error_message=d.get("error_message"),
+                created_at=now,
+                updated_at=now
+            )
+            db.add(doc_rec)
+            raw_path = Path(d["file_path"])
+            if not raw_path.exists():
+                try:
+                    raw_content = "\n\n".join([c["content"] for c in d["chunks"]])
+                    raw_path.write_text(raw_content, encoding="utf-8")
+                except Exception:
+                    pass
+
+            for c in d["chunks"]:
+                chunk_rec = ChunkRecord(
+                    id=c["id"],
+                    document_id=d["id"],
+                    chunk_index=c.get("chunk_index", 0),
+                    page_number=c.get("page_number", 1),
+                    content=c.get("content", ""),
+                    token_count=c.get("token_count", 0),
+                    created_at=now
+                )
+                db.add(chunk_rec)
+
+            for e in d["entities"]:
+                ent_rec = EntityRecord(
+                    id=e["id"],
+                    document_id=d["id"],
+                    name=e["name"],
+                    category=e["category"],
+                    mention_count=e.get("mention_count", 1),
+                    source_context=e.get("source_context")
+                )
+                db.add(ent_rec)
+
+            for r in d["relations"]:
+                rel_rec = RelationRecord(
+                    id=r["id"],
+                    document_id=d["id"],
+                    source_entity=r["source_entity"],
+                    relation_type=r["relation_type"],
+                    target_entity=r["target_entity"],
+                    provenance_text=r.get("provenance_text")
+                )
+                db.add(rel_rec)
+
+        db.commit()
+        logger.info("Foundational enterprise documents, chunks, and graph entities seeded successfully.")
+    except Exception as e:
+        logger.error(f"Error seeding initial documents: {e}")
+        db.rollback()
+    finally:
+        db.close()
+
+
 # Ensure storage directories and DB schema tables exist
 settings.ensure_directories_exist()
 Base.metadata.create_all(bind=engine)
@@ -226,6 +427,7 @@ ensure_database_schema_upgrades(engine)
 seed_initial_roles()
 seed_initial_accounts()
 seed_initial_workspace_data()
+seed_initial_documents()
 
 # Ensure vector index reflects only active database chunks
 _db_init = SessionLocal()
@@ -249,6 +451,7 @@ async def lifespan(app: FastAPI):
     logger.info("Database schemas verified.")
     seed_initial_accounts()
     seed_initial_workspace_data()
+    seed_initial_documents()
     _db = SessionLocal()
     try:
         from backend.app.services.vector_index import vector_index_service
