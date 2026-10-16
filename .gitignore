@@ -26,6 +26,7 @@ wheels/
 
 # Secrets & Environment variables
 .env
+.env.*
 *.env
 !.env.example
 *.pem
@@ -40,8 +41,11 @@ data/vector_store/*
 !data/vector_store/.gitkeep
 data/graph_store/*
 !data/graph_store/.gitkeep
+data/backups/
+data/*.json
 *.db
 *.sqlite3
+*.sqlite
 
 # Logs
 logs/

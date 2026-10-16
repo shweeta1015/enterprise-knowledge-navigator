@@ -1,0 +1,32 @@
+services:
+  knowledge-navigator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: enterprise-knowledge-navigator
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.production
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - BACKEND_HOST=0.0.0.0
+      - BACKEND_PORT=8000
+      - DATABASE_URL=sqlite:///./data/knowledge_navigator.db
+    volumes:
+      - ek_data:/app/data
+      - ek_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  ek_data:
+    name: ek_navigator_data
+  ek_logs:
+    name: ek_navigator_logs

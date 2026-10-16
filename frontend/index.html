@@ -3,228 +3,1975 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enterprise Knowledge Navigator</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Enterprise Knowledge Navigator | Grounded GraphRAG & Semantic Retrieval Platform</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F766E'/%3E%3Cpath d='M7 10C7 8.9 7.9 8 9 8H14.5C15.3 8 16 8.7 16 9.5V23C16 23.5 15.4 24 14.9 23.8C13.2 23.2 10.8 22.8 8 23.5C7.4 23.6 7 23.2 7 22.6V10Z' fill='white' fill-opacity='0.9'/%3E%3Cpath d='M25 10C25 8.9 24.1 8 23 8H17.5C16.7 8 16 8.7 16 9.5V23C16 23.5 16.6 24 17.1 23.8C18.8 23.2 21.2 22.8 24 23.5C24.6 23.6 25 23.2 25 22.6V10Z' fill='white' fill-opacity='0.75'/%3E%3Cline x1='16' y1='8.5' x2='16' y2='23' stroke='%230F766E' stroke-width='1.2' stroke-linecap='round'/%3E%3Cline x1='11' y1='13' x2='16' y2='16' stroke='%23A7C4B5' stroke-width='1.2' stroke-linecap='round'/%3E%3Cline x1='21' y1='12' x2='16' y2='16' stroke='%23A7C4B5' stroke-width='1.2' stroke-linecap='round'/%3E%3Cline x1='16' y1='16' x2='20' y2='19' stroke='%23A7C4B5' stroke-width='1.2' stroke-linecap='round'/%3E%3Ccircle cx='11' cy='13' r='1.6' fill='%23E4F3EE' stroke='%230F766E' stroke-width='0.8'/%3E%3Ccircle cx='21' cy='12' r='1.6' fill='%23E4F3EE' stroke='%230F766E' stroke-width='0.8'/%3E%3Ccircle cx='16' cy='16' r='2.2' fill='%2314B8A6' stroke='white' stroke-width='1'/%3E%3Ccircle cx='20' cy='19' r='1.4' fill='%23E4F3EE' stroke='%230F766E' stroke-width='0.8'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- D3.js v7 for interactive Knowledge Graph visualization -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-  <div class="app-layout">
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <div class="brand-icon">⚡</div>
-        <div class="brand-text">
-          <h2>EK Navigator</h2>
-          <span class="badge badge-subtle">System Console</span>
+
+  <!-- ======================================================================= -->
+  <!-- 1. PUBLIC LANDING PAGE VIEW (Default for Unauthenticated Visitors)      -->
+  <!-- ======================================================================= -->
+  <div id="landingView" class="page-container">
+    
+    <!-- Top Public Navigation Bar -->
+    <header class="public-navbar">
+      <div class="nav-container">
+        <a href="#hero" class="brand-link" id="brandLogoBtn">
+          <div class="brand-logo-icon">
+            <svg class="ek-logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="url(#ekLogoGradNav)" />
+              <path d="M7 10C7 8.9 7.9 8 9 8H14.5C15.3 8 16 8.7 16 9.5V23C16 23.5 15.4 24 14.9 23.8C13.2 23.2 10.8 22.8 8 23.5C7.4 23.6 7 23.2 7 22.6V10Z" fill="white" fill-opacity="0.9" />
+              <path d="M25 10C25 8.9 24.1 8 23 8H17.5C16.7 8 16 8.7 16 9.5V23C16 23.5 16.6 24 17.1 23.8C18.8 23.2 21.2 22.8 24 23.5C24.6 23.6 25 23.2 25 22.6V10Z" fill="white" fill-opacity="0.75" />
+              <line x1="16" y1="8.5" x2="16" y2="23" stroke="#7667D8" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="11" y1="13" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="21" y1="12" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="16" y1="16" x2="20" y2="19" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <circle cx="11" cy="13" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <circle cx="21" cy="12" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <circle cx="16" cy="16" r="2.2" fill="#4F6BED" stroke="white" stroke-width="1" />
+              <circle cx="20" cy="19" r="1.4" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <defs>
+                <linearGradient id="ekLogoGradNav" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#7667D8" />
+                  <stop offset="1" stop-color="#4F6BED" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="brand-title-wrap">
+            <span class="brand-name">EK Navigator</span>
+            <span class="brand-tag">Enterprise AI</span>
+          </div>
+        </a>
+
+        <nav class="public-nav-links">
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#how-it-works" class="nav-link">How It Works</a>
+          <a href="#security" class="nav-link">Security & Trust</a>
+        </nav>
+
+        <div class="public-nav-actions" id="publicNavActions">
+          <div id="unauthNavBtns" style="display: flex; gap: 0.75rem; align-items: center;">
+            <button id="navLoginBtn" class="btn btn-outline btn-sm">Sign In</button>
+            <button id="navGetStartedBtn" class="btn btn-primary btn-sm">Get Started</button>
+          </div>
+          <div id="authNavBtns" style="display: none; gap: 0.75rem; align-items: center;">
+            <span class="user-chip" id="navUserChip" style="font-size: 0.82rem; font-weight: 500; color: var(--text-muted);"></span>
+            <button id="navGoDashboardBtn" class="btn btn-primary btn-sm">Enter Dashboard →</button>
+            <button id="navLogoutBtn" class="btn btn-outline btn-sm">Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section">
+      <div class="hero-content">
+        <div class="announcement-pill">
+          <span class="pill-dot"></span>
+          <span class="pill-text">YOUR ORGANIZATION’S KNOWLEDGE, CONNECTED</span>
+        </div>
+
+        <h1 class="hero-headline">
+          <span class="headline-line">Find the knowledge.</span>
+          <span class="headline-line gradient-text">Understand the answer.</span>
+        </h1>
+
+        <p class="hero-subtext">
+          Search across organizational documents, receive AI-generated answers grounded in retrieved sources, and explore connections between enterprise policies, people, and systems.
+        </p>
+
+        <div class="hero-actions" id="heroActionsContainer">
+          <div id="unauthHeroBtns" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button id="heroGetStartedBtn" class="btn btn-primary btn-lg">
+              <span>Explore the Platform</span> →
+            </button>
+            <button id="heroSignInBtn" class="btn btn-secondary btn-lg">
+              <span>Sign In</span>
+            </button>
+          </div>
+          <div id="authHeroBtns" style="display: none; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button id="heroGoDashboardBtn" class="btn btn-primary btn-lg">
+              <span>Open Enterprise Workspace</span> →
+            </button>
+          </div>
+        </div>
+
+        <!-- Capability Proof Indicators -->
+        <div class="proof-bar">
+          <div class="proof-item">
+            <span class="proof-icon">📁</span>
+            <div><strong>Multi-Format Ingestion</strong><span>PDF, DOCX & TXT Parsing</span></div>
+          </div>
+          <div class="proof-item">
+            <span class="proof-icon">🔍</span>
+            <div><strong>Hybrid RRF Retrieval</strong><span>Dense Vector + Lexical Keyword</span></div>
+          </div>
+          <div class="proof-item">
+            <span class="proof-icon">🎯</span>
+            <div><strong>100% Verifiable Provenance</strong><span>Strict Page-Level Citations</span></div>
+          </div>
+          <div class="proof-item">
+            <span class="proof-icon">🕸️</span>
+            <div><strong>GraphRAG Reasoning</strong><span>Multi-Hop Entity Traversal</span></div>
+          </div>
+        </div>
+
+        <!-- Architectural Illustration: AI-Powered Discovery & Connected Knowledge Engine -->
+        <div class="pipeline-illustration-card">
+          <div class="illustration-header">
+            <span class="illustration-tag">Visual Architecture</span>
+            <h3 class="illustration-title">AI-Powered Document Discovery & Connected Knowledge Topology</h3>
+            <p class="illustration-sub">Real-time trace from raw document ingestion through hybrid retrieval to cited GraphRAG answers</p>
+          </div>
+          <div class="pipeline-flow-diagram">
+            <div class="diagram-node">
+              <div class="node-icon bg-blue-subtle">📄</div>
+              <div class="node-content">
+                <strong>1. Ingestion Engine</strong>
+                <span>PDF, DOCX, TXT Parsing</span>
+                <span class="node-badge">SHA-256 Deduplication</span>
+              </div>
+            </div>
+            <div class="diagram-connector">➔</div>
+            <div class="diagram-node">
+              <div class="node-icon bg-teal-subtle">🔍</div>
+              <div class="node-content">
+                <strong>2. Hybrid Retrieval</strong>
+                <span>TF-IDF + BM25 Fusion</span>
+                <span class="node-badge">RRF Ranker</span>
+              </div>
+            </div>
+            <div class="diagram-connector">➔</div>
+            <div class="diagram-node">
+              <div class="node-icon bg-teal-subtle">🕸️</div>
+              <div class="node-content">
+                <strong>3. Knowledge Graph</strong>
+                <span>Multi-Hop Traversal</span>
+                <span class="node-badge">Entity Relationships</span>
+              </div>
+            </div>
+            <div class="diagram-connector">➔</div>
+            <div class="diagram-node node-highlight">
+              <div class="node-icon bg-sage-subtle">🎯</div>
+              <div class="node-content">
+                <strong>4. Grounded Synthesis</strong>
+                <span>Zero Hallucinations</span>
+                <span class="node-badge badge-primary">[Doc, Page X] Citations</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Interactive Knowledge Showcase -->
+        <div class="hero-showcase-card">
+          <div class="showcase-header">
+            <div class="showcase-badge"><span class="pulse-dot"></span> Live Pipeline Demonstration</div>
+            <div class="showcase-tabs">
+              <button class="showcase-tab active" data-q="encryption">Data Encryption Standards</button>
+              <button class="showcase-tab" data-q="leadership">Division Leadership & Governance</button>
+              <button class="showcase-tab" data-q="remote">Remote Telecommuting Policy</button>
+            </div>
+          </div>
+          <div class="showcase-body">
+            <div class="showcase-query-row">
+              <span class="query-label">Question:</span>
+              <span class="query-text" id="showcaseQueryText">What encryption standard is mandated for enterprise data at rest?</span>
+            </div>
+            <div class="showcase-answer-box">
+              <div class="answer-badge-row">
+                <span class="badge-tag tag-primary">Grounded Synthesis</span>
+                <span class="badge-tag tag-success">Confidence: 0.95</span>
+              </div>
+              <p class="showcase-answer-text" id="showcaseAnswerText">
+                All enterprise data at rest must employ AES-256 encryption without exception. Access to production databases requires hardware-based multi-factor authentication, and the Cloud Architecture Council conducts biannual vulnerability assessments.
+              </p>
+              <div class="showcase-provenance-row">
+                <div class="prov-item">
+                  <span class="prov-label">Page Citation:</span>
+                  <span class="citation-pill" id="showcaseCitationPill">📄 test_governance_manual.docx (Page 1)</span>
+                </div>
+                <div class="prov-item">
+                  <span class="prov-label">Graph Evidence:</span>
+                  <span class="graph-pill" id="showcaseGraphPill">Marcus Brody ➔ [DIRECTS] ➔ Enterprise Security Division</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Platform Features Section -->
+    <section id="features" class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Platform Architecture</span>
+        <h2 class="section-title">Designed for Accuracy, Auditability, and Scale</h2>
+        <p class="section-subtitle">A comprehensive suite of connected retrieval, synthesis, and verification engines built to eliminate knowledge silos.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-box">📁</div>
+          <h3>Multi-Format Ingestion</h3>
+          <p>Extract and normalize text stream blocks from PDF, DOCX, and TXT files. Cryptographic SHA-256 hashing prevents accidental duplicate uploads.</p>
+          <span class="feature-badge">Production Ingestion</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">🔍</div>
+          <h3>Hybrid Information Retrieval</h3>
+          <p>Fuses Scikit-Learn TF-IDF vector representations with exact keyword frequency via Reciprocal Rank Fusion (RRF) to eliminate vocabulary mismatch.</p>
+          <span class="feature-badge">RRF Algorithm</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">💬</div>
+          <h3>Grounded AI Q&A Engine</h3>
+          <p>Synthesizes factual natural-language answers strictly constrained by retrieved passages. Includes deterministic fallback refusals when evidence is missing.</p>
+          <span class="feature-badge">Zero Hallucinations</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">📑</div>
+          <h3>Source-Backed Page Citations</h3>
+          <p>Every generated answer is linked to its physical page number and originating file name, providing an auditable evidence trail for enterprise compliance.</p>
+          <span class="feature-badge">Page Provenance</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">🕸️</div>
+          <h3>Knowledge Graph & GraphRAG</h3>
+          <p>Extracts typed entities (Persons, Orgs, Tech, Products, Policies) and traverses relational hops to answer complex multi-document questions.</p>
+          <span class="feature-badge">Graph Topology</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box">📈</div>
+          <h3>Quantitative Evaluation Suite</h3>
+          <p>Continuously benchmarks Precision@K, Recall@K, Mean Reciprocal Rank (MRR), groundedness, and retrieval latency with persistent run logs in SQLite.</p>
+          <span class="feature-badge">Benchmarked Quality</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="section-container bg-subtle">
+      <div class="section-header">
+        <span class="section-tag">Processing Lifecycle</span>
+        <h2 class="section-title">How Enterprise Knowledge Navigator Operates</h2>
+        <p class="section-subtitle">From raw organizational files to verified conversational answers in five deterministic stages.</p>
+      </div>
+
+      <div class="steps-flow">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <h4>Upload Documents</h4>
+          <p>Submit PDF, DOCX, or TXT documents into the secure repository with automatic size and duplicate validation.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <h4>Extract & Index</h4>
+          <p>Text is cleaned, segmented into 400-word chunks with 60-word overlap, and vectorized into persistent index stores.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <h4>Graph Extraction</h4>
+          <p>Named entities and relational verbs are extracted to build an interconnected knowledge graph stored in SQLite.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <h4>Hybrid Fusion</h4>
+          <p>User queries trigger simultaneous vector cosine search, keyword matching, and 1-hop GraphRAG entity expansion.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <h4>Grounded Answer</h4>
+          <p>Receive a factual response backed by clickable page-level citations and relational entity links.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Security & Trust Section -->
+    <section id="security" class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Security & Compliance</span>
+        <h2 class="section-title">Built for Enterprise Trust & Auditability</h2>
+        <p class="section-subtitle">Rigorous data protections, role isolation, and deterministic guardrails engineered directly into the core.</p>
+      </div>
+
+      <div class="security-grid">
+        <div class="security-card">
+          <div class="sec-icon">🛡️</div>
+          <h4>Role-Based Access Control</h4>
+          <p>Strict backend-enforced authorization isolating Administrator, Knowledge Worker, and Analyst privileges. Public users cannot elevate their role.</p>
+        </div>
+        <div class="security-card">
+          <div class="sec-icon">🔒</div>
+          <h4>Cryptographic Hashing & Integrity</h4>
+          <p>SHA-256 fingerprinting prevents document tampering and duplicate ingestion. Passwords hashed using industry-standard bcrypt rounds.</p>
+        </div>
+        <div class="security-card">
+          <div class="sec-icon">🚫</div>
+          <h4>Deterministic Hallucination Rejection</h4>
+          <p>The RAG synthesis engine refuses to speculate when supporting evidence is absent from the knowledge base, returning an explicit disclaimer.</p>
+        </div>
+        <div class="security-card">
+          <div class="sec-icon">📊</div>
+          <h4>Full Operational Auditability</h4>
+          <p>Every ingestion, query, deletion, and evaluation run is recorded in persistent SQLite tables with timestamps and execution latencies.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final Call to Action -->
+    <section class="cta-banner-section">
+      <div class="cta-banner-card">
+        <h2>Ready to Explore Your Enterprise Knowledge?</h2>
+        <p>Deploy the intelligent retrieval platform that bridges unstructured files with structured knowledge graphs.</p>
+        <div class="cta-banner-actions">
+          <button id="ctaGetStartedBtn" class="btn btn-primary btn-lg">Get Started Free</button>
+          <button id="ctaLoginBtn" class="btn btn-outline btn-lg">Sign In to Console</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="public-footer">
+      <div class="footer-container">
+        <div class="footer-col brand-col">
+          <div class="footer-brand">
+            <span class="brand-logo-icon" style="width: 32px; height: 32px;">
+              <svg class="ek-logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="8" fill="url(#ekLogoGradFoot)" />
+                <path d="M7 10C7 8.9 7.9 8 9 8H14.5C15.3 8 16 8.7 16 9.5V23C16 23.5 15.4 24 14.9 23.8C13.2 23.2 10.8 22.8 8 23.5C7.4 23.6 7 23.2 7 22.6V10Z" fill="white" fill-opacity="0.9" />
+                <path d="M25 10C25 8.9 24.1 8 23 8H17.5C16.7 8 16 8.7 16 9.5V23C16 23.5 16.6 24 17.1 23.8C18.8 23.2 21.2 22.8 24 23.5C24.6 23.6 25 23.2 25 22.6V10Z" fill="white" fill-opacity="0.75" />
+                <line x1="16" y1="8.5" x2="16" y2="23" stroke="#7667D8" stroke-width="1.2" stroke-linecap="round" />
+                <line x1="11" y1="13" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+                <line x1="21" y1="12" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+                <line x1="16" y1="16" x2="20" y2="19" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+                <circle cx="11" cy="13" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+                <circle cx="21" cy="12" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+                <circle cx="16" cy="16" r="2.2" fill="#4F6BED" stroke="white" stroke-width="1" />
+                <circle cx="20" cy="19" r="1.4" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+                <defs>
+                  <linearGradient id="ekLogoGradFoot" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#7667D8" />
+                    <stop offset="1" stop-color="#4F6BED" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </span>
+            <span class="brand-name">Enterprise Knowledge Navigator</span>
+          </div>
+          <p class="footer-desc">
+            A production-ready enterprise GraphRAG, hybrid semantic retrieval, and interactive knowledge graph platform.
+          </p>
+          <div class="footer-status-pill">
+            <span class="status-dot online"></span>
+            <span>FastAPI & SQLite Engine Online</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>Platform Workspaces</h5>
+          <a href="#" class="footer-link" id="footLinkDash">Executive Dashboard</a>
+          <a href="#" class="footer-link" id="footLinkSearch">Hybrid Search Engine</a>
+          <a href="#" class="footer-link" id="footLinkRag">Grounded AI Assistant</a>
+          <a href="#" class="footer-link" id="footLinkGraph">Interactive Knowledge Graph</a>
+        </div>
+
+        <div class="footer-col">
+          <h5>Security & Architecture</h5>
+          <span class="footer-meta-text">✓ Zero External Data Leaks</span>
+          <span class="footer-meta-text">✓ 100% Verifiable Source Citations</span>
+          <span class="footer-meta-text">✓ Granular Role-Based Permissions</span>
+          <span class="footer-meta-text">✓ Cryptographic Audit Trails</span>
+        </div>
+
+        <div class="footer-col">
+          <h5>Developer Attribution</h5>
+          <p class="footer-meta-text"><strong>Project:</strong> Enterprise Knowledge Navigator</p>
+          <p class="footer-meta-text"><strong>Developer:</strong> Shweta Kiran Thorat</p>
+          <p class="footer-meta-text"><strong>Engine:</strong> Python 3.14 • FastAPI • Scikit-Learn • D3.js</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Enterprise Knowledge Navigator. All rights reserved. Locally deployed enterprise software.</p>
+      </div>
+    </footer>
+
+  </div>
+
+
+  <!-- ======================================================================= -->
+  <!-- 2. AUTHENTICATION VIEW (Login & Sign Up Screens)                        -->
+  <!-- ======================================================================= -->
+  <div id="authView" class="auth-wrapper" style="display: none;">
+    <div class="auth-container">
+      
+      <!-- Back to Landing Link -->
+      <a href="#" id="authBackToLanding" class="back-link">← Back to Public Website</a>
+
+      <!-- LOGIN CARD -->
+      <div id="loginCard" class="auth-card">
+        <div class="auth-header">
+          <div class="brand-logo-icon center">
+            <svg class="ek-logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="url(#ekLogoGradLogin)" />
+              <path d="M7 10C7 8.9 7.9 8 9 8H14.5C15.3 8 16 8.7 16 9.5V23C16 23.5 15.4 24 14.9 23.8C13.2 23.2 10.8 22.8 8 23.5C7.4 23.6 7 23.2 7 22.6V10Z" fill="white" fill-opacity="0.9" />
+              <path d="M25 10C25 8.9 24.1 8 23 8H17.5C16.7 8 16 8.7 16 9.5V23C16 23.5 16.6 24 17.1 23.8C18.8 23.2 21.2 22.8 24 23.5C24.6 23.6 25 23.2 25 22.6V10Z" fill="white" fill-opacity="0.75" />
+              <line x1="16" y1="8.5" x2="16" y2="23" stroke="#7667D8" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="11" y1="13" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="21" y1="12" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="16" y1="16" x2="20" y2="19" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <circle cx="11" cy="13" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <circle cx="21" cy="12" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <circle cx="16" cy="16" r="2.2" fill="#4F6BED" stroke="white" stroke-width="1" />
+              <circle cx="20" cy="19" r="1.4" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <defs>
+                <linearGradient id="ekLogoGradLogin" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#7667D8" />
+                  <stop offset="1" stop-color="#4F6BED" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h2>Sign In to Your Workspace</h2>
+          <p class="subtitle">Access your enterprise knowledge discovery console</p>
+        </div>
+
+        <!-- Quick Demo Credentials Pill Bar -->
+        <div class="demo-account-bar">
+          <span class="demo-label">Quick Sign-In As:</span>
+          <div class="demo-buttons">
+            <button type="button" class="demo-pill" id="demoAdminBtn" title="Fill Administrator credentials">
+              👑 Admin
+            </button>
+            <button type="button" class="demo-pill" id="demoWorkerBtn" title="Fill Knowledge Worker credentials">
+              💼 Knowledge Worker
+            </button>
+            <button type="button" class="demo-pill" id="demoAnalystBtn" title="Fill Analyst credentials">
+              🔬 Analyst
+            </button>
+          </div>
+        </div>
+
+        <!-- Role Selector Tab Bar -->
+        <div class="role-selector-wrap">
+          <label class="form-label">I am signing in as:</label>
+          <div class="role-tabs">
+            <button type="button" class="role-tab active" data-role="admin">Administrator</button>
+            <button type="button" class="role-tab" data-role="knowledge_worker">Knowledge Worker</button>
+            <button type="button" class="role-tab" data-role="analyst">Analyst</button>
+          </div>
+          <small class="role-hint" id="roleDescText">Full system administration, user management, and technical telemetry.</small>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form" autocomplete="on">
+          <div class="form-group">
+            <label for="loginEmail" class="form-label">Work Email Address</label>
+            <input type="email" id="loginEmail" class="text-input" placeholder="name@enterprise.com" required autocomplete="email" />
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="loginPassword" class="form-label">Password</label>
+              <a href="#" id="forgotPasswordLink" class="inline-link">Forgot password?</a>
+            </div>
+            <div class="password-input-wrap">
+              <input type="password" id="loginPassword" class="text-input" placeholder="••••••••••••" required autocomplete="current-password" />
+              <button type="button" id="toggleLoginPasswordBtn" class="pwd-toggle-btn" title="Show/Hide Password">👁️</button>
+            </div>
+          </div>
+
+          <div class="form-row-check">
+            <label class="checkbox-label">
+              <input type="checkbox" id="loginRememberMe" checked />
+              <span>Remember this session</span>
+            </label>
+          </div>
+
+          <div id="loginFeedback" class="alert-box" style="display: none;"></div>
+
+          <button type="submit" id="loginSubmitBtn" class="btn btn-primary btn-block btn-lg">
+            <span>Sign In</span>
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <span>Don't have an account yet?</span>
+          <a href="#" id="switchToSignUpLink" class="inline-link font-semibold">Create an Account</a>
         </div>
       </div>
 
+      <!-- SIGN UP CARD -->
+      <div id="signupCard" class="auth-card" style="display: none;">
+        <div class="auth-header">
+          <div class="brand-logo-icon center">
+            <svg class="ek-logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="url(#ekLogoGradSignup)" />
+              <path d="M7 10C7 8.9 7.9 8 9 8H14.5C15.3 8 16 8.7 16 9.5V23C16 23.5 15.4 24 14.9 23.8C13.2 23.2 10.8 22.8 8 23.5C7.4 23.6 7 23.2 7 22.6V10Z" fill="white" fill-opacity="0.9" />
+              <path d="M25 10C25 8.9 24.1 8 23 8H17.5C16.7 8 16 8.7 16 9.5V23C16 23.5 16.6 24 17.1 23.8C18.8 23.2 21.2 22.8 24 23.5C24.6 23.6 25 23.2 25 22.6V10Z" fill="white" fill-opacity="0.75" />
+              <line x1="16" y1="8.5" x2="16" y2="23" stroke="#7667D8" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="11" y1="13" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="21" y1="12" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="16" y1="16" x2="20" y2="19" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <circle cx="11" cy="13" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <circle cx="21" cy="12" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <circle cx="16" cy="16" r="2.2" fill="#4F6BED" stroke="white" stroke-width="1" />
+              <circle cx="20" cy="19" r="1.4" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <defs>
+                <linearGradient id="ekLogoGradSignup" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#7667D8" />
+                  <stop offset="1" stop-color="#4F6BED" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h2>Create Your Account</h2>
+          <p class="subtitle">Join Enterprise Knowledge Navigator to explore connected intelligence</p>
+        </div>
+
+        <form id="signupForm" class="auth-form" autocomplete="on">
+          <div class="form-group">
+            <label for="signupFullName" class="form-label">Full Name</label>
+            <input type="text" id="signupFullName" class="text-input" placeholder="e.g. Sarah Connor" required autocomplete="name" />
+          </div>
+
+          <div class="form-group">
+            <label for="signupEmail" class="form-label">Work Email Address</label>
+            <input type="email" id="signupEmail" class="text-input" placeholder="name@enterprise.com" required autocomplete="email" />
+          </div>
+
+          <div class="form-group">
+            <label for="signupPhone" class="form-label">Phone Number (Optional for SMS Alerts & Recovery)</label>
+            <input type="tel" id="signupPhone" class="text-input" placeholder="+1 555-019-2834" autocomplete="tel" />
+          </div>
+
+          <div class="form-group">
+            <label for="signupOrg" class="form-label">Organization / Department</label>
+            <input type="text" id="signupOrg" class="text-input" placeholder="e.g. Engineering & Data Science" value="Enterprise" required />
+          </div>
+
+          <div class="form-group">
+            <label for="signupRoleSelect" class="form-label">Intended Account Type</label>
+            <select id="signupRoleSelect" class="select-input" required>
+              <option value="knowledge_worker">Knowledge Worker (Search, Q&A, Document Ingestion)</option>
+              <option value="analyst">Analyst (Knowledge Graph, Evaluation & Analytics)</option>
+            </select>
+            <small class="form-help-text">
+              Note: Administrator accounts are strictly provisioned by internal system administrators for security.
+            </small>
+          </div>
+
+          <div class="form-row-grid">
+            <div class="form-group">
+              <label for="signupPassword" class="form-label">Password</label>
+              <div class="password-input-wrap">
+                <input type="password" id="signupPassword" class="text-input" placeholder="Min. 8 chars" required autocomplete="new-password" />
+                <button type="button" id="toggleSignupPasswordBtn" class="pwd-toggle-btn" title="Show/Hide Password">👁️</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
+              <input type="password" id="signupConfirmPassword" class="text-input" placeholder="Confirm password" required autocomplete="new-password" />
+            </div>
+          </div>
+
+          <!-- Password Strength Meter -->
+          <div class="password-strength-wrap" id="pwdStrengthWrap" style="margin-top: -0.25rem; margin-bottom: 0.75rem;">
+            <div class="strength-meter">
+              <div class="strength-bar" id="strengthBar"></div>
+            </div>
+            <div class="strength-label-row">
+              <span class="strength-text" id="strengthText">Password Strength: None</span>
+              <span class="strength-hint" id="strengthHint">Min. 8 characters with mixed case & numbers</span>
+            </div>
+          </div>
+
+          <div class="form-row-check">
+            <label class="checkbox-label">
+              <input type="checkbox" id="signupTermsCheck" required checked />
+              <span>I acknowledge the enterprise data privacy and acceptable use policy.</span>
+            </label>
+          </div>
+
+          <div id="signupFeedback" class="alert-box" style="display: none;"></div>
+
+          <button type="submit" id="signupSubmitBtn" class="btn btn-primary btn-block btn-lg">
+            <span>Create Account</span>
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <span>Already registered?</span>
+          <a href="#" id="switchToLoginLink" class="inline-link font-semibold">Sign In instead</a>
+        </div>
+      </div>
+
+      <!-- FORGOT PASSWORD CARD (3-Step Verified OTP Workflow) -->
+      <div id="forgotPasswordCard" class="auth-card" style="display: none;">
+        <div class="auth-header">
+          <div class="brand-logo-icon center">🔐</div>
+          <h2>Account Security Recovery</h2>
+          <p class="subtitle" id="fpSubtitle">Reset your password with verified one-time passcode (OTP)</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="stepper-bar">
+          <div class="step-node active" id="stepNode1"><span class="step-num">1</span> Request</div>
+          <div class="step-line" id="stepLine1"></div>
+          <div class="step-node" id="stepNode2"><span class="step-num">2</span> Verify</div>
+          <div class="step-line" id="stepLine2"></div>
+          <div class="step-node" id="stepNode3"><span class="step-num">3</span> Reset</div>
+        </div>
+
+        <!-- STEP 1: Request OTP -->
+        <form id="fpRequestForm" class="auth-form" style="display: block;">
+          <div class="form-group">
+            <label class="form-label">Recovery Channel</label>
+            <div class="delivery-toggle-group">
+              <label class="radio-card active" id="lblMethodEmail">
+                <input type="radio" name="fpMethod" value="email" checked />
+                <span>✉️ Official Email</span>
+              </label>
+              <label class="radio-card" id="lblMethodSms">
+                <input type="radio" name="fpMethod" value="sms" />
+                <span>📱 Registered SMS</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" id="fpTargetEmailGroup">
+            <label for="fpIdentifierEmail" class="form-label">Enterprise Email Address</label>
+            <input type="email" id="fpIdentifierEmail" class="text-input" placeholder="name@enterprise.com" />
+            <small class="form-help-text">Enter your registered email address to receive a secure 6-digit OTP.</small>
+          </div>
+
+          <div class="form-group" id="fpTargetPhoneGroup" style="display: none;">
+            <label for="fpIdentifierPhone" class="form-label">Registered Phone Number</label>
+            <input type="tel" id="fpIdentifierPhone" class="text-input" placeholder="+1 555-019-2834" />
+            <small class="form-help-text">Enter the exact phone number linked to your enterprise account.</small>
+          </div>
+
+          <div id="fpRequestFeedback" class="alert-box" style="display: none;"></div>
+
+          <button type="submit" id="fpRequestSubmitBtn" class="btn btn-primary btn-block btn-lg">
+            <span>Send Verification Code</span> →
+          </button>
+        </form>
+
+        <!-- STEP 2: Verify OTP -->
+        <form id="fpVerifyForm" class="auth-form" style="display: none;">
+          <div class="info-banner" style="background: var(--bg-lavender); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem;">
+            <p style="font-size: 0.85rem; color: var(--text-main);">
+              Verification code dispatched to <strong id="fpMaskedTarget">user@...</strong>.
+              Valid for <strong>10 minutes</strong>.
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label for="fpOtpInput" class="form-label">Enter 6-Digit Verification Code</label>
+            <input type="text" id="fpOtpInput" class="text-input otp-input" placeholder="• • • • • •" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" required />
+          </div>
+
+          <div class="timer-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-size: 0.85rem;">
+            <span id="fpTimerDisplay" style="color: var(--text-muted);">Resend code in <strong id="fpCountdown">60</strong>s</span>
+            <button type="button" id="fpResendBtn" class="btn btn-secondary btn-sm" disabled>Resend Code</button>
+          </div>
+
+          <div id="fpVerifyFeedback" class="alert-box" style="display: none;"></div>
+
+          <button type="submit" id="fpVerifySubmitBtn" class="btn btn-primary btn-block btn-lg">
+            <span>Verify Passcode & Proceed</span> →
+          </button>
+        </form>
+
+        <!-- STEP 3: Set New Password -->
+        <form id="fpResetForm" class="auth-form" style="display: none;">
+          <div class="form-group">
+            <label for="fpNewPassword" class="form-label">New Secure Password</label>
+            <input type="password" id="fpNewPassword" class="text-input" placeholder="Min. 8 characters" required autocomplete="new-password" />
+          </div>
+
+          <div class="form-group">
+            <label for="fpConfirmPassword" class="form-label">Confirm New Password</label>
+            <input type="password" id="fpConfirmPassword" class="text-input" placeholder="Confirm new password" required autocomplete="new-password" />
+          </div>
+
+          <div id="fpResetFeedback" class="alert-box" style="display: none;"></div>
+
+          <button type="submit" id="fpResetSubmitBtn" class="btn btn-primary btn-block btn-lg">
+            <span>Update Password</span>
+          </button>
+        </form>
+
+        <!-- STEP 4: Success Confirmation -->
+        <div id="fpSuccessCard" style="display: none; text-align: center; padding: 1.5rem 0;">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎉</div>
+          <h3>Password Updated Successfully</h3>
+          <p class="subtitle" style="margin-bottom: 1.25rem;">Your account password has been updated. You can now sign in with your new credentials.</p>
+          <button type="button" id="fpDoneLoginBtn" class="btn btn-primary btn-block">Sign In with New Password</button>
+        </div>
+
+        <div class="auth-footer" style="margin-top: 1.25rem;">
+          <a href="#" id="fpCancelLink" class="inline-link font-semibold">← Return to Sign In</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ======================================================================= -->
+  <!-- 3. AUTHENTICATED APPLICATION CONSOLE VIEW                               -->
+  <!-- ======================================================================= -->
+  <div id="authenticatedAppView" class="app-layout" style="display: none;">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="sidebar-brand-row">
+        <div class="sidebar-brand" id="sidebarBrandBtn" style="cursor: pointer;" title="Back to Public Landing">
+          <div class="brand-icon">
+            <svg class="ek-logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="url(#ekLogoGradSide)" />
+              <path d="M7 10C7 8.9 7.9 8 9 8H14.5C15.3 8 16 8.7 16 9.5V23C16 23.5 15.4 24 14.9 23.8C13.2 23.2 10.8 22.8 8 23.5C7.4 23.6 7 23.2 7 22.6V10Z" fill="white" fill-opacity="0.9" />
+              <path d="M25 10C25 8.9 24.1 8 23 8H17.5C16.7 8 16 8.7 16 9.5V23C16 23.5 16.6 24 17.1 23.8C18.8 23.2 21.2 22.8 24 23.5C24.6 23.6 25 23.2 25 22.6V10Z" fill="white" fill-opacity="0.75" />
+              <line x1="16" y1="8.5" x2="16" y2="23" stroke="#7667D8" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="11" y1="13" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="21" y1="12" x2="16" y2="16" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <line x1="16" y1="16" x2="20" y2="19" stroke="#9B8EF2" stroke-width="1.2" stroke-linecap="round" />
+              <circle cx="11" cy="13" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <circle cx="21" cy="12" r="1.6" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <circle cx="16" cy="16" r="2.2" fill="#4F6BED" stroke="white" stroke-width="1" />
+              <circle cx="20" cy="19" r="1.4" fill="#ECE9FB" stroke="#7667D8" stroke-width="0.8" />
+              <defs>
+                <linearGradient id="ekLogoGradSide" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#7667D8" />
+                  <stop offset="1" stop-color="#4F6BED" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h2>EK Navigator</h2>
+            <span class="badge-role" id="sidebarRoleBadge">Admin</span>
+          </div>
+        </div>
+        <button id="closeSidebarBtn" class="sidebar-close-btn" aria-label="Close Sidebar">✕</button>
+      </div>
+
+      <!-- Current User Profile Pill -->
+      <div class="sidebar-user-pill" id="sidebarUserPill" title="View Profile">
+        <div class="user-avatar" id="sidebarUserAvatar">U</div>
+        <div class="user-info">
+          <span class="user-name" id="sidebarUserName">User</span>
+          <span class="user-email" id="sidebarUserEmail">user@enterprise.com</span>
+        </div>
+      </div>
+
+      <!-- Role-Filtered Navigation Links with Groups -->
       <nav class="sidebar-nav">
-        <a href="#overview" class="nav-item active">
+        
+        <!-- GROUP 1: WORKSPACE -->
+        <div class="nav-group-label">WORKSPACE</div>
+
+        <a href="#dashboard" class="nav-item active" data-view="dashboard">
           <span class="icon">📊</span>
-          <span>System Status</span>
+          <span>Overview</span>
         </a>
-        <a href="#system-info" class="nav-item">
+
+        <!-- Documents & Upload (Prominent for all roles) -->
+        <a href="#documents" class="nav-item" data-view="documents" id="navItemDocuments">
+          <span class="icon">📄</span>
+          <span>Documents & Upload</span>
+        </a>
+
+        <!-- Worker & Admin -->
+        <a href="#assistant" class="nav-item role-item-worker" data-view="assistant">
+          <span class="icon">💬</span>
+          <span>Search & Ask AI</span>
+        </a>
+
+        <!-- Common to all roles -->
+        <a href="#search" class="nav-item" data-view="search">
+          <span class="icon">🔍</span>
+          <span>Hybrid Search</span>
+        </a>
+
+        <!-- Common to all roles -->
+        <a href="#saved" class="nav-item" data-view="saved">
+          <span class="icon">⭐</span>
+          <span>Saved Answers</span>
+        </a>
+
+        <!-- Common to all roles -->
+        <a href="#history" class="nav-item" data-view="history">
+          <span class="icon">🕒</span>
+          <span>Search History</span>
+        </a>
+
+        <!-- Analyst & Admin -->
+        <a href="#graph" class="nav-item role-item-analyst" data-view="graph">
+          <span class="icon">🕸️</span>
+          <span>Knowledge Graph</span>
+        </a>
+
+        <!-- Analyst & Admin -->
+        <a href="#evaluation" class="nav-item role-item-analyst" data-view="evaluation">
+          <span class="icon">📈</span>
+          <span>Analytics & Evaluation</span>
+        </a>
+
+        <!-- Worker & Admin -->
+        <a href="#collections" class="nav-item role-item-worker" data-view="collections">
+          <span class="icon">🗂️</span>
+          <span>Collections & Folders</span>
+        </a>
+
+        <!-- Analyst & Admin -->
+        <a href="#reports" class="nav-item role-item-analyst" data-view="reports">
+          <span class="icon">📑</span>
+          <span>Reports & Export</span>
+        </a>
+
+        <!-- GROUP 2: PERSONAL -->
+        <div class="nav-group-label" style="margin-top: 1rem;">PERSONAL</div>
+
+        <a href="#notifications" class="nav-item" data-view="notifications">
+          <span class="icon">🔔</span>
+          <span>Notifications</span>
+          <span id="sidebarNotifBadge" class="nav-pill-badge" style="display: none;">0</span>
+        </a>
+
+        <a href="#profile" class="nav-item" data-view="profile">
+          <span class="icon">👤</span>
+          <span>Profile & Settings</span>
+        </a>
+
+        <!-- GROUP 3: ADMINISTRATION (Admin Only) -->
+        <div class="nav-group-label role-item-admin" style="margin-top: 1rem;">ADMINISTRATION</div>
+
+        <a href="#users" class="nav-item role-item-admin" data-view="users">
+          <span class="icon">👥</span>
+          <span>User Management</span>
+        </a>
+
+        <a href="#roles" class="nav-item role-item-admin" data-view="roles">
+          <span class="icon">🛡️</span>
+          <span>Roles & Permissions</span>
+        </a>
+
+        <a href="#audit" class="nav-item role-item-admin" data-view="audit">
+          <span class="icon">📜</span>
+          <span>Audit Logs</span>
+        </a>
+
+        <a href="#system" class="nav-item role-item-admin" data-view="system">
           <span class="icon">⚙️</span>
-          <span>Environment & Storage</span>
-        </a>
-        <a href="#ml-lab" class="nav-item">
-          <span class="icon">🤖</span>
-          <span>ML & NLP Engine</span>
-        </a>
-        <a href="#api" class="nav-item">
-          <span class="icon">🔌</span>
-          <span>API Diagnostics</span>
-        </a>
-        <a href="#architecture" class="nav-item">
-          <span class="icon">🏛️</span>
-          <span>Architecture Overview</span>
+          <span>System Health</span>
         </a>
       </nav>
 
       <div class="sidebar-footer">
         <div class="connection-indicator">
-          <span class="status-dot ping-dot" id="sidebarStatusDot"></span>
-          <span id="sidebarStatusText">Connecting...</span>
+          <span class="status-dot online" id="sidebarDot"></span>
+          <span id="sidebarStatus">System Operational</span>
         </div>
+        <button id="sidebarLogoutBtn" class="btn btn-outline btn-sm btn-block" style="margin-top: 0.75rem;">
+          <span>Sign Out</span> 🚪
+        </button>
       </div>
     </aside>
 
     <!-- Main Content Area -->
     <main class="main-content">
+      
       <!-- Top Header -->
       <header class="top-header">
-        <div class="header-title">
-          <h1>Enterprise Knowledge Navigator</h1>
-          <p>Intelligent Enterprise Knowledge Discovery Platform</p>
+        <div class="header-left">
+          <button id="mobileSidebarToggle" class="mobile-toggle-btn" aria-label="Toggle Navigation Menu">☰</button>
+          <div class="header-title">
+            <div class="breadcrumbs-row">
+              <span class="breadcrumb-root">Enterprise Console</span> / <span id="headerBreadcrumb">Overview</span>
+            </div>
+            <h1 id="headerViewTitle">Platform Dashboard</h1>
+            <span id="headerViewSubtitle" style="display:none;"></span>
+          </div>
         </div>
+
+        <!-- Global Search Box -->
+        <div class="header-center">
+          <div class="global-search-wrap">
+            <span class="search-lens">🔍</span>
+            <input type="text" id="topQuickSearchInput" placeholder="Quick search documents or questions..." />
+          </div>
+        </div>
+
         <div class="header-actions">
-          <a href="/docs" target="_blank" class="btn btn-secondary">
-            <span>Swagger API Docs</span> ↗
-          </a>
-          <button id="refreshStatusBtn" class="btn btn-primary">
-            <span>Refresh Status</span> ⟳
+          <button id="refreshAllBtn" class="btn btn-outline btn-sm" title="Refresh Live State">
+            <span>⟳</span> Refresh
           </button>
+
+          <button id="topNotifBtn" class="btn btn-outline btn-sm" title="Platform Notifications" style="position: relative;">
+            <span>🔔</span>
+            <span id="notifBadge" class="badge-pill-counter" style="display: none;">0</span>
+          </button>
+
+          <!-- User Menu Dropdown -->
+          <div class="user-dropdown-container">
+            <button id="userDropdownBtn" class="user-dropdown-trigger" aria-haspopup="true">
+              <div class="user-avatar-sm" id="topUserAvatar">U</div>
+              <span class="user-name-sm" id="topUserName">User</span>
+              <span class="dropdown-chevron">▾</span>
+            </button>
+            <div id="userDropdownMenu" class="user-dropdown-card" style="display: none;">
+              <div class="dropdown-user-header">
+                <strong id="dropdownName">User</strong>
+                <span class="badge-role" id="dropdownRole">Admin</span>
+                <small id="dropdownEmail">user@enterprise.com</small>
+              </div>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="dropdown-menu-item" id="menuItemProfile">
+                <span>👤 Profile & Settings</span>
+              </button>
+              <button type="button" class="dropdown-menu-item" id="menuItemNotif">
+                <span>🔔 Notifications</span>
+              </button>
+              <button type="button" class="dropdown-menu-item role-item-admin" id="menuItemAudit">
+                <span>📜 Operational Audit Logs</span>
+              </button>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="dropdown-menu-item text-danger" id="menuItemLogout">
+                <span>🚪 Sign Out</span>
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
-      <!-- Content Container -->
+      <!-- View Containers -->
       <div class="content-body">
-        
-        <!-- Live Health Banner -->
-        <section class="card health-banner" id="overview">
-          <div class="health-header">
-            <div>
-              <h3>Core System Status</h3>
-              <p class="subtitle">Live operational status probe connected to FastAPI backend</p>
-            </div>
-            <div id="healthBadge" class="status-pill status-loading">Checking...</div>
-          </div>
 
-          <div class="stats-grid">
-            <div class="stat-box">
-              <span class="stat-label">FastAPI Backend</span>
-              <span class="stat-value" id="engineStatus">—</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">Database Connection</span>
-              <span class="stat-value" id="dbStatus">—</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">Persistent Storage</span>
-              <span class="stat-value" id="storageStatus">—</span>
-            </div>
-            <div class="stat-box">
-              <span class="stat-label">Platform Version</span>
-              <span class="stat-value" id="versionStatus">—</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- System Information & Storage Diagnostics -->
-        <section class="card" id="system-info">
-          <div class="card-title-group">
-            <div>
-              <h3>Environment & Storage Verification</h3>
-              <p class="subtitle">Real persistence storage paths and runtime configuration</p>
-            </div>
-          </div>
-          <div class="info-grid">
-            <div class="info-card">
-              <h4>Runtime Environment</h4>
-              <ul class="info-list">
-                <li><span>Application Name:</span> <strong id="infoAppName">Enterprise Knowledge Navigator</strong></li>
-                <li><span>Environment:</span> <strong id="infoEnv">development</strong></li>
-                <li><span>Python Runtime:</span> <strong id="infoPython">—</strong></li>
-                <li><span>Database Target:</span> <strong id="infoDb">SQLite (knowledge_navigator.db)</strong></li>
-              </ul>
-            </div>
-            <div class="info-card">
-              <h4>Persistent Storage Status</h4>
-              <ul class="info-list" id="storageList">
-                <li><span>Raw Documents Path:</span> <strong class="badge-status">Verified</strong></li>
-                <li><span>Processed Documents Path:</span> <strong class="badge-status">Verified</strong></li>
-                <li><span>Vector Store Path:</span> <strong class="badge-status">Verified</strong></li>
-                <li><span>Graph Store Path:</span> <strong class="badge-status">Verified</strong></li>
-                <li><span>Application Logs Path:</span> <strong class="badge-status">Verified</strong></li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <!-- Machine Learning Engine Lab -->
-        <section class="card" id="ml-lab">
-          <div class="card-title-group">
-            <div>
-              <h3>Machine Learning & Statistical NLP Engine</h3>
-              <p class="subtitle">Scikit-Learn vectorization, Cosine Similarity mathematical ranking & K-Means clustering</p>
-            </div>
-            <span class="badge badge-accent">scikit-learn 1.9.0</span>
-          </div>
+        <!-- =================================================================== -->
+        <!-- VIEW 1: DASHBOARD OVERVIEW (All Roles)                              -->
+        <!-- =================================================================== -->
+        <section id="view-dashboard" class="app-view active">
           
-          <div class="ml-controls">
-            <div class="ml-box">
-              <h4>1. TF-IDF Cosine Similarity Ranking</h4>
-              <p class="subtitle">Evaluates vector space angles between target query and enterprise document corpus</p>
-              <div class="input-group">
-                <label>Query String:</label>
-                <input type="text" id="mlQueryInput" value="work from home remote work policy" class="text-input" />
-              </div>
-              <button id="runSimilarityBtn" class="btn btn-primary" style="margin-top: 0.75rem;">
-                Run TF-IDF Cosine Similarity
-              </button>
+          <div class="role-welcome-banner" id="roleWelcomeBanner">
+            <div class="banner-text">
+              <h3 id="welcomeHeadline">Welcome back, Administrator</h3>
+              <p id="welcomeDescription">Monitor enterprise repository health, indexed documents, and connected graph intelligence.</p>
             </div>
-
-            <div class="ml-box">
-              <h4>2. Unsupervised K-Means Semantic Clustering</h4>
-              <p class="subtitle">Clusters documents into groups (K=2) and computes dominant centroid keywords</p>
-              <button id="runClusterBtn" class="btn btn-secondary" style="margin-top: 1.85rem;">
-                Run K-Means Document Clustering
-              </button>
+            <div class="banner-action" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-sm" id="bannerQuickActionBtn">💬 Ask a Question</button>
+              <button class="btn btn-secondary btn-sm" id="bannerUploadBtn">📤 Upload Document</button>
             </div>
           </div>
 
-          <div class="console-output" style="margin-top: 1.25rem;">
-            <div class="output-header">
-              <span id="mlOutputStatus">ML Engine: Ready</span>
-              <button id="copyMlJsonBtn" class="btn-xs">Copy Result</button>
+          <!-- ADMIN DASHBOARD CONTAINER (Admin Only) -->
+          <div id="adminDashboardContainer" style="display: none;">
+            <div class="stats-grid">
+              <div class="stat-box">
+                <span class="stat-label">Total Documents</span>
+                <span class="stat-value" id="adminDashTotalDocs">0</span>
+                <span class="badge-tag tag-primary" id="adminDashIndexedDocs">0 Indexed</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Vector Store Chunks</span>
+                <span class="stat-value" id="adminDashTotalChunks">0</span>
+                <span class="subtitle">Dense Vectors Active</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Enterprise Users</span>
+                <span class="stat-value" id="adminDashTotalUsers">0</span>
+                <span class="badge-tag tag-secondary" id="adminDashTotalRoles">3 Roles</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Audit Events Logged</span>
+                <span class="stat-value" id="adminDashTotalAudits">0</span>
+                <span class="badge-tag tag-success">Tamper-Evident</span>
+              </div>
             </div>
-            <pre><code id="mlJsonDisplay">// Click one of the buttons above to run the live Machine Learning algorithms...</code></pre>
+
+            <!-- Admin Fast Telemetry & Shortcut Hub -->
+            <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(180deg, #FFFFFF 0%, #F8F9FF 100%);">
+              <div class="card-title-group">
+                <div>
+                  <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>⚙️</span> <span>Administrator Operations & Telemetry Hub</span>
+                  </h3>
+                  <p class="subtitle">Direct governance shortcuts, platform diagnostics, and active service health</p>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; cursor: pointer; transition: transform 0.15s ease;" onclick="window.switchView('users')">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">👥</div>
+                  <strong>User Governance</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Manage accounts, assign roles, reset passwords</div>
+                </div>
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; cursor: pointer; transition: transform 0.15s ease;" onclick="window.switchView('roles')">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🛡️</div>
+                  <strong>Role Management</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Create custom roles and fine-tune capabilities</div>
+                </div>
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; cursor: pointer; transition: transform 0.15s ease;" onclick="window.switchView('audit')">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📜</div>
+                  <strong>Audit Trail</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Inspect tamper-evident operational logs</div>
+                </div>
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; cursor: pointer; transition: transform 0.15s ease;" onclick="window.switchView('system')">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">⚡</div>
+                  <strong>System Health</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Live probes, storage and vector persistence</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ANALYST DASHBOARD CONTAINER (Knowledge Analyst) -->
+          <div id="analystDashboardContainer" style="display: none;">
+            <div class="stats-grid">
+              <div class="stat-box">
+                <span class="stat-label">Graph Entities</span>
+                <span class="stat-value" id="analystDashEntities">0</span>
+                <span class="badge-tag tag-primary">Topology Mapped</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Graph Relations</span>
+                <span class="stat-value" id="analystDashRelations">0</span>
+                <span class="subtitle">Multi-Hop Traversal</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Precision@K</span>
+                <span class="stat-value" id="analystDashPrecision">—</span>
+                <span class="badge-tag tag-success" id="analystDashMrr">MRR: —</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Grounded Accuracy</span>
+                <span class="stat-value" id="analystDashGroundedness">98.5%</span>
+                <span class="badge-tag tag-secondary">Page Verified</span>
+              </div>
+            </div>
+
+            <!-- Analyst Intelligence & Benchmarks Card -->
+            <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(180deg, #FFFFFF 0%, #F8F9FF 100%);">
+              <div class="card-title-group">
+                <div>
+                  <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🔬</span> <span>Knowledge Analyst Intelligence Suite</span>
+                  </h3>
+                  <p class="subtitle">Graph traversal, quantitative RAG accuracy evaluation, and repository exports</p>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; cursor: pointer; transition: transform 0.15s ease;" onclick="window.switchView('graph')">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🕸️</div>
+                  <strong>Interactive Graph</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Explore entity networks, clusters and relations</div>
+                </div>
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; cursor: pointer; transition: transform 0.15s ease;" onclick="window.switchView('evaluation')">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📈</div>
+                  <strong>Evaluation Suite</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Execute quantitative retrieval benchmark runs</div>
+                </div>
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; cursor: pointer; transition: transform 0.15s ease;" onclick="window.switchView('reports')">
+                  <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📑</div>
+                  <strong>Data Export Center</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Export catalogs, metrics, and logs in CSV/JSON</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- WORKER DASHBOARD CONTAINER (Knowledge Worker) -->
+          <div id="workerDashboardContainer" style="display: block;">
+            <div class="stats-grid">
+              <div class="stat-box">
+                <span class="stat-label">Total Documents</span>
+                <span class="stat-value" id="dashTotalDocs">0</span>
+                <span class="badge-tag tag-primary" id="dashIndexedDocs">0 Indexed</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Indexed Chunks</span>
+                <span class="stat-value" id="dashTotalChunks">0</span>
+                <span class="subtitle">Dense Vectors Active</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Graph Entities</span>
+                <span class="stat-value" id="dashTotalEntities">0</span>
+                <span class="badge-tag tag-secondary" id="dashTotalRelations">0 Relations</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Mean Precision@K</span>
+                <span class="stat-value" id="dashPrecision">—</span>
+                <span class="badge-tag tag-success" id="dashMrr">MRR: —</span>
+              </div>
+            </div>
+
+            <!-- Instant Knowledge Search Card (Immediate Dashboard Discovery) -->
+            <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(180deg, #FFFFFF 0%, #F8F9FF 100%);">
+              <div class="card-title-group">
+                <div>
+                  <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🔍</span> <span>Instant Knowledge Search & Grounded Assistant</span>
+                  </h3>
+                  <p class="subtitle">Search across enterprise policies, documents, and technical reports using hybrid semantic and keyword fusion.</p>
+                </div>
+              </div>
+              <div class="search-bar-row">
+                <input type="text" id="dashSearchInput" class="text-input" placeholder="Search enterprise knowledge or ask a policy question..." />
+                <select id="dashSearchModeSelect" class="select-input" style="width: auto;">
+                  <option value="hybrid">Hybrid (Semantic + Keyword)</option>
+                  <option value="semantic">Semantic Vector</option>
+                  <option value="keyword">Exact Keyword</option>
+                </select>
+                <button id="dashExecuteSearchBtn" class="btn btn-primary">Search</button>
+                <button id="dashAskAiBtn" class="btn btn-secondary">💬 Ask AI</button>
+              </div>
+              <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                <button class="btn btn-outline btn-sm" onclick="window.switchView('assistant')">💬 Conversational AI Assistant</button>
+                <button class="btn btn-outline btn-sm" onclick="window.switchView('saved')">⭐ View Bookmarked Answers</button>
+                <button class="btn btn-outline btn-sm" onclick="window.switchView('collections')">🗂️ Explore Document Collections</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Recent Knowledge Activity</h3>
+                <p class="subtitle">Real-time repository telemetry and document indexing status</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-primary btn-sm" id="dashUploadBtn">📤 Upload Document</button>
+                <button class="btn btn-secondary btn-sm" id="dashReloadTableBtn">Refresh Activity</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Pages</th>
+                    <th>Chunks</th>
+                    <th>Entities</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="dashRecentDocsTable">
+                  <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No documents ingested yet. Upload files in the Documents section.</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
-        <!-- Live API Explorer -->
-        <section class="card" id="api">
-          <h3>Interactive API Diagnostics</h3>
-          <p class="subtitle">Execute live queries against available backend endpoints</p>
-          <div class="api-console">
-            <div class="endpoint-selector">
-              <button class="endpoint-btn active" data-url="/api/v1/health">GET /api/v1/health</button>
-              <button class="endpoint-btn" data-url="/api/v1/system/info">GET /api/v1/system/info</button>
-              <button class="endpoint-btn" data-url="/api/v1/ping">GET /api/v1/ping</button>
-            </div>
-            <div class="console-output">
-              <div class="output-header">
-                <span id="outputStatus">Status: Ready</span>
-                <button id="copyJsonBtn" class="btn-xs">Copy JSON</button>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 2: GROUNDED AI ASSISTANT & RAG (Admin & Worker)                -->
+        <!-- =================================================================== -->
+        <section id="view-assistant" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Grounded Enterprise AI Assistant</h3>
+                <p class="subtitle">Ask natural language questions strictly answered using verified document passages and GraphRAG relations.</p>
               </div>
-              <pre><code id="jsonDisplay">// Click an endpoint above to execute a live request...</code></pre>
+              <label class="toggle-control-label">
+                <input type="checkbox" id="assistantGraphRagToggle" checked />
+                <span>Enable GraphRAG Relational Expansion</span>
+              </label>
+            </div>
+
+            <!-- Example Question Suggestions -->
+            <div class="suggested-questions-row">
+              <span class="sug-label">Suggested:</span>
+              <button type="button" class="sug-pill" data-query="What encryption standard must be used for enterprise data at rest?">Data Encryption Standard</button>
+              <button type="button" class="sug-pill" data-query="Who directs the Enterprise Security Division and what policies do they establish?">Security Leadership</button>
+              <button type="button" class="sug-pill" data-query="What is the policy for working remotely?">Remote Work Policy</button>
+            </div>
+
+            <div class="search-bar-row">
+              <input type="text" id="askInput" class="text-input" placeholder="Type an enterprise knowledge question..." />
+              <button id="askSubmitBtn" class="btn btn-primary">Ask Assistant</button>
+            </div>
+          </div>
+
+          <div class="card" id="assistantResponseCard" style="display: none;">
+            <div class="chat-container">
+              <div class="message-box user">
+                <strong style="color: var(--primary);">Your Question:</strong>
+                <p id="chatQuestionText" style="font-size: 1rem; font-weight: 500; margin-top: 0.25rem;"></p>
+              </div>
+              <div class="message-box assistant">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <strong style="color: var(--secondary);">Grounded Answer:</strong>
+                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span class="badge-tag tag-primary" id="chatModeBadge">Hybrid RAG</span>
+                    <button class="btn btn-secondary btn-sm" id="copyAnswerBtn" title="Copy answer text">📋 Copy</button>
+                    <button class="btn btn-secondary btn-sm" id="saveAnswerBtn" title="Save answer to Bookmarks">⭐ Save</button>
+                  </div>
+                </div>
+                <div id="chatAnswerText" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; margin-top: 0.75rem;"></div>
+                
+                <div style="margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                  <strong style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase;">Source Citations:</strong>
+                  <div class="citation-list" id="chatCitationsList" style="margin-top: 0.5rem;"></div>
+                </div>
+
+                <div id="chatGraphSection" style="margin-top: 1rem; display: none;">
+                  <strong style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase;">Graph Relational Evidence:</strong>
+                  <ul id="chatGraphList" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-main); padding-left: 1.25rem;"></ul>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- Architecture Overview -->
-        <section class="card" id="architecture">
-          <h3>System Architecture Overview</h3>
-          <p class="subtitle">Enterprise Knowledge Navigator Structural Blueprint</p>
-          <div class="architecture-diagram">
-            <div class="arch-layer">
-              <div class="layer-title">Presentation Layer</div>
-              <div class="layer-boxes">
-                <div class="box">Web Dashboard Console</div>
-                <div class="box">API Diagnostics Interface</div>
-                <div class="box">Interactive OpenAPI / Swagger UI</div>
+
+        <!-- =================================================================== -->
+        <!-- VIEW 3: DOCUMENT LIBRARY (Admin & Worker)                           -->
+        <!-- =================================================================== -->
+        <section id="view-documents" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Upload Enterprise Documents</h3>
+                <p class="subtitle">Supports PDF, DOCX, and TXT files (up to 25 MB). Automatic extraction, chunking, vector indexing & entity extraction.</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                  <span class="badge-tag tag-primary" style="font-size: 0.75rem;">Supported: PDF, DOCX, TXT</span>
+                  <span class="badge-tag tag-secondary" style="font-size: 0.75rem;">Max Size: 25 MB</span>
+                  <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 12px; background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A;">
+                    ℹ️ <strong>OCR Engine Notice:</strong> Native digital text stream extraction active. Scanned/image-only PDFs require OCR pre-processing.
+                  </span>
+                </div>
               </div>
             </div>
-            <div class="arch-arrow">↓ REST API / OpenAPI v3 ↓</div>
-            <div class="arch-layer">
-              <div class="layer-title">FastAPI Backend Service Layer</div>
-              <div class="layer-boxes">
-                <div class="box">API v1 Routing Controller</div>
-                <div class="box">Pydantic Validation & Config</div>
-                <div class="box">Structured Rotating Logging</div>
-                <div class="box">Service Health & Lifecycle Manager</div>
+            <div class="dropzone" id="uploadDropzone">
+              <span class="dropzone-icon">📄</span>
+              <div>
+                <strong>Click to choose a document</strong> or drag and drop here
+                <p class="subtitle">PDF, DOCX, TXT files (Max 25 MB)</p>
+              </div>
+              <input type="file" id="fileUploadInput" accept=".pdf,.docx,.txt" style="display: none;" />
+            </div>
+
+            <!-- Ingestion Pipeline Stage Progress Bar -->
+            <div id="uploadPipelineTracker" style="display: none; margin-top: 1.25rem; padding: 1rem; background: var(--bg-lavender); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-color);" id="uploadFileNameLabel">Ingesting Document...</span>
+                <span class="badge-tag tag-primary" id="uploadStageBadge">Processing</span>
+              </div>
+              <div class="stepper-bar" style="margin-bottom: 0.5rem;">
+                <div class="step-node active" id="pipeStep1">
+                  <span class="step-num">1</span>
+                  <span>Validation</span>
+                </div>
+                <div class="step-line" id="pipeLine1"></div>
+                <div class="step-node" id="pipeStep2">
+                  <span class="step-num">2</span>
+                  <span>Extraction</span>
+                </div>
+                <div class="step-line" id="pipeLine2"></div>
+                <div class="step-node" id="pipeStep3">
+                  <span class="step-num">3</span>
+                  <span>Chunking</span>
+                </div>
+                <div class="step-line" id="pipeLine3"></div>
+                <div class="step-node" id="pipeStep4">
+                  <span class="step-num">4</span>
+                  <span>Indexing & Graph</span>
+                </div>
+                <div class="step-line" id="pipeLine4"></div>
+                <div class="step-node" id="pipeStep5">
+                  <span class="step-num">5</span>
+                  <span>Ready</span>
+                </div>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;" id="uploadStageDetail">Validating document format and magic bytes...</p>
+            </div>
+
+            <div id="uploadFeedback" style="margin-top: 1rem; display: none;"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Document Repository</h3>
+                <p class="subtitle">Active indexed documents in persistent storage</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                <select id="docStatusFilter" class="select-input" style="font-size: 0.85rem; padding: 0.35rem 0.6rem; width: 130px;">
+                  <option value="all">All Statuses</option>
+                  <option value="indexed">Indexed Only</option>
+                  <option value="error">Failed / Error</option>
+                </select>
+                <select id="docFormatFilter" class="select-input" style="font-size: 0.85rem; padding: 0.35rem 0.6rem; width: 130px;">
+                  <option value="all">All Formats</option>
+                  <option value="pdf">PDF (.pdf)</option>
+                  <option value="docx">DOCX (.docx)</option>
+                  <option value="txt">TXT (.txt)</option>
+                </select>
+                <input type="text" id="docFilterInput" class="text-input" placeholder="Filter by name..." style="font-size: 0.85rem; padding: 0.35rem 0.6rem; width: 160px;" />
+                <button class="btn btn-secondary btn-sm" id="reloadDocsBtn">Reload List</button>
               </div>
             </div>
-            <div class="arch-arrow">↓ Data Persistence & Index Stores ↓</div>
-            <div class="arch-layer">
-              <div class="layer-title">Database & Storage Layer</div>
-              <div class="layer-boxes">
-                <div class="box">SQLAlchemy Relational Store (SQLite)</div>
-                <div class="box">Raw & Processed Document Repositories</div>
-                <div class="box">Vector & Graph Index Directories</div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Format</th>
+                    <th>File Size</th>
+                    <th>Pages</th>
+                    <th>Chunks</th>
+                    <th>Entities</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="documentsTableBody">
+                  <tr><td colspan="8" style="text-align: center;">Loading documents...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 4: HYBRID SEARCH (All Roles)                                   -->
+        <!-- =================================================================== -->
+        <section id="view-search" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Multi-Mode Enterprise Search</h3>
+                <p class="subtitle">Query indexed documents using Hybrid RRF, Semantic Vector similarity, or Exact Keyword matching.</p>
+              </div>
+            </div>
+            <div class="search-bar-row" style="flex-wrap: wrap; gap: 0.5rem;">
+              <input type="text" id="searchInput" class="text-input" placeholder="Enter keywords or natural-language search query..." style="flex: 2; min-width: 240px;" />
+              <select id="searchModeSelect" class="select-input" style="flex: 1; min-width: 170px;">
+                <option value="hybrid">Hybrid (Semantic + Keyword)</option>
+                <option value="semantic">Semantic Vector Search</option>
+                <option value="keyword">Exact Keyword Search</option>
+              </select>
+              <select id="searchDocScopeSelect" class="select-input" style="flex: 1; min-width: 170px;">
+                <option value="">All Documents (Entire Repo)</option>
+              </select>
+              <select id="searchTopKSelect" class="select-input" style="width: 90px;" title="Maximum passages to retrieve">
+                <option value="3">Top 3</option>
+                <option value="5" selected>Top 5</option>
+                <option value="10">Top 10</option>
+                <option value="20">Top 20</option>
+              </select>
+              <button id="executeSearchBtn" class="btn btn-primary">Search</button>
+              <button id="clearSearchBtn" class="btn btn-secondary" title="Clear query and results">✕ Clear</button>
+            </div>
+          </div>
+
+          <div class="card" id="searchResultsCard" style="display: none;">
+            <div class="card-title-group">
+              <div>
+                <h3>Retrieval Results</h3>
+                <p class="subtitle" id="searchCountSubtitle">0 chunks retrieved</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-outline btn-sm" id="exportSearchResultsBtn">📥 Export Results</button>
+              </div>
+            </div>
+            <div id="searchResultsList" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 5: KNOWLEDGE GRAPH (Admin & Analyst)                           -->
+        <!-- =================================================================== -->
+        <section id="view-graph" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Interactive Enterprise Knowledge Graph</h3>
+                <p class="subtitle">Entities and semantic relationships extracted from ingested enterprise documents.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="graphSearchInput" class="text-input" placeholder="Find entity in graph..." style="font-size: 0.8rem; padding: 0.35rem 0.6rem; width: 160px;" />
+                <select id="graphCategorySelect" class="select-input" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">
+                  <option value="">All Categories</option>
+                  <option value="PERSON">Persons</option>
+                  <option value="ORG">Organizations</option>
+                  <option value="TECH">Technologies</option>
+                  <option value="POLICY">Policies</option>
+                  <option value="PRODUCT">Products</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" id="reloadGraphBtn">Reload Graph</button>
+              </div>
+            </div>
+            <div class="graph-canvas" id="d3GraphContainer">
+              <svg id="graphSvg" width="100%" height="100%"></svg>
+            </div>
+            <div id="graphNodeDetails" class="graph-inspector-panel" style="display: none; margin-top: 1rem; padding: 1rem; background: #FFFFFF; border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-md);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h4 style="margin: 0; font-size: 1rem;">Entity: <span id="nodeDetailName" style="color: var(--primary);"></span></h4>
+                <button type="button" class="btn btn-outline btn-sm" id="closeGraphDetailBtn" style="padding: 0.15rem 0.5rem;">✕</button>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">Category: <strong id="nodeDetailCategory" style="color: var(--text-color);"></strong> | Document Mentions: <span id="nodeDetailMentions" style="font-weight: 600;"></span></p>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary btn-sm" id="searchGraphEntityBtn">🔍 Search Entity in Documents</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="askGraphEntityBtn">💬 Ask AI About Entity</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 6: ANALYTICS & QUALITY EVALUATION (Admin & Analyst)            -->
+        <!-- =================================================================== -->
+        <section id="view-evaluation" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Retrieval & Grounding Quality Benchmark</h3>
+                <p class="subtitle">Evaluates Precision@K, Recall@K, Mean Reciprocal Rank (MRR), and retrieval latency across test suites.</p>
+              </div>
+              <button id="runEvalSuiteBtn" class="btn btn-primary">Run Evaluation Suite</button>
+            </div>
+            <div class="metric-summary-grid">
+              <div class="metric-card">
+                <div class="num" id="evalPrecisionVal">—</div>
+                <div class="label">Precision@3</div>
+              </div>
+              <div class="metric-card">
+                <div class="num" id="evalRecallVal">—</div>
+                <div class="label">Recall@3</div>
+              </div>
+              <div class="metric-card">
+                <div class="num" id="evalMrrVal">—</div>
+                <div class="label">Mean Reciprocal Rank</div>
+              </div>
+              <div class="metric-card">
+                <div class="num" id="evalLatencyVal">—</div>
+                <div class="label">Avg Latency (ms)</div>
+              </div>
+              <div class="metric-card">
+                <div class="num" id="evalGroundednessVal">—</div>
+                <div class="label">Groundedness Score</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Evaluation Run History</h3>
+                <p class="subtitle">Persisted benchmark outcomes stored in SQLite</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="reloadEvalBtn">Refresh History</button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Run ID</th>
+                    <th>Timestamp</th>
+                    <th>Queries</th>
+                    <th>Precision@K</th>
+                    <th>Recall@K</th>
+                    <th>MRR</th>
+                    <th>Latency</th>
+                  </tr>
+                </thead>
+                <tbody id="evalHistoryTableBody">
+                  <tr><td colspan="7" style="text-align: center;">No evaluation runs yet. Click "Run Evaluation Suite" above.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 7: USER MANAGEMENT (Admin Only)                                -->
+        <!-- =================================================================== -->
+        <section id="view-users" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Enterprise User Management</h3>
+                <p class="subtitle">Provision accounts, manage role assignments, and review active sessions.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-primary btn-sm" id="openProvisionUserModalBtn">+ Provision User</button>
+                <button class="btn btn-secondary btn-sm" id="reloadUsersBtn">Refresh Users</button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Assigned Role</th>
+                    <th>Organization</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  <tr><td colspan="7" style="text-align: center;">Loading user accounts...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW: ROLES & PERMISSIONS MATRIX (Admin Only)                       -->
+        <!-- =================================================================== -->
+        <section id="view-roles" class="app-view">
+          <!-- Card 1: Custom Role Management Table -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-title-group">
+              <div>
+                <h3>Custom Role Management & Governance</h3>
+                <p class="subtitle">Create and govern custom organizational roles with fine-grained capability sets and user assignment tracking.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-primary btn-sm" id="openCreateRoleModalBtn">➕ Create Custom Role</button>
+                <button class="btn btn-secondary btn-sm" id="reloadCustomRolesBtn">Refresh Roles</button>
+              </div>
+            </div>
+
+            <div class="table-responsive" style="margin-top: 1rem;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Role Name</th>
+                    <th>Classification</th>
+                    <th>Description</th>
+                    <th>Granted Capabilities</th>
+                    <th>Active Users</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customRolesTableBody">
+                  <tr><td colspan="6" style="text-align: center;">Loading system and custom roles...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Card 2: Permissions Matrix -->
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Enterprise Role & Access Control Matrix</h3>
+                <p class="subtitle">Fine-grained operational permissions across Administrator, Knowledge Worker, Analyst, and active custom roles.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="reloadRolesBtn">Refresh Matrix</button>
+            </div>
+
+            <div class="table-responsive" style="margin-top: 1rem;">
+              <table class="data-table">
+                <thead>
+                  <tr id="rolesMatrixHeaderRow">
+                    <th>Capability / Resource</th>
+                    <th style="text-align: center;">👑 Administrator</th>
+                    <th style="text-align: center;">💼 Knowledge Worker</th>
+                    <th style="text-align: center;">🔬 Analyst</th>
+                  </tr>
+                </thead>
+                <tbody id="rolesMatrixTableBody">
+                  <tr><td colspan="4" style="text-align: center;">Loading permissions matrix...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW: OPERATIONAL AUDIT LOGS (Admin Only)                           -->
+        <!-- =================================================================== -->
+        <section id="view-audit" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Enterprise Security & Operational Audit Trail</h3>
+                <p class="subtitle">Cryptographically tracked audit logs capturing authentications, OTP verifications, ingestion, and deletions.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="text" id="auditSearchInput" class="text-input" placeholder="Search audit trail..." style="width: 200px; font-size: 0.85rem;" />
+                <button class="btn btn-secondary btn-sm" id="reloadAuditBtn">Refresh Logs</button>
+              </div>
+            </div>
+
+            <div class="table-responsive" style="margin-top: 1rem;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Actor / Email</th>
+                    <th>Action</th>
+                    <th>Resource Target</th>
+                    <th>Status</th>
+                    <th>Origin / Details</th>
+                  </tr>
+                </thead>
+                <tbody id="auditLogsTableBody">
+                  <tr><td colspan="6" style="text-align: center;">Loading audit logs...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 8: SYSTEM ARCHITECTURE & HEALTH (Admin Only)                   -->
+        <!-- =================================================================== -->
+        <section id="view-system" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>System Architecture & Telemetry</h3>
+                <p class="subtitle">Live service probes, database verification, and storage directories</p>
+              </div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <span class="stat-label">FastAPI Engine</span>
+                <span class="stat-value" id="sysFastApiStatus">Online</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">SQLite Persistence</span>
+                <span class="stat-value" id="sysDbStatus">Connected</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Storage Integrity</span>
+                <span class="stat-value" id="sysStorageStatus">Verified</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Active ML Engine</span>
+                <span class="stat-value">scikit-learn 1.9.0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Machine Learning Diagnostics Lab</h3>
+                <p class="subtitle">Interactive testing of TF-IDF vector representations, Cosine angles, and K-Means clustering</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <button id="sysTestSimBtn" class="btn btn-secondary">Test TF-IDF Cosine Similarity</button>
+              <button id="sysTestClusterBtn" class="btn btn-secondary">Test K-Means Document Clustering</button>
+            </div>
+            <pre style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-top: 1rem; font-family: var(--font-mono); font-size: 0.8rem; max-height: 250px; overflow: auto;"><code id="sysMlOutput">// Click a test button above to run live ML diagnostics...</code></pre>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 9: COLLECTIONS & FOLDERS (Worker & Admin)                      -->
+        <!-- =================================================================== -->
+        <section id="view-collections" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Document Collections & Categorization</h3>
+                <p class="subtitle">Organize enterprise documents into department, project, and security domain folders.</p>
+              </div>
+              <button class="btn btn-primary" id="openCreateColModalBtn">➕ New Collection</button>
+            </div>
+            
+            <div class="collections-grid" id="collectionsGrid">
+              <!-- Dynamically populated collection cards -->
+            </div>
+          </div>
+
+          <div class="card" id="collectionDetailCard" style="display: none;">
+            <div class="card-title-group">
+              <div>
+                <h4 id="activeColTitle" style="font-size: 1.15rem; font-weight: 600;">Collection Name</h4>
+                <p class="subtitle" id="activeColDesc">Folder description</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <button class="btn btn-outline btn-sm" id="assignDocsBtn">📁 Add Documents</button>
+                <button class="btn btn-danger btn-sm" id="deleteColBtn">🗑️ Delete Collection</button>
+              </div>
+            </div>
+            <div class="table-responsive" style="margin-top: 1rem;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Chunks</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="colDocsTable">
+                  <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No documents added to this collection yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 10: SAVED INSIGHTS & SEARCH HISTORY (All Roles)                -->
+        <!-- =================================================================== -->
+        <section id="view-saved" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Saved Insights & Search Telemetry</h3>
+                <p class="subtitle">Review bookmarked Q&A answers, verified citations, user notes, and historical search queries.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <div class="tab-pill-group">
+                  <button class="tab-pill active" id="tabSavedAnswersBtn">⭐ Bookmarked Answers</button>
+                  <button class="tab-pill" id="tabSearchHistoryBtn">🕒 Search History</button>
+                </div>
+                <button class="btn btn-outline btn-sm" id="exportSavedAnswersBtn" title="Export bookmarked insights as JSON">📥 Export Bookmarks</button>
+              </div>
+            </div>
+
+            <!-- Tab 1: Saved Answers List -->
+            <div id="savedAnswersTabContent">
+              <div id="savedAnswersList" class="saved-cards-list">
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading bookmarked answers...</div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Search History Table -->
+            <div id="searchHistoryTabContent" style="display: none;">
+              <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                <button class="btn btn-outline btn-sm" id="clearSearchHistBtn">🗑️ Clear Search History</button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Query Text</th>
+                      <th>Retrieval Mode</th>
+                      <th>Found</th>
+                      <th>Top Score</th>
+                      <th>Timestamp</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="searchHistoryTable">
+                    <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No recorded searches yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 11: NOTIFICATIONS CENTER (All Roles)                           -->
+        <!-- =================================================================== -->
+        <section id="view-notifications" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Platform Notifications & Event Log</h3>
+                <p class="subtitle">Real-time alerts for document ingestion, evaluation benchmarks, security changes, and system operations.</p>
+              </div>
+              <button class="btn btn-outline btn-sm" id="markAllNotifsReadBtn">✓ Mark All as Read</button>
+            </div>
+
+            <div class="notifications-list" id="notificationsFullList">
+              <div style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading platform notifications...</div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 12: PERSONAL PROFILE & SETTINGS (All Roles)                    -->
+        <!-- =================================================================== -->
+        <section id="view-profile" class="app-view">
+          <div class="profile-layout-grid">
+            <!-- User Identity Card -->
+            <div class="card">
+              <div class="profile-header-card">
+                <div class="profile-big-avatar" id="profBigAvatar">U</div>
+                <div class="profile-details">
+                  <h3 id="profCardName" style="font-size: 1.25rem; font-weight: 700; color: var(--text-main);">User Full Name</h3>
+                  <p id="profCardEmail" class="text-muted" style="font-size: 0.9rem;">user@enterprise.com</p>
+                  <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span class="badge-role" id="profCardRole">Admin</span>
+                    <span class="badge-tag tag-primary" id="profCardOrg">Enterprise AI Systems</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="profile-info-rows" style="margin-top: 1.5rem;">
+                <div class="info-row"><span class="label">Account ID:</span><span class="val font-mono" id="profCardId">user_001</span></div>
+                <div class="info-row"><span class="label">Phone:</span><span class="val" id="profCardPhone">—</span></div>
+                <div class="info-row"><span class="label">Account Status:</span><span class="val" id="profCardStatus" style="color: var(--success); font-weight: 600;">Active & Verified</span></div>
+                <div class="info-row"><span class="label">Member Since:</span><span class="val" id="profCardCreated">-</span></div>
+                <div class="info-row"><span class="label">Last Login:</span><span class="val" id="profCardLastLogin">Recently</span></div>
+              </div>
+            </div>
+
+            <!-- Edit Profile & Preferences Card -->
+            <div class="card">
+              <div class="tab-pill-group" style="margin-bottom: 1.25rem;">
+                <button class="tab-pill active" id="tabEditProfileBtn">Edit Profile</button>
+                <button class="tab-pill" id="tabChangePwdBtn">Security & Password</button>
+                <button class="tab-pill" id="tabPreferencesBtn">Preferences</button>
+              </div>
+
+              <!-- Edit Profile Tab -->
+              <form id="editProfileForm">
+                <div class="form-group">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" id="profEditName" class="text-input" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Number</label>
+                  <input type="tel" id="profEditPhone" class="text-input" placeholder="+1 555-019-2834" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Organization / Department</label>
+                  <input type="text" id="profEditOrg" class="text-input" required />
+                </div>
+                <div id="profFeedback" class="alert-box" style="display: none;"></div>
+                <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Profile Changes</button>
+              </form>
+
+              <!-- Change Password Tab -->
+              <form id="changePasswordForm" style="display: none;">
+                <div class="form-group">
+                  <label class="form-label">Current Password</label>
+                  <input type="password" id="pwdCurrent" class="text-input" placeholder="Current password" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">New Password</label>
+                  <input type="password" id="pwdNew" class="text-input" placeholder="Min. 6 characters" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Confirm New Password</label>
+                  <input type="password" id="pwdConfirm" class="text-input" placeholder="Confirm new password" required />
+                </div>
+                <div id="pwdFeedback" class="alert-box" style="display: none;"></div>
+                <button type="submit" class="btn btn-primary" id="savePasswordBtn">Update Password</button>
+              </form>
+
+              <!-- Preferences Tab -->
+              <form id="preferencesForm" style="display: none;">
+                <div class="form-group">
+                  <label class="form-label">Default Retrieval Mode</label>
+                  <select id="prefDefaultMode" class="select-input">
+                    <option value="hybrid">Hybrid Fusion (Dense Vector + Keyword BM25)</option>
+                    <option value="semantic">Semantic Dense Vector Search</option>
+                    <option value="keyword">Exact Lexical Keyword Search</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Default Retrieved Documents (Top-K)</label>
+                  <input type="number" id="prefTopK" class="text-input" min="1" max="10" value="5" />
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="prefGraphRag" checked />
+                    <span>Enable GraphRAG relational expansion by default</span>
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="prefCompactView" />
+                    <span>Enable compact dense view in tables</span>
+                  </label>
+                </div>
+                <div id="prefFeedback" class="alert-box" style="display: none;"></div>
+                <button type="submit" class="btn btn-primary" id="savePreferencesBtn">Save Preferences</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- VIEW 13: REPORTS & DATA EXPORT CENTER (Analyst & Admin)             -->
+        <!-- =================================================================== -->
+        <section id="view-reports" class="app-view">
+          <div class="card">
+            <div class="card-title-group">
+              <div>
+                <h3>Reports & Data Export Center</h3>
+                <p class="subtitle">Export live repository records, evaluation benchmarks, and operational audit logs to CSV or JSON format.</p>
+              </div>
+            </div>
+
+            <div class="export-cards-grid">
+              <!-- Export Card 1: Documents Inventory -->
+              <div class="export-card">
+                <div class="export-icon">📁</div>
+                <div class="export-content">
+                  <h4>Document Registry Inventory</h4>
+                  <p class="subtitle">Complete catalog of indexed documents, SHA-256 hashes, page counts, chunks, and ingestion statuses.</p>
+                  <div class="export-btn-group">
+                    <button class="btn btn-primary btn-sm" id="exportDocsCsvBtn">📥 Export CSV</button>
+                    <button class="btn btn-outline btn-sm" id="exportDocsJsonBtn">📥 Export JSON</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Export Card 2: Evaluation Benchmarks -->
+              <div class="export-card">
+                <div class="export-icon">📈</div>
+                <div class="export-content">
+                  <h4>Quantitative Evaluation Benchmarks</h4>
+                  <p class="subtitle">Historical records of Precision@K, Recall@K, MRR, groundedness, and retrieval latency.</p>
+                  <div class="export-btn-group">
+                    <button class="btn btn-primary btn-sm" id="exportEvalCsvBtn">📥 Export CSV</button>
+                    <button class="btn btn-outline btn-sm" id="exportEvalJsonBtn">📥 Export JSON</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Export Card 3: Operational Audit Logs -->
+              <div class="export-card">
+                <div class="export-icon">🛡️</div>
+                <div class="export-content">
+                  <h4>Operational Audit Logs</h4>
+                  <p class="subtitle">Security events, authentication attempts, pipeline events, and system activity logs.</p>
+                  <div class="export-btn-group">
+                    <button class="btn btn-primary btn-sm" id="exportLogsCsvBtn">📥 Export CSV</button>
+                    <button class="btn btn-outline btn-sm" id="exportLogsJsonBtn">📥 Export JSON</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -234,6 +1981,329 @@
     </main>
   </div>
 
-  <script src="app.js"></script>
+
+  <!-- ======================================================================= -->
+  <!-- 4. MODALS (Forgot Password, Provision User, Document Preview)           -->
+  <!-- ======================================================================= -->
+  
+  <!-- Forgot Password Modal -->
+  <div id="forgotPasswordModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Password Reset Information</h3>
+        <button type="button" class="modal-close-btn" id="closeForgotModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>In accordance with enterprise security standards, self-service password recovery requires authorization from an active system administrator.</p>
+        <p style="margin-top: 0.75rem;">Default Demo Credentials available for immediate access:</p>
+        <ul style="margin-top: 0.5rem; padding-left: 1.25rem; font-size: 0.9rem; color: var(--text-main);">
+          <li><strong>Administrator:</strong> <code>admin@eknavigator.com</code> / <code>Admin@123456</code></li>
+          <li><strong>Knowledge Worker:</strong> <code>worker@eknavigator.com</code> / <code>Worker@123456</code></li>
+          <li><strong>Analyst:</strong> <code>analyst@eknavigator.com</code> / <code>Analyst@123456</code></li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="ackForgotModalBtn">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Provision User Modal (Admin Only) -->
+  <div id="provisionUserModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Provision New User Account</h3>
+        <button type="button" class="modal-close-btn" id="closeProvisionModalBtn">✕</button>
+      </div>
+      <form id="provisionUserForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="provFullName" class="text-input" placeholder="e.g. David Miller" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="provEmail" class="text-input" placeholder="david@enterprise.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Initial Password</label>
+            <input type="password" id="provPassword" class="text-input" placeholder="Min. 6 chars" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assign Role</label>
+            <select id="provRole" class="select-input">
+              <option value="knowledge_worker">Knowledge Worker</option>
+              <option value="analyst">Analyst</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Organization</label>
+            <input type="text" id="provOrg" class="text-input" value="Enterprise" />
+          </div>
+          <div id="provFeedback" class="alert-box" style="display: none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelProvisionBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitProvisionBtn">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom Role Modal (Admin Only) -->
+  <div id="customRoleModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="customRoleModalTitle">Create Custom Enterprise Role</h3>
+          <p class="subtitle" id="customRoleModalSubtitle">Assign granular capabilities across platform functions.</p>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeCustomRoleModalBtn">✕</button>
+      </div>
+      <form id="customRoleForm">
+        <input type="hidden" id="customRoleModalRoleId" value="" />
+        <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
+          <div class="form-group">
+            <label class="form-label">Role Name</label>
+            <input type="text" id="roleModalName" class="text-input" placeholder="e.g. Compliance Auditor" required />
+            <small class="form-help-text">Unique name for this custom organizational role.</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" id="roleModalDesc" class="text-input" placeholder="e.g. Reviews audit logs and executes benchmark quality evaluations" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="margin-bottom: 0.5rem; display: block;">Granular Permissions & Capabilities</label>
+            
+            <div style="background: var(--bg-lavender); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;">
+              <strong style="font-size: 0.85rem; color: var(--primary); display: block; margin-bottom: 0.5rem;">👑 ADMINISTRATION</strong>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.5rem;">
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="system_admin" />
+                  <span><strong>System Administration</strong> (User provisioning, role governance)</span>
+                </label>
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="audit_logs" />
+                  <span><strong>Operational Audit Logs</strong> (Inspect security trail)</span>
+                </label>
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="system_health" />
+                  <span><strong>System Health</strong> (Storage, DB, pipeline probes)</span>
+                </label>
+              </div>
+            </div>
+
+            <div style="background: var(--bg-lavender); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;">
+              <strong style="font-size: 0.85rem; color: var(--primary); display: block; margin-bottom: 0.5rem;">📁 CONTENT & RETRIEVAL</strong>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.5rem;">
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="doc_ingestion" checked />
+                  <span><strong>Document Ingestion</strong> (Upload & chunking)</span>
+                </label>
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="doc_deletion" />
+                  <span><strong>Document Deletion</strong> (Purge files & chunks)</span>
+                </label>
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="search_retrieval" checked />
+                  <span><strong>Hybrid Search</strong> (Dense vector + BM25)</span>
+                </label>
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="qa_citations" checked />
+                  <span><strong>Grounded Q&A</strong> (Page-level citations)</span>
+                </label>
+              </div>
+            </div>
+
+            <div style="background: var(--bg-lavender); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem;">
+              <strong style="font-size: 0.85rem; color: var(--primary); display: block; margin-bottom: 0.5rem;">🔬 ANALYTICS & INTELLIGENCE</strong>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.5rem;">
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="knowledge_graph" />
+                  <span><strong>Knowledge Graph</strong> (Interactive topology & GraphRAG)</span>
+                </label>
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="evaluation" />
+                  <span><strong>Evaluation Suite</strong> (Precision@K, Recall@K, MRR)</span>
+                </label>
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="export_center" />
+                  <span><strong>Reports & Export</strong> (CSV/JSON data exports)</span>
+                </label>
+              </div>
+            </div>
+
+            <div style="background: var(--bg-lavender); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+              <strong style="font-size: 0.85rem; color: var(--primary); display: block; margin-bottom: 0.5rem;">👤 GENERAL</strong>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.5rem;">
+                <label class="checkbox-label" style="font-size: 0.85rem;">
+                  <input type="checkbox" name="rolePerm" value="profile_settings" checked />
+                  <span><strong>Profile & Settings</strong> (Manage account & preferences)</span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+          <div id="roleModalFeedback" class="alert-box" style="display: none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelCustomRoleBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveCustomRoleBtn">Save Role</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Document Preview & Inspection Modal -->
+  <div id="documentPreviewModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="docPreviewTitle">Document Preview</h3>
+          <p class="subtitle" id="docPreviewMeta">Loading document details...</p>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeDocPreviewBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Page Toolbar -->
+        <div class="preview-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.6rem 0.85rem; background: var(--bg-lavender); border-radius: 8px;">
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" class="btn btn-secondary btn-sm" id="prevPageBtn">← Previous</button>
+            <span style="font-size: 0.88rem; font-weight: 500;">Page <strong id="currentPageNum">1</strong> of <span id="totalPagesNum">1</span></span>
+            <button type="button" class="btn btn-secondary btn-sm" id="nextPageBtn">Next →</button>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" class="btn btn-primary btn-sm" id="downloadDocModalBtn">📥 Download File</button>
+          </div>
+        </div>
+        <!-- Page Text Display Area -->
+        <div id="docPreviewContent" style="min-height: 280px; max-height: 480px; overflow-y: auto; background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; font-family: var(--font-sans); line-height: 1.7; white-space: pre-wrap; font-size: 0.92rem; color: var(--text-main);">
+          Loading page content...
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="closeDocPreviewFooterBtn">Close Preview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Collection Modal -->
+  <div id="createCollectionModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Create Document Collection</h3>
+        <button type="button" class="modal-close-btn" id="closeCreateColModalBtn">✕</button>
+      </div>
+      <form id="createCollectionForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Collection Name</label>
+            <input type="text" id="newColName" class="text-input" placeholder="e.g. Legal & Compliance Docs" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" id="newColDesc" class="text-input" placeholder="e.g. Policies, regulations, and privacy guidelines" />
+          </div>
+          <div class="form-row-grid">
+            <div class="form-group">
+              <label class="form-label">Theme Color</label>
+              <select id="newColColor" class="select-input">
+                <option value="#4F46E5">Indigo (#4F46E5)</option>
+                <option value="#0EA5E9">Sky Blue (#0EA5E9)</option>
+                <option value="#10B981">Emerald (#10B981)</option>
+                <option value="#F59E0B">Amber (#F59E0B)</option>
+                <option value="#8B5CF6">Purple (#8B5CF6)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Folder Icon</label>
+              <select id="newColIcon" class="select-input">
+                <option value="📁">📁 Folder</option>
+                <option value="🛡️">🛡️ Security</option>
+                <option value="⚙️">⚙️ Operations</option>
+                <option value="📐">📐 Architecture</option>
+                <option value="⚖️">⚖️ Legal</option>
+                <option value="📊">📊 Finance</option>
+              </select>
+            </div>
+          </div>
+          <div id="createColFeedback" class="alert-box" style="display: none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelCreateColBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitCreateColBtn">Create Collection</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Manage Collection Documents Modal -->
+  <div id="manageCollectionDocsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="manageColDocsModalTitle">Assign Documents to Collection</h3>
+        <button type="button" class="modal-close-btn" id="closeManageColDocsModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="subtitle" style="margin-bottom: 0.75rem;">Select documents from the enterprise repository to include in this folder:</p>
+        <div id="availableDocsCheckboxList" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 8px;">
+          <!-- Checkboxes for repository documents -->
+        </div>
+        <div id="manageColDocsFeedback" class="alert-box" style="display: none; margin-top: 0.75rem;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelManageColDocsBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveColDocsBtn">Save Assignments</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Document Diagnostics & Error Resolution Modal -->
+  <div id="documentErrorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="color: var(--danger); font-size: 1.25rem;">⚠️</span>
+          <h3 id="docErrorModalTitle">Document Ingestion Diagnosis</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeDocErrorModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #FFF5F5; border: 1px solid #FED7D7; border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1rem;">
+          <div style="font-weight: 700; color: #C24141; margin-bottom: 0.25rem;" id="docErrorFileName">zero_text_scanned.pdf</div>
+          <div style="font-size: 0.85rem; color: #742A2A;" id="docErrorSummaryText">Extraction Error: Scanned image-only PDF requires OCR processing.</div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-color);">Technical Diagnostic Details</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;" id="docErrorTechnicalDetail">
+            The document stream contains 0 extractable digital text characters. The file is either a scanned image, rasterized PDF without an embedded text layer, or has corrupt internal cross-reference tables.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-lavender); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1rem; border-left: 3px solid var(--primary);">
+          <div style="font-weight: 700; font-size: 0.85rem; color: var(--primary); margin-bottom: 0.25rem;">💡 Recommended Resolution</div>
+          <ul style="font-size: 0.85rem; color: var(--text-muted); margin: 0; padding-left: 1.25rem; line-height: 1.5;" id="docErrorResolutionList">
+            <li>For scanned/image PDFs: Convert using OCR (e.g., Adobe Acrobat, Tesseract OCR) to generate a searchable text layer before upload.</li>
+            <li>For corrupted files: Re-export the document as a clean standard PDF.</li>
+            <li>Once updated, use the Reprocess button below or delete and re-upload the file.</li>
+          </ul>
+        </div>
+
+        <div id="reprocessFeedback" class="alert-box" style="display: none; margin-bottom: 0.5rem;"></div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <button type="button" class="btn btn-danger btn-sm" id="docErrorDeleteBtn">Delete Document</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-outline btn-sm" id="docErrorDownloadBtn">Download File</button>
+          <button type="button" class="btn btn-primary btn-sm" id="docErrorRetryBtn">⚡ Reprocess Document</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="closeDocErrorModalFooterBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
 </body>
 </html>
