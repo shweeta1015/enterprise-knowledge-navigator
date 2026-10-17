@@ -4,6 +4,7 @@
 > *A production-ready, multi-role knowledge management system bridging dense vector semantic retrieval with interactive knowledge graph traversal.*
 
 
+
 ---
 
 ## 1. Introduction
@@ -117,7 +118,22 @@ In addition to built-in roles, administrators can create and manage custom roles
 
 ---
 
-## 7. Technical Architecture
+## 7. Application Interface & Visual Showcase
+
+The platform provides a responsive, single-page web interface built with modern vanilla ES6+ JavaScript, CSS3 design tokens, and D3.js v7:
+
+| Application View | Interface Screenshot | Capabilities Demonstrated |
+| :--- | :--- | :--- |
+| **Public Landing Page** | ![Public Landing Page](docs/screenshots/01_landing_page.png) | Unified entry portal with interactive pipeline demonstration, architectural highlights, and direct role navigation. |
+| **Authentication & Role Selection** | ![Authentication Screen](docs/screenshots/02_login_portal.png) | Secure login portal with role quick-access selectors (Administrator, Knowledge Worker, Analyst) and password recovery. |
+| **Executive Operations Dashboard** | ![Executive Dashboard](docs/screenshots/03_worker_dashboard.png) | Real-time system telemetry, indexed document catalog, vector chunk metrics, and instant hybrid search interface. |
+| **Grounded AI Q&A Assistant** | ![Grounded Q&A Assistant](docs/screenshots/04_grounded_assistant.png) | Factual natural-language Q&A engine with toggleable GraphRAG expansion, compliance suggestions, and verified page citations. |
+| **Interactive D3.js Knowledge Graph** | ![Knowledge Graph](docs/screenshots/05_knowledge_graph.png) | Force-directed entity-relationship network visualizer mapping institutional policies, leadership, and cross-department links. |
+| **Administrative Governance & RBAC** | ![Admin Roles Matrix](docs/screenshots/06_admin_portal.png) | Fine-grained capability matrix across system roles, user provisioning, and tamper-evident audit logs. |
+
+---
+
+## 8. Technical Architecture
 
 ```mermaid
 flowchart TD
@@ -182,7 +198,7 @@ flowchart TD
 
 ---
 
-## 8. Technology Stack
+## 9. Technology Stack
 
 ### Backend
 - **Framework**: Python 3.11+ / Python 3.14 on FastAPI (Starlette ASGI)
@@ -211,7 +227,7 @@ flowchart TD
 
 ---
 
-## 9. AI, NLP & Retrieval Methodologies
+## 10. AI, NLP & Retrieval Methodologies
 
 ### Document Ingestion & Chunking
 1. **Extraction**: Safe text stream extraction from PDF, Word DOCX, and TXT files with special character sanitization.
@@ -239,7 +255,7 @@ Queries are executed concurrently across two retrieval modalities:
 
 ---
 
-## 10. Evaluation Benchmarking Metrics
+## 11. Evaluation Benchmarking Metrics
 
 The system includes a dedicated evaluation pipeline measuring retrieval performance across five key metrics:
 
@@ -253,7 +269,7 @@ The system includes a dedicated evaluation pipeline measuring retrieval performa
 
 ---
 
-## 11. Directory Structure
+## 12. Directory Structure
 
 ```
 enterprise-knowledge-navigator/
@@ -299,12 +315,15 @@ enterprise-knowledge-navigator/
 │   ├── Caddyfile                # Optional Caddy reverse proxy configuration
 │   └── nginx.conf               # Optional Nginx reverse proxy configuration
 ├── docs/                        # Architecture guides, audit logs, and technical reports
+│   ├── diagrams/                # Architectural flowcharts and system diagrams
+│   └── screenshots/             # Genuine captures of the running web application
 ├── frontend/
 │   ├── app.js                   # Client-side SPA controller and D3.js graph visualizer
 │   ├── index.html               # Semantic HTML5 layout and role-tailored dashboard shells
 │   └── style.css                # CSS custom properties and responsive stylesheet
 ├── scripts/
-│   └── comprehensive_final_audit.py # Deep 29-check end-to-end verification script
+│   ├── capture_genuine_screenshots.py # Playwright automated screenshot capture utility
+│   └── comprehensive_final_audit.py   # Deep 29-check end-to-end verification script
 ├── tests/                       # Complete automated pytest test suite (58 tests)
 │   ├── test_accuracy_benchmark.py
 │   ├── test_auth_and_roles.py
@@ -324,7 +343,7 @@ enterprise-knowledge-navigator/
 
 ---
 
-## 12. Local Installation & Setup
+## 13. Local Installation & Setup
 
 Enterprise Knowledge Navigator is designed to run seamlessly in a local development environment. Both the FastAPI backend and modern single-page frontend (HTML5/CSS3/JavaScript/D3.js) are served concurrently through a unified ASGI web server on localhost.
 
@@ -419,19 +438,25 @@ Enterprise Knowledge Navigator is designed to run seamlessly in a local developm
 
 ---
 
-## 13. Pre-Seeded Default Accounts
+## 14. Pre-Seeded Default Accounts & Access Roles
 
-For evaluation and demonstration, the database initializes with the following default accounts:
+During initial local database bootstrapping, the application initializes default accounts representing each built-in role to facilitate evaluation:
 
-| Role | Email | Password | Granted Scope |
-| :--- | :--- | :--- | :--- |
-| **Administrator** | `admin@eknavigator.com` | `Admin@123456` | Full platform administration, users, roles, audit logs |
-| **Knowledge Analyst** | `analyst@eknavigator.com` | `Analyst@123456` | Knowledge Graph, Evaluation Benchmarks, Data Export |
-| **Knowledge Worker** | `worker@eknavigator.com` | `Worker@123456` | Document Ingestion, Hybrid Search, Grounded Q&A |
+| Role | Account Identifier | Access Level & Scope |
+| :--- | :--- | :--- |
+| **Administrator** | `admin@eknavigator.com` | Full platform administration, user directory, role governance, and audit logs |
+| **Knowledge Analyst** | `analyst@eknavigator.com` | Knowledge Graph navigation, evaluation benchmarks, and data export |
+| **Knowledge Worker** | `worker@eknavigator.com` | Document ingestion, multi-format catalog, hybrid search, and grounded Q&A |
+
+### Safe Local Setup & Authentication
+
+1. **Local Demonstration Login**: When running locally on localhost, the single-page login screen provides convenient role quick-fill buttons for rapid demonstration without requiring manual credential entry.
+2. **Self-Registration**: New local worker accounts can be created directly using the **Create an Account** portal on the login screen ([http://127.0.0.1:8000/](http://127.0.0.1:8000/)).
+3. **Privilege Hardening for Shared/Production Environments**: In production or multi-user environments, default administrator credentials must be changed immediately upon initialization through the Profile & Settings menu, or supplied via secure environment variables prior to initial database bootstrapping.
 
 ---
 
-## 14. Running Tests
+## 15. Running Tests
 
 The test suite validates database models, security, authorization, document processing, and hybrid retrieval.
 
@@ -447,7 +472,7 @@ python scripts/comprehensive_final_audit.py
 
 ---
 
-## 15. Local Development & Git Synchronization Workflow
+## 16. Local Development & Git Synchronization Workflow
 
 The project follows a disciplined local engineering and version control workflow:
 
@@ -488,7 +513,7 @@ The project follows a disciplined local engineering and version control workflow
 
 ---
 
-## 16. Security & Privacy Notes
+## 17. Security & Privacy Notes
 
 - **Password Security**: All user passwords are encrypted using bcrypt with per-user salt.
 - **Signed Tokens**: JWT session tokens are signed with HS256 and subject to strict expiration (`ACCESS_TOKEN_EXPIRE_MINUTES`).
@@ -498,14 +523,14 @@ The project follows a disciplined local engineering and version control workflow
 
 ---
 
-## 17. Current Limitations
+## 18. Current Limitations
 
 - **OCR for Scanned Documents**: Documents lacking digital text streams (pure rasterized scanned images) are flagged with an unprocessable warning (`status: error`). Optical Character Recognition (Tesseract) can be integrated in future releases.
 - **Vector Space Scaling**: The built-in TF-IDF hybrid retrieval engine is optimized for single-node deployments up to 25,000 document passages. For ultra-scale corpora (>100,000 documents), horizontal vector backends such as `pgvector` or `HNSWLib` can be connected.
 
 ---
 
-## 18. Troubleshooting
+## 19. Troubleshooting
 
 | Symptom | Cause | Resolution |
 | :--- | :--- | :--- |
@@ -516,6 +541,6 @@ The project follows a disciplined local engineering and version control workflow
 
 ---
 
-## 19. License
+## 20. License
 
 This project is licensed under the [MIT License](LICENSE).
