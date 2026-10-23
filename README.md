@@ -335,7 +335,7 @@ enterprise-knowledge-navigator/
 ├── scripts/
 │   ├── capture_genuine_screenshots.py # Playwright automated screenshot capture utility
 │   └── comprehensive_final_audit.py   # Deep 29-check end-to-end verification script
-├── tests/                       # Complete automated pytest test suite (58 tests)
+├── tests/                       # Complete automated pytest test suite (63 tests)
 │   ├── test_accuracy_benchmark.py
 │   ├── test_auth_and_roles.py
 │   ├── test_edge_cases_and_resilience.py
@@ -343,6 +343,7 @@ enterprise-knowledge-navigator/
 │   ├── test_full_pipeline_verification.py
 │   ├── test_ml_engine.py
 │   ├── test_navigator_pipeline.py
+│   ├── test_security_and_access_control.py
 │   └── test_workspace_features.py
 ├── .env.example                 # Safe environment template with placeholder values
 ├── .gitignore                   # Comprehensive exclusion of secrets, DBs, and runtime data
@@ -471,7 +472,7 @@ During initial local database bootstrapping, the application initializes default
 
 The test suite validates database models, security, authorization, document processing, and hybrid retrieval.
 
-### Run Full Pytest Suite (58 Tests)
+### Run Full Pytest Suite (63 Tests)
 ```bash
 python -m pytest tests -v
 ```
@@ -497,7 +498,7 @@ The project follows a disciplined local engineering and version control workflow
                        ▼
 ┌──────────────────────────────────────────────┐
 │ Local Automated Quality & Verification Suite │
-│ - pytest tests -v (58 Unit & Integration)    │
+│ - pytest tests -v (63 Unit & Security Tests) │
 │ - python scripts/comprehensive_final_audit.py│
 └──────────────────────┬───────────────────────┘
                        │ 2. Stage verified code (excluding secrets, DBs, uploads)
