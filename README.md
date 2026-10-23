@@ -1,21 +1,19 @@
 # Enterprise Knowledge Navigator
 
 > **Enterprise Semantic Retrieval, GraphRAG & Institutional Intelligence Platform**  
-> *A production-ready, multi-role knowledge management system bridging dense vector semantic retrieval with interactive knowledge graph traversal.*
-
-
+> *A modular, local-first enterprise knowledge platform bridging sparse statistical vector retrieval (TF-IDF + Cosine Similarity), lexical search, and interactive knowledge graph traversal.*
 
 ---
 
 ## 1. Introduction
 
-**Enterprise Knowledge Navigator** is a comprehensive, production-compatible enterprise knowledge retrieval and synthesis platform. Modern organizations face severe cognitive overload and knowledge fragmentation across departments, manuals, and unstructured document silos. Traditional keyword searches frequently miss conceptual meaning, while generic Large Language Models (LLMs) often hallucinate answers and lack verifiable institutional attribution.
+**Enterprise Knowledge Navigator** is a modular enterprise knowledge retrieval and synthesis platform. Modern organizations face cognitive overload and knowledge fragmentation across departments, operational manuals, and unstructured document silos. Traditional keyword searches frequently miss conceptual relevance, while generic Large Language Models (LLMs) often hallucinate answers and lack verifiable institutional attribution.
 
-Enterprise Knowledge Navigator solves these challenges by combining:
-1. **Lexical Keyword Search (BM25 tokenization)** and **Dense Semantic Vector Space Modeling (TF-IDF with Cosine Similarity)** via **Reciprocal Rank Fusion (RRF)**.
-2. **Interactive Knowledge Graph Traversal (GraphRAG)** for multi-hop semantic relationship expansion across corporate entities, policies, and products.
-3. **Deterministic, Zero-Key Grounded Extractive Synthesis** that verifies claims sentence-by-sentence and delivers page-precise citations `[Document Name, Page X]`.
-4. **Strict Abstention Protocols** that refuse to hallucinate when evidence is absent from the organizational corpus.
+Enterprise Knowledge Navigator addresses these challenges by combining:
+1. **Lexical Keyword Search** (frequency-density scoring and exact n-gram phrase matching) and **Sparse Statistical Vector Space Modeling** (Scikit-Learn TF-IDF with Cosine Similarity) fused via **Reciprocal Rank Fusion (RRF)**.
+2. **Interactive Knowledge Graph Traversal (GraphRAG)** for rule-based entity/relation extraction and 1-hop context expansion across corporate entities, policies, and products.
+3. **Deterministic, Zero-Key Grounded Extractive Synthesis** that verifies assertions against database passages and delivers page-precise citations `[Document Name, Page X]`.
+4. **Heuristic Abstention Protocols** that refuse to fabricate answers (`confidence: 0.0`, status: `abstained`) when supporting evidence is absent from the indexed corpus.
 5. **Multi-Tenant Role-Based Access Control (RBAC)** and **Custom Role Governance** tailored for Administrators, Knowledge Analysts, and Knowledge Workers.
 
 ---
@@ -31,25 +29,25 @@ Enterprise internal knowledge bases suffer from three critical bottlenecks:
 
 ## 3. Project Objectives
 
-1. **Deterministic Attribution**: Guarantee that every fact in generated responses traces directly to an indexed enterprise passage with exact document, page, and chunk metadata.
-2. **Hallucination Prevention**: Strictly abstain (`confidence: 0.0`, status: `abstained`) when answering questions outside the verified organizational corpus.
+1. **Verifiable Attribution**: Maximize factual grounding by verifying assertions directly against indexed enterprise passages with document, page, and chunk metadata.
+2. **Hallucination Mitigation**: Strictly abstain (`confidence: 0.0`, status: `abstained`) when answering questions that fall outside the indexed organizational corpus or fail retrieval confidence thresholds.
 3. **Operational Role Isolation**: Provide dedicated, secure interfaces tailored to Administrators, Knowledge Analysts, and Knowledge Workers.
 4. **Flexible & Extensible RBAC**: Support built-in system roles and enable administrators to configure dynamic custom roles with granular platform capabilities.
-5. **Zero-Key Local Capability with Cloud LLM Extension**: Provide deterministic local extractive synthesis out-of-the-box without requiring third-party API keys, while supporting optional cloud LLM providers (Groq, Gemini, OpenAI).
-6. **Production-Ready Portability**: Designed for containerized and reproducible environments with clean dependency isolation, automated CI/CD validation pipelines, and portable SQLite storage.
+5. **Zero-Key Local Capability with Cloud LLM Extension**: Provide deterministic local extractive synthesis out-of-the-box without requiring third-party API keys, while supporting optional cloud LLM providers (Groq implemented via OpenAI-compatible completions; Gemini and OpenAI settings configured as extensible hooks).
+6. **Portable Architecture**: Designed for containerized and reproducible execution with dependency isolation, automated test validation, and portable SQLite storage.
 
 ---
 
 ## 4. Key Features
 
-- **Document Ingestion Engine**: Automated multi-format parsing for PDF, DOCX, and TXT files, recursive text extraction, dynamic chunking with customizable token windows and overlaps, and SHA-256 duplicate prevention.
-- **Hybrid Retrieval Engine**: Multi-mode retrieval supporting Keyword (Lexical), Vector (Dense Semantic), and Hybrid Fusion scoring with configurable weighting.
-- **Grounded AI Assistant & Verifiable Citations**: Factual answer synthesis engine that cross-references assertions against physical SQLite chunks and outputs interactive citation links.
-- **Interactive Knowledge Graph & GraphRAG**: Automatic entity extraction (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relational link extraction rendered with D3.js force-directed physics, with multi-hop context expansion during RAG retrieval.
+- **Document Ingestion Engine**: Automated multi-format parsing for PDF (`pypdf` with `PyPDF2` fallback), Word DOCX (`python-docx`), and plain text (`.txt`) files, Unicode NFKC normalization, dynamic sliding-window chunking (400 tokens with 60-token overlap), and SHA-256 duplicate prevention.
+- **Hybrid Retrieval Engine**: Multi-mode retrieval supporting Keyword (Lexical frequency-density), Vector (TF-IDF sparse vector space with cosine similarity), and Reciprocal Rank Fusion (RRF) scoring with configurable weighting.
+- **Grounded AI Assistant & Citations**: Factual answer synthesis engine that cross-references assertions against physical SQLite chunks, outputs interactive citations, and falls back to local extractive synthesis when cloud keys are omitted.
+- **Interactive Knowledge Graph & GraphRAG**: Rule-based entity extraction (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relational link extraction rendered with D3.js force-directed physics, with 1-hop context expansion during RAG retrieval.
 - **Enterprise Role-Based Access Control**: Strict privilege separation across API endpoints and UI views, with public registration restricted to non-privileged roles.
 - **Dynamic Custom Role Governance**: Administrative UI and REST API for creating, editing, and safely deleting custom enterprise roles with granular capability sets and user assignment deletion protection.
 - **Password Recovery & OTP Security**: Cryptographically secure 6-digit OTP verification with rate limiting, attempt decrement, resend cooldown, and timing-safe SHA-256 hashing.
-- **Quality & Retrieval Benchmarks**: Built-in quantitative evaluation engine computing Precision@K, Recall@K, Mean Reciprocal Rank (MRR), Groundedness Ratio, and query latency with persistent historical tracking.
+- **Quality & Retrieval Benchmarks**: Built-in quantitative evaluation engine computing Precision@K, Recall@K, Mean Reciprocal Rank (MRR), and query latency with persistent historical tracking.
 - **Workspace Productivity Suite**: Document categorization collections, saved answers, bookmarked insights, persistent search audit history, and notification feeds.
 - **Data Export Center**: Instant export of catalog records, evaluation benchmarks, and operational audit logs into CSV and JSON formats.
 
@@ -154,15 +152,15 @@ flowchart TD
     end
 
     subgraph Engine["Machine Learning & NLP Services"]
-        VectorService["Scikit-Learn TF-IDF & Cosine Similarity"]
-        BM25Service["Lexical Inverted Index & Tokenizer"]
-        RRF["Reciprocal Rank Fusion Ranking Engine"]
+        VectorService["Scikit-Learn TF-IDF & Cosine Similarity (Sparse Vector Space)"]
+        BM25Service["Lexical Keyword Engine (Frequency-Density & N-Gram Matching)"]
+        RRF["Reciprocal Rank Fusion Ranking Engine (k=60)"]
         ExtractiveRAG["Zero-Key Deterministic Extractive Synthesizer"]
-        CloudLLM["Optional Cloud LLM (Groq / Gemini / OpenAI)"]
+        CloudLLM["Optional Cloud LLM (Groq Implemented; Gemini/OpenAI Configured)"]
     end
 
     subgraph Storage["Persistence Layer"]
-        DB[("SQLite Database / Relational Store")]
+        DB[("SQLite Database via SQLAlchemy ORM")]
         VectorStore[("Persistent Vector Index (PKL & JSON)")]
         DocStore[("Structured Document Filesystem (data/raw)")]
         GraphStore[("Knowledge Graph Store (JSON)")]
@@ -204,25 +202,25 @@ flowchart TD
 - **Framework**: Python 3.11+ / Python 3.14 on FastAPI (Starlette ASGI)
 - **ASGI Server**: Uvicorn with single-worker concurrency safety for SQLite
 - **Configuration & Validation**: Pydantic v2, Pydantic-Settings, Python-Dotenv
-- **Relational Database**: SQLAlchemy ORM with SQLite (PostgreSQL compatible)
+- **Relational Database**: SQLite with SQLAlchemy ORM (SQLAlchemy provides architectural portability for PostgreSQL; verified primarily on SQLite)
 - **Logging**: Rotating file and console structured logging
 
 ### Machine Learning, Retrieval & NLP
-- **Statistical Vector Retrieval**: Scikit-Learn `TfidfVectorizer` (sublinear TF scaling, n-grams 1-2, English stop-words) with Cosine Similarity
-- **Lexical Keyword Retrieval**: BM25 frequency-density scoring and exact multi-word phrase matching
-- **Hybrid Fusion**: Reciprocal Rank Fusion (RRF) with configurable modality weights ($k = 60$)
-- **Optional Dense Embeddings**: Sentence-Transformers neural embedders (`sentence-transformers/all-MiniLM-L6-v2`) when installed
-- **Document Processing**: `pypdf` / `PyPDF2` (PDF extraction), `python-docx` (Word DOCX extraction), UTF-8 / NFKC Unicode normalization, and optional OCR fallback (`pytesseract`, `pdf2image`) for scanned PDFs
-- **Knowledge Graph**: Rule-based entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relational triple extraction
-- **Optional Cloud AI**: Groq SDK (`llama-3.3-70b-versatile`), Google Gemini, and OpenAI API integrations
+- **Sparse Statistical Vector Retrieval**: Scikit-Learn `TfidfVectorizer` (sublinear TF scaling, n-grams 1-2, English stop-words) with Cosine Similarity
+- **Lexical Keyword Retrieval**: Frequency-density scoring with length normalization and exact multi-word n-gram phrase matching
+- **Hybrid Fusion**: Reciprocal Rank Fusion (RRF) with configurable modality weights ($w_{\text{semantic}}=0.7, w_{\text{keyword}}=0.3, k=60$)
+- **Optional Dense Embeddings**: Planned architectural extension (optional `sentence-transformers` hook)
+- **Document Processing**: `pypdf>=4.0.0` (primary modern reader) with `PyPDF2` fallback (PDF), `python-docx` (Word DOCX), UTF-8 / NFKC Unicode normalization, and optional OCR fallback hooks (`pytesseract`, `pdf2image` requiring system Tesseract binary)
+- **Knowledge Graph & GraphRAG**: Rule-based entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relational triple extraction with 1-hop context expansion during RAG
+- **Cloud AI Integration**: Groq API (`llama-3.3-70b-versatile` implemented via OpenAI-compatible endpoint); Google Gemini and OpenAI API keys configured in settings as planned provider hooks
 
 ### Security & Authentication
-- **Password Hashing**: `passlib` with `bcrypt` salt generation
+- **Password Hashing**: `passlib` with `bcrypt` salt generation (one-way cryptographic hashing)
 - **Session Tokens**: Signed Bearer JWTs via `python-jose` (HS256)
-- **Production Secret Validation**: Mandatory 32+ character non-default `SECRET_KEY` in production environments
-- **Multi-Tenant Document Access Control**: Role and owner-based document access isolation (`public`, `internal`, `confidential`, `restricted`) across search, RAG Q&A, and knowledge graph
+- **Production Secret Validation**: Mandatory 32+ character non-default `SECRET_KEY` enforced in production environments
+- **Multi-Tenant Document Access Control**: Role and ownership-based document access isolation (`public`, `internal`, `confidential`, `restricted`) across search, RAG Q&A, and knowledge graph
 - **Demo Account Gating**: `ENABLE_DEMO_ACCOUNTS` setting (enabled in dev, strictly disabled in production)
-- **Prompt Injection Defense**: Multi-pattern jailbreak filtering and strict isolation of embedded document instructions as untrusted data
+- **Prompt Injection Defense**: Multi-pattern regex filtering and strict isolation of embedded document instructions as untrusted data
 - **OTP Recovery**: Cryptographically secure numeric OTPs, timing-attack safe `secrets.compare_digest` verification
 
 ### Frontend
@@ -235,48 +233,52 @@ flowchart TD
 
 ## 10. AI, NLP & Retrieval Methodologies
 
-### Lexical Retrieval vs. Dense Vector Retrieval
-Enterprise Knowledge Navigator clearly distinguishes between retrieval paradigms:
-- **Lexical BM25 Retrieval**: Matches query keywords, acronyms, and multi-word n-gram phrases against indexed document tokens. Effective for specific code identifiers, acronyms, policy numbers, and verbatim phrases.
-- **Statistical Vector Space Modeling (TF-IDF)**: Projects text into a high-dimensional vocabulary vector space with sublinear term-frequency scaling and cosine similarity. Captures thematic relevance without external API dependencies.
-- **Dense Neural Embeddings (Optional)**: Maps queries and passages into dense continuous vector spaces using pre-trained sentence transformer models when installed.
+### Lexical Retrieval vs. Sparse Statistical Vector Retrieval
+Enterprise Knowledge Navigator distinguishes between complementary retrieval paradigms:
+- **Lexical Keyword Retrieval**: Matches query terms, acronyms, and multi-word n-gram phrases against indexed document passages using length-normalized frequency-density scoring. Effective for code identifiers, policy numbers, and verbatim phrases.
+- **Sparse Statistical Vector Space Modeling (TF-IDF)**: Projects text into a high-dimensional vocabulary vector space with sublinear term-frequency scaling and computes cosine similarity:
+  $$\text{Cosine Similarity}(\mathbf{u}, \mathbf{v}) = \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\|_2 \|\mathbf{v}\|_2}$$
+  Captures thematic relevance locally without external API dependencies.
+- **Dense Neural Embeddings (Planned / Optional)**: Architectural hook for mapping queries and passages into dense continuous vector spaces using pre-trained sentence transformer models (`sentence-transformers/all-MiniLM-L6-v2`) when optional dependencies are installed.
 - **Hybrid Reciprocal Rank Fusion (RRF)**: Merges ranked candidate lists from both modalities:
-  $$\text{RRF Score}(d) = \sum_{m \in \{\text{vector}, \text{keyword}\}} \frac{w_m}{k + \text{Rank}_m(d)}$$
-  *(where $k = 60$ and $w_m$ represents modality weight).*
+  $$\text{RRF Score}(d) = \sum_{m \in \{\text{semantic}, \text{keyword}\}} \frac{w_m}{k + \text{rank}_m(d)}$$
+  *(where $k = 60$, with default weights $w_{\text{semantic}} = 0.7$ and $w_{\text{keyword}} = 0.3$).*
 
 ### Document Ingestion & Chunking
-1. **Extraction & Sanitization**: Safe text stream extraction from PDF, Word DOCX, and TXT files with Unicode NFKC normalization and control character sanitization.
-2. **Duplicate Detection**: Content hash computed via SHA-256 before disk writes. Identical files return `HTTP 409 Conflict`.
-3. **Sliding-Window Chunking**: Splits extracted document text into chunks of 400 tokens with a 60-token overlap, preserving cross-sentence context boundaries.
+1. **Extraction & Sanitization**: Text extraction from PDF (`pypdf` with `PyPDF2` fallback), Word DOCX (`python-docx`), and plain text files with Unicode NFKC normalization and control character stripping.
+2. **Duplicate Detection**: Computes SHA-256 hash before saving. Identical content returns `HTTP 409 Conflict`.
+3. **Sliding-Window Chunking**: Splits document text into chunks of 400 tokens with a 60-token overlap to preserve sentence boundaries.
 4. **Metadata Preservation**: Every chunk retains its `document_id`, `chunk_index`, `page_number`, token count, and access tenancy tags.
 
-### Grounded Answer Synthesis & Verifiable Citations
-- Responses are synthesized strictly from retrieved passages.
-- In zero-key mode, the deterministic extractive engine selects top-scoring grounded assertions, cross-verifies sentences against SQLite source chunks, and appends explicit citations in `[Filename, Page X, Chunk Y]` format.
-- If retrieved passage similarity falls below the confidence threshold, the assistant abstains with: *"I could not find sufficient information in the indexed enterprise documents to answer this question."*
+### Grounded Answer Synthesis & Citations
+- **Zero-Key Deterministic Extractive Synthesis**: In default local mode, the engine selects top-scoring grounded assertions, cross-verifies sentences against SQLite source chunks, and appends explicit citations in `[Filename, Page X]` format.
+- **Optional Cloud Synthesis**: When `GROQ_API_KEY` is configured, queries can be synthesized via Groq (`llama-3.3-70b-versatile`) with evidence validation fallback.
+- **Heuristic Abstention**: If retrieved passage similarity falls below confidence thresholds or evidence is absent, the assistant strictly abstains: *"I could not find sufficient information in the indexed enterprise documents to answer this question."*
 
-### Multi-Tenant Access Control & Cross-User Document Isolation
-- Documents can be tagged with access tiers: `public`, `internal`, `confidential`, or `restricted`.
-- Confidential and restricted documents are strictly filtered out of search results, retrieved chunks, RAG answers, citations, and Knowledge Graph visualizations for unauthorized roles.
-- Document deletion is strictly authorized: only document owners or system administrators can delete documents.
+### Multi-Tenant Access Control & Document Isolation
+- Documents are tagged with access tiers: `public`, `internal`, `confidential`, or `restricted`.
+- Access checks enforce that confidential and restricted documents are excluded from search results, retrieved chunks, RAG answers, citations, and Knowledge Graph visualizations for unauthorized roles.
+- Document deletion is restricted to document owners or system administrators.
 
 ### Knowledge Graph & GraphRAG
-- Evaluates entity co-occurrences and semantic patterns to build an entity-relationship network.
-- During query synthesis, GraphRAG extracts neighboring nodes within $k$-hops of identified entities to inject structural relational context into the prompt, respecting document access boundaries.
+- Uses rule-based regex entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relationship pattern matching (`MANAGES`, `DEVELOPS`, `OPERATES_IN`, `GOVERNS`, `INTEGRATES_WITH`).
+- During query synthesis, GraphRAG retrieves 1-hop connected facts from authorized documents to inject structural relational context into the prompt.
 
 ---
 
 ## 11. Evaluation Benchmarking Metrics
 
-The system includes a dedicated evaluation pipeline measuring retrieval performance across five key metrics:
+The system includes a dedicated evaluation pipeline (`evaluation_service.py`) measuring retrieval performance across standard information retrieval metrics:
 
-| Metric | Calculation Method | Target Threshold |
-| :--- | :--- | :--- |
-| **Precision@K** | Ratio of relevant retrieved chunks among top-K results | $\ge 80\%$ |
-| **Recall@K** | Ratio of relevant chunks retrieved out of total ground truth chunks | $\ge 85\%$ |
-| **MRR (Mean Reciprocal Rank)** | Average reciprocal rank of the first relevant retrieved document: $\frac{1}{|Q|}\sum_{i=1}^{|Q|}\frac{1}{\text{rank}_i}$ | $\ge 0.75$ |
-| **Groundedness Ratio** | Percentage of synthesized response claims backed by database passage citations | $100\%$ |
-| **Average Query Latency** | End-to-end retrieval, fusion, and synthesis execution duration | $< 150\text{ ms}$ |
+| Metric | Calculation Method | Target Threshold | Evaluated Benchmark |
+| :--- | :--- | :--- | :--- |
+| **Precision@K** | $\text{Precision@K} = \frac{|\text{Relevant Chunks in Top-K}|}{K}$ | $\ge 80\%$ | Measured on benchmark queries |
+| **Recall@K** | $\text{Recall@K} = \frac{|\text{Discovered Target Concepts}|}{|\text{Total Expected Concepts}|}$ | $\ge 85\%$ | Measured on benchmark queries |
+| **MRR (Mean Reciprocal Rank)** | $\text{MRR} = \frac{1}{|Q|} \sum_{i=1}^{|Q|} \frac{1}{\text{rank}_i}$ | $\ge 0.75$ | Evaluated across query suite |
+| **Groundedness Verification** | Percentage of synthesized claims backed by database passage evidence | High / Verified | Verified against source chunks |
+| **Query Latency** | End-to-end retrieval, fusion, and synthesis execution duration | $< 150\text{ ms}$ | Benchmarked on local test corpus |
+
+> **Benchmark Methodology**: Evaluation runs execute 4 standard enterprise domain test queries (remote work, healthcare benefits, quarterly revenue, container deployment) against indexed corporate documents in SQLite, calculating precision, recall, reciprocal ranks, and millisecond latency.
 
 ---
 
@@ -447,12 +449,13 @@ Enterprise Knowledge Navigator is designed to run seamlessly in a local developm
      }
    }
    ```
+   > **Note on Active Providers**: The `active_providers` field displays the configured provider names in `config.py`. In zero-key local mode (without a `GROQ_API_KEY`), the RAG assistant automatically uses local deterministic extractive synthesis and sparse TF-IDF retrieval.
 
 ---
 
 ## 14. Pre-Seeded Default Accounts & Access Roles
 
-During initial local database bootstrapping, the application initializes default accounts representing each built-in role to facilitate evaluation:
+During initial local database bootstrapping, the application initializes default accounts representing each built-in role to facilitate evaluation when `ENABLE_DEMO_ACCOUNTS=True`:
 
 | Role | Account Identifier | Access Level & Scope |
 | :--- | :--- | :--- |
@@ -463,8 +466,11 @@ During initial local database bootstrapping, the application initializes default
 ### Safe Local Setup & Authentication
 
 1. **Local Demonstration Login**: When running locally on localhost, the single-page login screen provides convenient role quick-fill buttons for rapid demonstration without requiring manual credential entry.
-2. **Self-Registration**: New local worker accounts can be created directly using the **Create an Account** portal on the login screen ([http://127.0.0.1:8000/](http://127.0.0.1:8000/)).
-3. **Privilege Hardening for Shared/Production Environments**: In production or multi-user environments, default administrator credentials must be changed immediately upon initialization through the Profile & Settings menu, or supplied via secure environment variables prior to initial database bootstrapping.
+2. **Self-Registration**: New local worker accounts can be created directly using the **Create an Account** portal on the login screen (`http://127.0.0.1:8000/`).
+3. **Password Management**: Passwords can be updated at any time through the **Profile & Settings** menu or reset via the cryptographically secure **Forgot Password** OTP flow.
+4. **Production Security Warning**:
+   > [!WARNING]
+   > Demo accounts are strictly intended for local demonstration and academic review. In production (`ENVIRONMENT=production`), always configure `ENABLE_DEMO_ACCOUNTS=False` and supply a strong random `SECRET_KEY` of at least 32 characters in your environment. The application will block startup if a default key is detected in production.
 
 ---
 
@@ -510,9 +516,9 @@ The project follows a disciplined local engineering and version control workflow
                        │ 3. Automated CI Validation on Ubuntu Linux
                        ▼
 ┌──────────────────────────────────────────────┐
-│ GitHub Actions CI Pipeline (Passing 100%)    │
+│ GitHub Actions Automated CI Pipeline         │
 │ - Compiles syntax across all modules         │
-│ - Executes full pytest suite                 │
+│ - Executes full 63-test pytest suite         │
 │ - Runs 29-check comprehensive audit script   │
 └──────────────────────────────────────────────┘
 ```
@@ -521,24 +527,44 @@ The project follows a disciplined local engineering and version control workflow
 2. **Local Validation**: Run `pytest tests -v` and `python scripts/comprehensive_final_audit.py` to confirm zero regressions.
 3. **Data Protection**: Ensure private databases (`*.db`), `.env` files, logs, and user-uploaded raw files remain strictly untracked and excluded via `.gitignore`.
 4. **Git Synchronization**: Push clean commits to `https://github.com/shweeta1015/enterprise-knowledge-navigator.git`.
-5. **Continuous Integration**: GitHub Actions CI independently tests every pushed commit on a clean Ubuntu Linux container to guarantee portability.
+5. **Continuous Integration**: GitHub Actions CI (`.github/workflows/ci.yml`) independently tests every pushed commit on an Ubuntu Linux container to guarantee portability.
 
 ---
 
 ## 17. Security & Privacy Notes
 
-- **Password Security**: All user passwords are encrypted using bcrypt with per-user salt.
-- **Signed Tokens**: JWT session tokens are signed with HS256 and subject to strict expiration (`ACCESS_TOKEN_EXPIRE_MINUTES`).
-- **Privilege Escalation Protection**: Public self-registration is strictly restricted from assigning the `admin` role or privileged system capabilities.
-- **Grounded Verification**: Answers require verified database overlap to avoid fabricated statements.
-- **Prompt Injection Defense**: Security filters inspect incoming prompts for delimiter injection and role-play override attempts.
+- **Password Hashing**: All user passwords are cryptographically hashed using salted bcrypt via passlib (one-way hashing, never stored or encrypted in reversible form).
+- **Signed Session Tokens**: JWT session tokens are signed with HS256 and subject to configurable expiration (`ACCESS_TOKEN_EXPIRE_MINUTES`).
+- **Production Secret Validation**: When `ENVIRONMENT=production`, the application requires a secure random `SECRET_KEY` of at least 32 characters, preventing deployment with insecure default credentials.
+- **Multi-Tenant Document Access Isolation**: Documents are protected by access tiers (`public`, `internal`, `confidential`, `restricted`) and role permissions, ensuring restricted records are excluded from search, RAG, and knowledge graph queries for unauthorized users.
+- **Privilege Escalation Defense**: Public self-registration is strictly restricted from assigning the `admin` role or privileged capabilities.
+- **Prompt Injection & Safety Defense**: Pattern-based heuristic filtering detects instruction override and delimiter injection attempts, treating retrieved document contents as untrusted data.
 
 ---
 
-## 18. Current Limitations
+## 18. Implementation Status & Limitations
 
-- **OCR for Scanned Documents**: Documents lacking digital text streams (pure rasterized scanned images) are flagged with an unprocessable warning (`status: error`). Optical Character Recognition (Tesseract) can be integrated in future releases.
-- **Vector Space Scaling**: The built-in TF-IDF hybrid retrieval engine is optimized for single-node deployments up to 25,000 document passages. For ultra-scale corpora (>100,000 documents), horizontal vector backends such as `pgvector` or `HNSWLib` can be connected.
+### Implemented and Verified
+- **Document Ingestion**: Multi-format parsing for PDF (`pypdf` with `PyPDF2` fallback), Word DOCX, and TXT files with Unicode NFKC normalization and SHA-256 duplicate detection.
+- **Hybrid Search**: Lexical keyword search (frequency-density + n-gram phrase matching) and sparse statistical vector retrieval (Scikit-Learn TF-IDF + Cosine Similarity) fused via Reciprocal Rank Fusion ($k=60$).
+- **Grounded Answer Synthesis**: Deterministic zero-key extractive synthesis with SQLite passage verification, claim support validation, and page citations `[Filename, Page X]`.
+- **Heuristic Abstention**: Automated abstention (`confidence: 0.0`, status: `abstained`) when query similarity or supporting evidence falls below confidence thresholds.
+- **Access Control & Multi-Tenancy**: Document privacy tiers (`public`, `internal`, `confidential`, `restricted`), 11 RBAC capabilities, custom role lifecycle governance, and user assignment deletion protection.
+- **Knowledge Graph**: Rule-based regex entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`), relationship extraction, D3.js force-directed visualization, and 1-hop GraphRAG context expansion.
+- **User Authentication & OTP**: Salted bcrypt password hashing, signed JWT tokens, and cryptographically secure OTP password recovery.
+- **Automated Verification**: Complete 63-test pytest suite and 29-check end-to-end audit script.
+
+### Implemented Optional Integrations
+- **Cloud LLM Integration**: Groq API integration (`llama-3.3-70b-versatile` via OpenAI-compatible endpoint) with automatic fallback to local deterministic extractive synthesis if the API key is omitted or validation fails.
+
+### Partially Implemented / Configured Hooks
+- **Alternative Cloud Providers**: Configuration settings for OpenAI and Google Gemini exist in `config.py`, with runtime routing currently directed through Groq or local extractive synthesis.
+- **Scanned PDF Handling**: Detects raster-only PDFs without digital text layers and returns descriptive error responses (`HTTP 422`); OCR processing hooks documented.
+
+### Planned Future Enhancements
+- **Native OCR Pipeline**: System-level Tesseract integration (`pytesseract`, `pdf2image`) for scanned physical archives.
+- **Dense Neural Semantic Embeddings**: Pre-trained transformer embeddings (`sentence-transformers/all-MiniLM-L6-v2`) and external vector database adapters (Qdrant, pgvector).
+- **Distributed Relational Clustering**: Managed PostgreSQL connection pooling for high-concurrency multi-instance deployments.
 
 ---
 
