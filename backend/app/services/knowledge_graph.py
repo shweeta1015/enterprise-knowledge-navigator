@@ -209,14 +209,24 @@ class KnowledgeGraphService:
         except Exception as e:
             logger.error(f"Failed to export graph JSON: {e}")
 
-    def get_graph_data(self, db: Session, filter_category: Optional[str] = None) -> Dict[str, Any]:
-        """Returns nodes and edges formatted for interactive D3 / SVG graph visualizations."""
+    def get_graph_data(
+        self,
+        db: Session,
+        filter_category: Optional[str] = None,
+        allowed_doc_ids: Optional[Set[str]] = None
+    ) -> Dict[str, Any]:
+        """Returns nodes and edges formatted for interactive D3 / SVG graph visualizations, filtered by permitted document access."""
         query_ent = db.query(EntityRecord)
+        query_rel = db.query(RelationRecord)
+        if allowed_doc_ids is not None:
+            query_ent = query_ent.filter(EntityRecord.document_id.in_(allowed_doc_ids))
+            query_rel = query_rel.filter(RelationRecord.document_id.in_(allowed_doc_ids))
+
         if filter_category:
             query_ent = query_ent.filter(EntityRecord.category == filter_category)
         
         entities = query_ent.all()
-        relations = db.query(RelationRecord).all()
+        relations = query_rel.all()
 
         nodes_dict = {}
         for e in entities:
@@ -250,13 +260,25 @@ class KnowledgeGraphService:
             "edge_count": len(edges_list)
         }
 
-    def graphrag_expand(self, db: Session, query: str, max_hops: int = 1) -> List[Dict[str, Any]]:
+    def graphrag_expand(
+        self,
+        db: Session,
+        query: str,
+        max_hops: int = 1,
+        allowed_doc_ids: Optional[Set[str]] = None
+    ) -> List[Dict[str, Any]]:
         """
         Extracts entities present in query, traverses relational graph edges,
-        and returns multi-hop contextual graph evidence for GraphRAG.
+        and returns multi-hop contextual graph evidence for GraphRAG, restricted to authorized documents.
         """
+        if not query or not query.strip():
+            return []
+
         query_lower = query.lower()
-        all_entities = db.query(EntityRecord).all()
+        query_ent = db.query(EntityRecord)
+        if allowed_doc_ids is not None:
+            query_ent = query_ent.filter(EntityRecord.document_id.in_(allowed_doc_ids))
+        all_entities = query_ent.all()
         
         matched_entities = [e.name for e in all_entities if e.name.lower() in query_lower]
         if not matched_entities:
@@ -271,7 +293,10 @@ class KnowledgeGraphService:
         seen_triples = set()
         for entity in set(matched_entities):
             # Outgoing relations
-            out_rels = db.query(RelationRecord).filter(RelationRecord.source_entity == entity).all()
+            q_out = db.query(RelationRecord).filter(RelationRecord.source_entity == entity)
+            if allowed_doc_ids is not None:
+                q_out = q_out.filter(RelationRecord.document_id.in_(allowed_doc_ids))
+            out_rels = q_out.all()
             for r in out_rels:
                 key = (r.source_entity, r.relation_type, r.target_entity)
                 if key not in seen_triples:
@@ -285,7 +310,10 @@ class KnowledgeGraphService:
                     })
 
             # Incoming relations
-            in_rels = db.query(RelationRecord).filter(RelationRecord.target_entity == entity).all()
+            q_in = db.query(RelationRecord).filter(RelationRecord.target_entity == entity)
+            if allowed_doc_ids is not None:
+                q_in = q_in.filter(RelationRecord.document_id.in_(allowed_doc_ids))
+            in_rels = q_in.all()
             for r in in_rels:
                 key = (r.source_entity, r.relation_type, r.target_entity)
                 if key not in seen_triples:

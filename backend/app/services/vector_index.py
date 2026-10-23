@@ -13,7 +13,7 @@ import json
 import math
 import pickle
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple, Set
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -186,10 +186,11 @@ class VectorIndexService:
         self,
         query: str,
         top_k: int = 5,
-        document_id: Optional[str] = None
+        document_id: Optional[str] = None,
+        allowed_doc_ids: Optional[Set[str]] = None
     ) -> List[Dict[str, Any]]:
-        """Dense statistical vector retrieval using cosine similarity with query expansion."""
-        if not self.chunks or self.vectorizer is None or self.tfidf_matrix is None:
+        """Vector retrieval using TF-IDF sublinear vector space with cosine similarity and query expansion."""
+        if not query or not query.strip() or not self.chunks or self.vectorizer is None or self.tfidf_matrix is None:
             return []
 
         expanded_query, _ = self._expand_query(query)
@@ -200,6 +201,8 @@ class VectorIndexService:
         for idx, score in enumerate(similarities):
             chunk = self.chunks[idx]
             if document_id and chunk.get("document_id") != document_id:
+                continue
+            if allowed_doc_ids is not None and chunk.get("document_id") not in allowed_doc_ids:
                 continue
             if score > 0.001:
                 scored.append({
@@ -215,10 +218,11 @@ class VectorIndexService:
         self,
         query: str,
         top_k: int = 5,
-        document_id: Optional[str] = None
+        document_id: Optional[str] = None,
+        allowed_doc_ids: Optional[Set[str]] = None
     ) -> List[Dict[str, Any]]:
         """Lexical term matching with stopword filtering, phrase matching, and frequency density scoring."""
-        if not self.chunks:
+        if not query or not query.strip() or not self.chunks:
             return []
 
         from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
@@ -253,6 +257,8 @@ class VectorIndexService:
         for chunk in self.chunks:
             if document_id and chunk.get("document_id") != document_id:
                 continue
+            if allowed_doc_ids is not None and chunk.get("document_id") not in allowed_doc_ids:
+                continue
             text_lower = chunk["content"].lower()
             matches = sum(text_lower.count(term) for term in query_terms)
 
@@ -278,6 +284,7 @@ class VectorIndexService:
         query: str,
         top_k: int = 5,
         document_id: Optional[str] = None,
+        allowed_doc_ids: Optional[Set[str]] = None,
         semantic_weight: float = 0.7,
         keyword_weight: float = 0.3
     ) -> List[Dict[str, Any]]:
@@ -285,11 +292,11 @@ class VectorIndexService:
         Hybrid retrieval combining semantic vector similarity and keyword search
         using Reciprocal Rank Fusion (RRF), exact phrase boosting, and passage deduplication.
         """
-        if not self.chunks:
+        if not query or not query.strip() or not self.chunks:
             return []
 
-        semantic_results = self.semantic_search(query, top_k=top_k * 2, document_id=document_id)
-        keyword_results = self.keyword_search(query, top_k=top_k * 2, document_id=document_id)
+        semantic_results = self.semantic_search(query, top_k=top_k * 2, document_id=document_id, allowed_doc_ids=allowed_doc_ids)
+        keyword_results = self.keyword_search(query, top_k=top_k * 2, document_id=document_id, allowed_doc_ids=allowed_doc_ids)
 
         # Build fused score map
         fused: Dict[str, Dict[str, Any]] = {}

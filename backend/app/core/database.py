@@ -25,13 +25,27 @@ def ensure_database_schema_upgrades(db_engine):
     if "sqlite" in settings.DATABASE_URL:
         with db_engine.connect() as conn:
             try:
-                res = conn.execute(text("PRAGMA table_info(users)"))
-                cols = [row[1] for row in res.fetchall()]
-                if cols and "phone_number" not in cols:
+                # Verify users columns
+                res_users = conn.execute(text("PRAGMA table_info(users)"))
+                user_cols = [row[1] for row in res_users.fetchall()]
+                if user_cols and "phone_number" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN phone_number VARCHAR(50)"))
                     conn.commit()
-                if cols and "is_verified" not in cols:
+                if user_cols and "is_verified" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT 1"))
+                    conn.commit()
+
+                # Verify documents columns for multi-tenant access control
+                res_docs = conn.execute(text("PRAGMA table_info(documents)"))
+                doc_cols = [row[1] for row in res_docs.fetchall()]
+                if doc_cols and "owner_id" not in doc_cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN owner_id VARCHAR(36)"))
+                    conn.commit()
+                if doc_cols and "access_level" not in doc_cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN access_level VARCHAR(50) DEFAULT 'internal'"))
+                    conn.commit()
+                if doc_cols and "allowed_roles" not in doc_cols:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN allowed_roles VARCHAR(255)"))
                     conn.commit()
             except Exception:
                 pass

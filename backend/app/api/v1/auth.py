@@ -77,6 +77,80 @@ def get_current_user(
     return user
 
 
+def get_optional_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_bearer),
+    db: Session = Depends(get_db)
+) -> Optional[UserRecord]:
+    """
+    Extracts and validates JWT Bearer token if present.
+    If valid token is provided, returns the verified active UserRecord.
+    If invalid/expired token is provided, raises 401 Unauthorized.
+    If no credentials are provided, returns None.
+    """
+    if not credentials or not credentials.credentials:
+        return None
+
+    token = credentials.credentials
+    payload = decode_access_token(token)
+    if not payload or "sub" not in payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session has expired or token is invalid. Please sign in again."
+        )
+
+    user_id = payload.get("sub")
+    user = db.query(UserRecord).filter(UserRecord.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account no longer exists."
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your account has been deactivated. Please contact an administrator."
+        )
+
+    return user
+
+
+def check_document_access(document: Any, user: Optional[UserRecord], operation: str = "view") -> bool:
+    """
+    Evaluates whether the given user has permission to view, search, or delete the document.
+    - Admins have full access to all documents for all operations.
+    - Document owner has full access to their own documents.
+    - 'public' documents: readable by all users.
+    - 'internal' documents: readable by authenticated users or default guest mode.
+    - 'confidential' / 'restricted' documents:
+        - Readable only by document owner, admin, or users whose role matches allowed_roles.
+    - 'delete' operation:
+        - Only document owner or Admin can delete.
+    """
+    if user and (user.role == "admin" or user.id == getattr(document, "owner_id", None)):
+        return True
+
+    level = getattr(document, "access_level", "internal") or "internal"
+
+    if operation == "delete":
+        return False
+
+    if level in ("public", "internal"):
+        return True
+
+    # Confidential or restricted access
+    if not user:
+        return False
+
+    allowed = getattr(document, "allowed_roles", None)
+    if allowed:
+        role_list = [r.strip().lower() for r in allowed.split(",") if r.strip()]
+        if user.role.lower() in role_list:
+            return True
+
+    return False
+
+
 # Platform Capabilities Matrix
 PLATFORM_CAPABILITIES = [
     {

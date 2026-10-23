@@ -17,6 +17,9 @@ class DocumentItem(BaseModel):
     page_count: int
     chunk_count: int
     entity_count: int
+    owner_id: Optional[str] = None
+    access_level: Optional[str] = "internal"
+    allowed_roles: Optional[str] = None
     created_at: datetime
     error_message: Optional[str] = None
 

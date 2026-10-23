@@ -208,15 +208,21 @@ flowchart TD
 - **Logging**: Rotating file and console structured logging
 
 ### Machine Learning, Retrieval & NLP
-- **Vector Space Modeling**: Scikit-Learn `TfidfVectorizer` (sublinear TF scaling, n-grams 1-2, English stop-words)
-- **Similarity & Ranking**: Scikit-Learn Cosine Similarity + Reciprocal Rank Fusion (RRF)
-- **Document Processing**: `PyPDF2` (PDF extraction), `python-docx` (DOCX extraction), UTF-8 text processing
-- **Knowledge Graph**: Custom rule-based entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relational triple extraction
+- **Statistical Vector Retrieval**: Scikit-Learn `TfidfVectorizer` (sublinear TF scaling, n-grams 1-2, English stop-words) with Cosine Similarity
+- **Lexical Keyword Retrieval**: BM25 frequency-density scoring and exact multi-word phrase matching
+- **Hybrid Fusion**: Reciprocal Rank Fusion (RRF) with configurable modality weights ($k = 60$)
+- **Optional Dense Embeddings**: Sentence-Transformers neural embedders (`sentence-transformers/all-MiniLM-L6-v2`) when installed
+- **Document Processing**: `pypdf` / `PyPDF2` (PDF extraction), `python-docx` (Word DOCX extraction), UTF-8 / NFKC Unicode normalization, and optional OCR fallback (`pytesseract`, `pdf2image`) for scanned PDFs
+- **Knowledge Graph**: Rule-based entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relational triple extraction
 - **Optional Cloud AI**: Groq SDK (`llama-3.3-70b-versatile`), Google Gemini, and OpenAI API integrations
 
 ### Security & Authentication
 - **Password Hashing**: `passlib` with `bcrypt` salt generation
 - **Session Tokens**: Signed Bearer JWTs via `python-jose` (HS256)
+- **Production Secret Validation**: Mandatory 32+ character non-default `SECRET_KEY` in production environments
+- **Multi-Tenant Document Access Control**: Role and owner-based document access isolation (`public`, `internal`, `confidential`, `restricted`) across search, RAG Q&A, and knowledge graph
+- **Demo Account Gating**: `ENABLE_DEMO_ACCOUNTS` setting (enabled in dev, strictly disabled in production)
+- **Prompt Injection Defense**: Multi-pattern jailbreak filtering and strict isolation of embedded document instructions as untrusted data
 - **OTP Recovery**: Cryptographically secure numeric OTPs, timing-attack safe `secrets.compare_digest` verification
 
 ### Frontend
@@ -229,29 +235,34 @@ flowchart TD
 
 ## 10. AI, NLP & Retrieval Methodologies
 
-### Document Ingestion & Chunking
-1. **Extraction**: Safe text stream extraction from PDF, Word DOCX, and TXT files with special character sanitization.
-2. **Duplicate Detection**: Content hash computed via SHA-256 before disk writes. Identical files return `HTTP 409 Conflict`.
-3. **Sliding-Window Chunking**: Splits extracted document text into chunks of 400 tokens with a 60-token overlap, preserving cross-sentence context boundaries.
-4. **Metadata Preservation**: Every chunk retains its `document_id`, `chunk_index`, `page_number`, and token count.
-
-### Hybrid Search & Reciprocal Rank Fusion (RRF)
-Queries are executed concurrently across two retrieval modalities:
-- **Lexical BM25 Retrieval**: Computes term frequency and inverse document frequency across exact keyword matches.
-- **Dense Vector Retrieval**: Computes cosine similarity between the query vector and all chunk vectors in the multi-dimensional TF-IDF space:
-  $$\text{Cosine Similarity}(\vec{q}, \vec{d}) = \frac{\vec{q} \cdot \vec{d}}{\|\vec{q}\| \|\vec{d}\|}$$
-- **Fusion Ranking**: Combines ranked candidate lists using Reciprocal Rank Fusion:
+### Lexical Retrieval vs. Dense Vector Retrieval
+Enterprise Knowledge Navigator clearly distinguishes between retrieval paradigms:
+- **Lexical BM25 Retrieval**: Matches query keywords, acronyms, and multi-word n-gram phrases against indexed document tokens. Effective for specific code identifiers, acronyms, policy numbers, and verbatim phrases.
+- **Statistical Vector Space Modeling (TF-IDF)**: Projects text into a high-dimensional vocabulary vector space with sublinear term-frequency scaling and cosine similarity. Captures thematic relevance without external API dependencies.
+- **Dense Neural Embeddings (Optional)**: Maps queries and passages into dense continuous vector spaces using pre-trained sentence transformer models when installed.
+- **Hybrid Reciprocal Rank Fusion (RRF)**: Merges ranked candidate lists from both modalities:
   $$\text{RRF Score}(d) = \sum_{m \in \{\text{vector}, \text{keyword}\}} \frac{w_m}{k + \text{Rank}_m(d)}$$
   *(where $k = 60$ and $w_m$ represents modality weight).*
+
+### Document Ingestion & Chunking
+1. **Extraction & Sanitization**: Safe text stream extraction from PDF, Word DOCX, and TXT files with Unicode NFKC normalization and control character sanitization.
+2. **Duplicate Detection**: Content hash computed via SHA-256 before disk writes. Identical files return `HTTP 409 Conflict`.
+3. **Sliding-Window Chunking**: Splits extracted document text into chunks of 400 tokens with a 60-token overlap, preserving cross-sentence context boundaries.
+4. **Metadata Preservation**: Every chunk retains its `document_id`, `chunk_index`, `page_number`, token count, and access tenancy tags.
 
 ### Grounded Answer Synthesis & Verifiable Citations
 - Responses are synthesized strictly from retrieved passages.
 - In zero-key mode, the deterministic extractive engine selects top-scoring grounded assertions, cross-verifies sentences against SQLite source chunks, and appends explicit citations in `[Filename, Page X, Chunk Y]` format.
 - If retrieved passage similarity falls below the confidence threshold, the assistant abstains with: *"I could not find sufficient information in the indexed enterprise documents to answer this question."*
 
+### Multi-Tenant Access Control & Cross-User Document Isolation
+- Documents can be tagged with access tiers: `public`, `internal`, `confidential`, or `restricted`.
+- Confidential and restricted documents are strictly filtered out of search results, retrieved chunks, RAG answers, citations, and Knowledge Graph visualizations for unauthorized roles.
+- Document deletion is strictly authorized: only document owners or system administrators can delete documents.
+
 ### Knowledge Graph & GraphRAG
 - Evaluates entity co-occurrences and semantic patterns to build an entity-relationship network.
-- During query synthesis, GraphRAG extracts neighboring nodes within $k$-hops of identified entities to inject structural relational context into the prompt.
+- During query synthesis, GraphRAG extracts neighboring nodes within $k$-hops of identified entities to inject structural relational context into the prompt, respecting document access boundaries.
 
 ---
 

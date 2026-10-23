@@ -15,7 +15,7 @@ Orchestrates:
 import json
 import os
 import re
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple, Set
 import httpx
 from sqlalchemy.orm import Session
 
@@ -51,10 +51,12 @@ class RagAssistantService:
         question: str,
         top_k: int = 4,
         enable_graphrag: bool = True,
-        document_filter: Optional[str] = None
+        document_filter: Optional[str] = None,
+        allowed_doc_ids: Optional[Set[str]] = None
     ) -> Dict[str, Any]:
         """
-        Executes grounded retrieval, citation verification, and evidence-verified synthesis.
+        Executes grounded retrieval, citation verification, and evidence-verified synthesis,
+        strictly restricted to documents the current user is authorized to access.
         """
         # 0. Prompt Injection & Security Defense Check
         if self.is_prompt_injection(question):
@@ -75,18 +77,21 @@ class RagAssistantService:
                 "synthesis_engine": "security_guard"
             }
 
-        # 1. Retrieve relevant document chunks via Hybrid Search
+        # 1. Retrieve relevant document chunks via Hybrid Search with permission filtering
         retrieved_chunks = vector_index_service.hybrid_search(
             query=question,
             top_k=top_k,
-            document_id=document_filter
+            document_id=document_filter,
+            allowed_doc_ids=allowed_doc_ids
         )
 
-        # 2. GraphRAG expansion if requested
+        # 2. GraphRAG expansion if requested with permission filtering
         graph_evidence = []
         if enable_graphrag:
             try:
-                graph_evidence = knowledge_graph_service.graphrag_expand(db, question)
+                graph_evidence = knowledge_graph_service.graphrag_expand(
+                    db, question, allowed_doc_ids=allowed_doc_ids
+                )
             except Exception as ge_err:
                 logger.warning(f"GraphRAG expansion error: {ge_err}")
                 graph_evidence = []

@@ -7,17 +7,19 @@ import re
 import shutil
 import uuid
 from pathlib import Path
-from typing import List, Optional
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status, Query
+from typing import List, Optional, Set
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, status, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from backend.app.core.config import settings
 from backend.app.core.database import get_db
 from backend.app.core.logging import logger
+from backend.app.models.user import UserRecord
 from backend.app.models.document import (
     DocumentRecord, ChunkRecord, EntityRecord, RelationRecord, EvaluationRunRecord
 )
+from backend.app.api.v1.auth import get_optional_current_user, check_document_access
 from backend.app.services.document_processor import document_processor
 from backend.app.services.vector_index import vector_index_service
 from backend.app.services.knowledge_graph import knowledge_graph_service
@@ -32,6 +34,12 @@ from backend.app.schemas.navigator import (
 router = APIRouter()
 
 
+def get_allowed_document_ids(db: Session, user: Optional[UserRecord]) -> Set[str]:
+    """Returns the set of document IDs that the given user has permission to view/search."""
+    all_docs = db.query(DocumentRecord).all()
+    return {d.id for d in all_docs if check_document_access(d, user, operation="view")}
+
+
 # ============================================================================
 # 1. DOCUMENT INGESTION & MANAGEMENT
 # ============================================================================
@@ -39,11 +47,14 @@ router = APIRouter()
 @router.post("/documents/upload", response_model=DocumentItem, summary="Upload & Ingest Enterprise Document")
 async def upload_document(
     file: UploadFile = File(...),
+    access_level: str = Form("internal"),
+    allowed_roles: Optional[str] = Form(None),
+    current_user: Optional[UserRecord] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Uploads a PDF, DOCX, or TXT file, performs validation, text extraction,
-    chunking, vector indexing, and knowledge graph extraction.
+    chunking, vector indexing, and knowledge graph extraction with multi-tenant access tags.
     """
     raw_filename = file.filename or "uploaded_document"
     clean_name = re.sub(r'[\x00/\\:*?"<>|]', '_', Path(raw_filename).name)
@@ -103,7 +114,11 @@ async def upload_document(
     if stale_failed:
         db.commit()
 
-    # Register initial DB record
+    # Register initial DB record with access control tags
+    clean_level = access_level.lower().strip() if access_level else "internal"
+    if clean_level not in ("public", "internal", "confidential", "restricted"):
+        clean_level = "internal"
+
     doc_record = DocumentRecord(
         id=doc_id,
         filename=safe_filename,
@@ -111,7 +126,10 @@ async def upload_document(
         file_size_bytes=file_size,
         file_path=str(saved_path),
         content_hash=file_hash,
-        status="processing"
+        status="processing",
+        owner_id=current_user.id if current_user else None,
+        access_level=clean_level,
+        allowed_roles=allowed_roles
     )
     db.add(doc_record)
     db.commit()
@@ -181,21 +199,35 @@ async def upload_document(
 
 
 @router.get("/documents", response_model=DocumentListResponse, summary="List Indexed Documents")
-def list_documents(db: Session = Depends(get_db)):
-    """Returns all ingested enterprise documents with processing statuses and metadata."""
+def list_documents(
+    current_user: Optional[UserRecord] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """Returns all ingested enterprise documents with processing statuses and metadata, filtered by user permissions."""
     docs = db.query(DocumentRecord).order_by(DocumentRecord.created_at.desc()).all()
+    accessible = [d for d in docs if check_document_access(d, current_user, operation="view")]
     return DocumentListResponse(
-        total_count=len(docs),
-        documents=docs
+        total_count=len(accessible),
+        documents=accessible
     )
 
 
 @router.get("/documents/{document_id}", response_model=DocumentDetailResponse, summary="Get Document Details")
-def get_document_details(document_id: str, db: Session = Depends(get_db)):
-    """Returns detailed metadata, chunk previews, and extracted entities for a document."""
+def get_document_details(
+    document_id: str,
+    current_user: Optional[UserRecord] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """Returns detailed metadata, chunk previews, and extracted entities for a document, enforcing permission guards."""
     doc = db.query(DocumentRecord).filter(DocumentRecord.id == document_id).first()
     if not doc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found.")
+
+    if not check_document_access(doc, current_user, operation="view"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to access this document."
+        )
 
     chunks = db.query(ChunkRecord).filter(ChunkRecord.document_id == document_id).limit(8).all()
     entities = db.query(EntityRecord).filter(EntityRecord.document_id == document_id).limit(10).all()
@@ -216,11 +248,21 @@ def get_document_details(document_id: str, db: Session = Depends(get_db)):
 
 
 @router.delete("/documents/{document_id}", summary="Delete Document and Cleanup Indexes")
-def delete_document(document_id: str, db: Session = Depends(get_db)):
-    """Deletes document record, associated chunks, vector index entries, graph data, and file on disk."""
+def delete_document(
+    document_id: str,
+    current_user: Optional[UserRecord] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """Deletes document record, associated chunks, vector index entries, graph data, and file on disk with role checks."""
     doc = db.query(DocumentRecord).filter(DocumentRecord.id == document_id).first()
     if not doc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found.")
+
+    if current_user and not check_document_access(doc, current_user, operation="delete"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: Only the document owner or an administrator can delete this document."
+        )
 
     # Remove physical file
     file_path = Path(doc.file_path)
@@ -309,11 +351,22 @@ def reprocess_document(document_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/documents/{document_id}/download", summary="Download Raw Document File")
-def download_document_file(document_id: str, db: Session = Depends(get_db)):
-    """Allows downloading the original ingested raw document file."""
+def download_document_file(
+    document_id: str,
+    current_user: Optional[UserRecord] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """Allows downloading the original ingested raw document file with permission verification."""
     doc = db.query(DocumentRecord).filter(DocumentRecord.id == document_id).first()
     if not doc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found.")
+
+    if not check_document_access(doc, current_user, operation="view"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to download this document."
+        )
+
     file_path = Path(doc.file_path)
     if not file_path.exists():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Original document file not found on disk.")
@@ -321,11 +374,21 @@ def download_document_file(document_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/documents/{document_id}/preview", summary="Preview Extracted Document Text")
-def preview_document_text(document_id: str, db: Session = Depends(get_db)):
-    """Returns the full text or extracted chunk passages for document preview."""
+def preview_document_text(
+    document_id: str,
+    current_user: Optional[UserRecord] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """Returns the full text or extracted chunk passages for document preview with permission verification."""
     doc = db.query(DocumentRecord).filter(DocumentRecord.id == document_id).first()
     if not doc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found.")
+
+    if not check_document_access(doc, current_user, operation="view"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to preview this document."
+        )
 
     chunks = db.query(ChunkRecord).filter(ChunkRecord.document_id == document_id).order_by(ChunkRecord.chunk_index.asc()).all()
     preview_parts = []
@@ -367,20 +430,33 @@ def preview_document_text(document_id: str, db: Session = Depends(get_db)):
 # ============================================================================
 
 @router.post("/search", response_model=SearchResponse, summary="Execute Hybrid / Semantic / Keyword Search")
-def execute_search(payload: SearchRequest, db: Session = Depends(get_db)):
-    """Executes multi-mode document retrieval (semantic vector, keyword, or hybrid fusion)."""
+def execute_search(
+    payload: SearchRequest,
+    current_user: Optional[UserRecord] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """Executes multi-mode document retrieval (semantic vector, keyword, or hybrid fusion) restricted to authorized documents."""
+    allowed_ids = get_allowed_document_ids(db, current_user)
+    if payload.document_id and payload.document_id not in allowed_ids:
+        return SearchResponse(
+            query=payload.query,
+            mode=payload.mode,
+            total_found=0,
+            results=[]
+        )
+
     mode = payload.mode.lower()
     if mode == "semantic":
         results = vector_index_service.semantic_search(
-            query=payload.query, top_k=payload.top_k, document_id=payload.document_id
+            query=payload.query, top_k=payload.top_k, document_id=payload.document_id, allowed_doc_ids=allowed_ids
         )
     elif mode == "keyword":
         results = vector_index_service.keyword_search(
-            query=payload.query, top_k=payload.top_k, document_id=payload.document_id
+            query=payload.query, top_k=payload.top_k, document_id=payload.document_id, allowed_doc_ids=allowed_ids
         )
     else:
         results = vector_index_service.hybrid_search(
-            query=payload.query, top_k=payload.top_k, document_id=payload.document_id
+            query=payload.query, top_k=payload.top_k, document_id=payload.document_id, allowed_doc_ids=allowed_ids
         )
 
     formatted = [{
@@ -424,14 +500,38 @@ def execute_search(payload: SearchRequest, db: Session = Depends(get_db)):
 # ============================================================================
 
 @router.post("/ask", response_model=AskResponse, summary="Grounded Enterprise RAG & GraphRAG Answering")
-def ask_question(payload: AskRequest, db: Session = Depends(get_db)):
-    """Answers natural-language enterprise queries strictly backed by retrieved evidence and citations."""
+def ask_question(
+    payload: AskRequest,
+    current_user: Optional[UserRecord] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """Answers natural-language enterprise queries strictly backed by retrieved evidence and citations, gated by permissions."""
+    allowed_ids = get_allowed_document_ids(db, current_user)
+    if payload.document_filter and payload.document_filter not in allowed_ids:
+        return AskResponse(
+            question=payload.question,
+            answer="Access Restricted: You do not have authorization to query the specified document.",
+            confidence=0.0,
+            is_grounded=False,
+            sources=[],
+            graph_evidence=[],
+            retrieval_mode="access_restricted",
+            searched_chunks_count=0,
+            verification_status="refused",
+            claim_support_rate=0.0,
+            verified_claims_count=0,
+            unverified_claims_count=0,
+            contradictions_detected=[],
+            synthesis_engine="access_guard"
+        )
+
     ans_data = rag_assistant_service.query(
         db=db,
         question=payload.question,
         top_k=payload.top_k,
         enable_graphrag=payload.enable_graphrag,
-        document_filter=payload.document_filter
+        document_filter=payload.document_filter,
+        allowed_doc_ids=allowed_ids
     )
     return AskResponse(**ans_data)
 
@@ -443,10 +543,12 @@ def ask_question(payload: AskRequest, db: Session = Depends(get_db)):
 @router.get("/graph", response_model=GraphResponse, summary="Fetch Knowledge Graph Entities and Relations")
 def get_knowledge_graph(
     category: Optional[str] = Query(None, description="Optional category filter (PERSON, ORG, TECH, PRODUCT, POLICY)"),
+    current_user: Optional[UserRecord] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
-    """Returns interactive Knowledge Graph nodes and edges for exploration."""
-    data = knowledge_graph_service.get_graph_data(db, filter_category=category)
+    """Returns interactive Knowledge Graph nodes and edges for exploration, filtered by authorized documents."""
+    allowed_ids = get_allowed_document_ids(db, current_user)
+    data = knowledge_graph_service.get_graph_data(db, filter_category=category, allowed_doc_ids=allowed_ids)
     return GraphResponse(**data)
 
 

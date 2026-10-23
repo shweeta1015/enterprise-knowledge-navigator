@@ -89,7 +89,11 @@ def seed_initial_roles():
 
 
 def seed_initial_accounts():
-    """Seeds default demo accounts for each role if no users exist."""
+    """Seeds default demo accounts for each role if no users exist and ENABLE_DEMO_ACCOUNTS is True."""
+    if not settings.ENABLE_DEMO_ACCOUNTS:
+        logger.info("Demo account seeding is disabled (ENABLE_DEMO_ACCOUNTS=False). Skipping automatic demo user creation.")
+        return
+
     db = SessionLocal()
     try:
         user_count = db.query(UserRecord).count()

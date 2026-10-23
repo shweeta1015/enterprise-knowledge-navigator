@@ -7,6 +7,7 @@ hash generation, chunking with configurable overlap, and page-level metadata.
 import hashlib
 import os
 import re
+import unicodedata
 from pathlib import Path
 from typing import List, Dict, Any, Tuple, Optional
 try:
@@ -35,10 +36,13 @@ class DocumentProcessingService:
 
     @staticmethod
     def clean_text(text: str) -> str:
-        """Removes unreadable control characters, standardizes whitespace while preserving paragraphs."""
+        """Removes unreadable control characters, standardizes whitespace while preserving paragraphs and Unicode NFKC fidelity."""
         if not text:
             return ""
-        # Remove null bytes and non-printable control chars except newlines and tabs
+        # Unicode normalization (NFKC) for uniform glyphs, ligatures, and compatibility forms
+        text = unicodedata.normalize('NFKC', text)
+        # Remove zero-width spaces, joiners, and non-printable control chars except newlines and tabs
+        text = re.sub(r'[\u200b-\u200d\ufeff]', '', text)
         text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
         # Normalize carriage returns
         text = text.replace('\r\n', '\n').replace('\r', '\n')

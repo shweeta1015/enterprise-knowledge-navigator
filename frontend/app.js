@@ -13,6 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentUser = null;
   let authToken = localStorage.getItem('ek_token');
 
+  function getAuthHeaders(extra = {}) {
+    const headers = { ...extra };
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+    return headers;
+  }
+
   // Top-Level View Containers
   const landingView = document.getElementById('landingView');
   const authView = document.getElementById('authView');
@@ -1179,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadDashboardMetrics() {
     try {
-      const res = await fetch('/api/v1/navigator/dashboard/metrics');
+      const res = await fetch('/api/v1/navigator/dashboard/metrics', { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         const setTxt = (id, val) => {
@@ -1305,7 +1313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadRecentDocsTable() {
     try {
-      const res = await fetch('/api/v1/navigator/documents');
+      const res = await fetch('/api/v1/navigator/documents', { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         const tbody = document.getElementById('dashRecentDocsTable');
@@ -1559,6 +1567,12 @@ document.addEventListener('DOMContentLoaded', () => {
       uploadFeedback.innerHTML = `Unsupported format "${escapeHtml(ext)}". Supported formats: PDF, DOCX, TXT.`;
       return;
     }
+    if (file.size === 0) {
+      uploadFeedback.style.display = 'block';
+      uploadFeedback.className = 'alert-box alert-error';
+      uploadFeedback.innerHTML = 'Selected file is empty (0 bytes). Please upload a file with content.';
+      return;
+    }
     if (file.size > 25 * 1024 * 1024) {
       uploadFeedback.style.display = 'block';
       uploadFeedback.className = 'alert-box alert-error';
@@ -1643,7 +1657,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadDocumentsList() {
     const tbody = document.getElementById('documentsTableBody');
     try {
-      const res = await fetch('/api/v1/navigator/documents');
+      const res = await fetch('/api/v1/navigator/documents', { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         let docs = data.documents || [];
@@ -1846,7 +1860,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let docs = window.cachedDocuments || [];
     if (docs.length === 0) {
       try {
-        const res = await fetch('/api/v1/navigator/documents');
+        const res = await fetch('/api/v1/navigator/documents', { headers: getAuthHeaders() });
         if (res.ok) {
           const data = await res.json();
           docs = data.documents || [];
@@ -2420,7 +2434,7 @@ document.addEventListener('DOMContentLoaded', () => {
       runEvalSuiteBtn.textContent = 'Running Benchmark...';
       runEvalSuiteBtn.disabled = true;
       try {
-        const res = await fetch('/api/v1/navigator/evaluate/run?k=3', { method: 'POST' });
+        const res = await fetch('/api/v1/navigator/evaluate/run?k=3', { method: 'POST', headers: getAuthHeaders() });
         if (res.ok) {
           const data = await res.json();
           document.getElementById('evalPrecisionVal').textContent = `${(data.precision_at_k * 100).toFixed(1)}%`;
@@ -2442,7 +2456,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadEvaluationHistory() {
     try {
-      const res = await fetch('/api/v1/navigator/evaluate/history');
+      const res = await fetch('/api/v1/navigator/evaluate/history', { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         const tbody = document.getElementById('evalHistoryTableBody');
@@ -3278,7 +3292,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading collection documents...</td></tr>';
 
     try {
-      const res = await fetch('/api/v1/navigator/documents');
+      const res = await fetch('/api/v1/navigator/documents', { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         const allDocs = data.documents || [];
@@ -3411,7 +3425,7 @@ document.addEventListener('DOMContentLoaded', () => {
       manageCollectionDocsModal.style.display = 'flex';
 
       try {
-        const res = await fetch('/api/v1/navigator/documents');
+        const res = await fetch('/api/v1/navigator/documents', { headers: getAuthHeaders() });
         if (res.ok) {
           const data = await res.json();
           const docs = data.documents || [];

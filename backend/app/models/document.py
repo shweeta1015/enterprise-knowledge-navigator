@@ -23,6 +23,9 @@ class DocumentRecord(Base):
     page_count = Column(Integer, default=1)
     chunk_count = Column(Integer, default=0)
     entity_count = Column(Integer, default=0)
+    owner_id = Column(String(36), nullable=True, index=True)
+    access_level = Column(String(50), default="internal", index=True)  # public, internal, confidential, restricted
+    allowed_roles = Column(String(255), nullable=True)  # comma-separated roles permitted if restricted
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     error_message = Column(Text, nullable=True)

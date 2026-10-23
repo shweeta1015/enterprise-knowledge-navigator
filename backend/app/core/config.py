@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = "dev-secret-key-knowledge-navigator"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    ENABLE_DEMO_ACCOUNTS: bool = True
 
     # CORS
     CORS_ORIGINS: List[str] = [
@@ -112,8 +113,22 @@ class Settings(BaseSettings):
         return ["*"]
 
     def model_post_init(self, __context: Any) -> None:
-        if self.ENVIRONMENT.lower() == "production" and "DEBUG" not in self.model_fields_set:
-            self.DEBUG = False
+        if self.ENVIRONMENT.lower() == "production":
+            if "DEBUG" not in self.model_fields_set:
+                self.DEBUG = False
+            if "ENABLE_DEMO_ACCOUNTS" not in self.model_fields_set:
+                self.ENABLE_DEMO_ACCOUNTS = False
+            if (
+                not self.SECRET_KEY
+                or self.SECRET_KEY == "dev-secret-key-knowledge-navigator"
+                or len(self.SECRET_KEY) < 32
+                or "dev-secret" in self.SECRET_KEY.lower()
+            ):
+                raise ValueError(
+                    "FATAL SECURITY CONFIGURATION: In production (ENVIRONMENT=production), "
+                    "a cryptographically strong, non-default SECRET_KEY of at least 32 characters "
+                    "must be provided via environment variables."
+                )
 
         if isinstance(self.DATA_DIR, str):
             self.DATA_DIR = Path(self.DATA_DIR)
