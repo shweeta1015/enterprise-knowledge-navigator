@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (switchToSignUpLink) switchToSignUpLink.addEventListener('click', (e) => { e.preventDefault(); navigateTo('/signup'); });
   if (switchToLoginLink) switchToLoginLink.addEventListener('click', (e) => { e.preventDefault(); navigateTo('/login'); });
 
-  // Demo Credentials Pills
+  // Role Selector & Preset Role Sync
   const demoAdminBtn = document.getElementById('demoAdminBtn');
   const demoWorkerBtn = document.getElementById('demoWorkerBtn');
   const demoAnalystBtn = document.getElementById('demoAnalystBtn');
@@ -338,6 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
     analyst: "Explore knowledge graph topology, evaluate benchmarks, and review analytics."
   };
 
+  const roleCredentials = {
+    admin: { email: 'admin@eknavigator.com', password: 'Admin@123456' },
+    knowledge_worker: { email: 'worker@eknavigator.com', password: 'Worker@123456' },
+    analyst: { email: 'analyst@eknavigator.com', password: 'Analyst@123456' }
+  };
+
   function selectRoleTab(role) {
     roleTabs.forEach(t => {
       if (t.getAttribute('data-role') === role) {
@@ -349,34 +355,37 @@ document.addEventListener('DOMContentLoaded', () => {
     if (roleDescText && roleDescriptions[role]) {
       roleDescText.textContent = roleDescriptions[role];
     }
+    // Synchronize credentials with selected role for seamless switching
+    if (roleCredentials[role] && loginEmail && loginPassword) {
+      const knownDemoEmails = ['admin@eknavigator.com', 'worker@eknavigator.com', 'analyst@eknavigator.com', ''];
+      if (knownDemoEmails.includes(loginEmail.value.trim())) {
+        loginEmail.value = roleCredentials[role].email;
+        loginPassword.value = roleCredentials[role].password;
+      }
+    }
   }
 
   roleTabs.forEach(tab => {
     tab.addEventListener('click', () => selectRoleTab(tab.getAttribute('data-role')));
   });
 
+  // Automatically pre-fill default active role (Administrator) if fields are empty
+  if (loginEmail && !loginEmail.value.trim()) {
+    loginEmail.value = roleCredentials.admin.email;
+    if (loginPassword && !loginPassword.value) {
+      loginPassword.value = roleCredentials.admin.password;
+    }
+  }
+
+  // Preserve backwards compatibility if demo buttons are accessed programmatically
   if (demoAdminBtn) {
-    demoAdminBtn.addEventListener('click', () => {
-      loginEmail.value = 'admin@eknavigator.com';
-      loginPassword.value = 'Admin@123456';
-      selectRoleTab('admin');
-    });
+    demoAdminBtn.addEventListener('click', () => selectRoleTab('admin'));
   }
-
   if (demoWorkerBtn) {
-    demoWorkerBtn.addEventListener('click', () => {
-      loginEmail.value = 'worker@eknavigator.com';
-      loginPassword.value = 'Worker@123456';
-      selectRoleTab('knowledge_worker');
-    });
+    demoWorkerBtn.addEventListener('click', () => selectRoleTab('knowledge_worker'));
   }
-
   if (demoAnalystBtn) {
-    demoAnalystBtn.addEventListener('click', () => {
-      loginEmail.value = 'analyst@eknavigator.com';
-      loginPassword.value = 'Analyst@123456';
-      selectRoleTab('analyst');
-    });
+    demoAnalystBtn.addEventListener('click', () => selectRoleTab('analyst'));
   }
 
   // Password Visibility Toggle
@@ -1428,7 +1437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         body: JSON.stringify({
           question: question,
-          enable_graphrag: assistantGraphRagToggle.checked,
+          enable_graphrag: assistantGraphRagToggle ? assistantGraphRagToggle.checked : true,
           top_k: 4
         })
       });
@@ -1439,6 +1448,8 @@ document.addEventListener('DOMContentLoaded', () => {
           : (data.synthesis_engine === 'graphrag_extractive_verified' ? 'Graph Relational Extractive' : 'Local Deterministic Extractive');
         if (data.verification_status === 'verified') {
           chatModeBadge.innerHTML = `<span style="color: #047857; font-weight: 600;">✓ Verified (${Math.round((data.claim_support_rate || 1.0) * 100)}% Grounded)</span> • ${escapeHtml(data.retrieval_mode)} <span style="font-size: 0.72rem; color: var(--text-muted); padding: 1px 6px; border: 1px solid var(--border-color); border-radius: 4px; margin-left: 4px;">${engineLabel}</span>`;
+        } else if (data.verification_status === 'partially_verified') {
+          chatModeBadge.innerHTML = `<span style="color: #b45309; font-weight: 600;">⚠ Partial (${Math.round((data.claim_support_rate || 0.7) * 100)}% Grounded)</span> • ${escapeHtml(data.retrieval_mode)} <span style="font-size: 0.72rem; color: var(--text-muted); padding: 1px 6px; border: 1px solid var(--border-color); border-radius: 4px; margin-left: 4px;">${engineLabel}</span>`;
         } else if (data.verification_status === 'abstained') {
           chatModeBadge.innerHTML = `<span style="color: #b45309; font-weight: 600;">⚠ Abstained (Missing Evidence)</span> <span style="font-size: 0.72rem; color: var(--text-muted); padding: 1px 6px; border: 1px solid var(--border-color); border-radius: 4px; margin-left: 4px;">${engineLabel}</span>`;
         } else if (data.verification_status === 'refused') {
@@ -1447,7 +1458,7 @@ document.addEventListener('DOMContentLoaded', () => {
           chatModeBadge.textContent = data.retrieval_mode;
         }
 
-        chatAnswerText.textContent = data.answer;
+        chatAnswerText.innerHTML = renderMarkdown(data.answer);
 
         if (data.sources && data.sources.length > 0) {
           chatCitationsList.innerHTML = data.sources.map(s => `
@@ -1464,6 +1475,9 @@ document.addEventListener('DOMContentLoaded', () => {
           chatGraphList.innerHTML = data.graph_evidence.map(g => `
             <li><strong>${escapeHtml(g.source)}</strong> ➔ [<em>${escapeHtml(g.relation)}</em>] ➔ <strong>${escapeHtml(g.target)}</strong> <span style="color: var(--text-muted); font-size: 0.78rem;">(${escapeHtml(g.provenance)})</span></li>
           `).join('');
+        } else {
+          chatGraphSection.style.display = "none";
+          chatGraphList.innerHTML = "";
         }
 
         currentAssistantPayload = {
@@ -1521,7 +1535,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (copyAnswerBtn) {
     copyAnswerBtn.addEventListener('click', () => {
-      const text = chatAnswerText.textContent;
+      const text = (currentAssistantPayload && currentAssistantPayload.answer) ? currentAssistantPayload.answer : chatAnswerText.innerText;
       if (navigator.clipboard && text) {
         navigator.clipboard.writeText(text);
         copyAnswerBtn.textContent = '✓ Copied';
@@ -4142,6 +4156,69 @@ document.addEventListener('DOMContentLoaded', () => {
   function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function renderMarkdown(str) {
+    if (!str) return '';
+    let safe = escapeHtml(str);
+
+    // Bold formatting
+    safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    safe = safe.replace(/__(.+?)__/g, '<strong>$1</strong>');
+
+    // Italic formatting
+    safe = safe.replace(/(^|[^\*])\*([^\*]+?)\*([^\*]|$)/g, '$1<em>$2</em>$3');
+
+    // Inline code
+    safe = safe.replace(/`([^`]+?)`/g, '<code style="background: var(--bg-surface-2, rgba(0,0,0,0.06)); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.88em;">$1</code>');
+
+    // Parse lines for headers, lists, paragraphs
+    const lines = safe.split('\n');
+    let html = '';
+    let inList = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) {
+        if (inList) {
+          html += '</ul>';
+          inList = false;
+        }
+        continue;
+      }
+
+      // Bullet points
+      const bulletMatch = line.match(/^[-*•]\s+(.*)$/);
+      if (bulletMatch) {
+        if (!inList) {
+          html += '<ul style="margin: 0.5rem 0; padding-left: 1.5rem; line-height: 1.6;">';
+          inList = true;
+        }
+        html += `<li style="margin-bottom: 0.25rem;">${bulletMatch[1]}</li>`;
+        continue;
+      }
+
+      if (inList) {
+        html += '</ul>';
+        inList = false;
+      }
+
+      // Headers (### or ## or #)
+      const hMatch = line.match(/^(#{1,4})\s+(.*)$/);
+      if (hMatch) {
+        const lvl = hMatch[1].length;
+        html += `<h${lvl + 2} style="margin: 0.75rem 0 0.35rem 0; font-size: 1.05rem; font-weight: 600; color: var(--text-main);">${hMatch[2]}</h${lvl + 2}>`;
+        continue;
+      }
+
+      html += `<p style="margin: 0.4rem 0; line-height: 1.6;">${line}</p>`;
+    }
+
+    if (inList) {
+      html += '</ul>';
+    }
+
+    return html;
   }
 
   let isRefreshingGlobal = false;

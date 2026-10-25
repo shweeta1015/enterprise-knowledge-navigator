@@ -1138,59 +1138,19 @@ body {
   color: var(--text-muted);
 }
 
-/* Demo Switcher Bar */
-.demo-account-bar {
-  background: #f8fafc;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 0.75rem;
-  margin-bottom: 1.25rem;
-}
-
-.demo-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.4rem;
-}
-
-.demo-buttons {
-  display: flex;
-  gap: 0.4rem;
-}
-
-.demo-pill {
-  flex: 1;
-  background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 0.35rem 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-main);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.demo-pill:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: var(--primary-subtle);
-}
-
 /* Role Selector Tabs */
 .role-selector-wrap {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.35rem;
 }
 
 .role-tabs {
   display: flex;
   background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-sm);
-  padding: 3px;
-  margin-top: 0.35rem;
+  padding: 4px;
+  margin-top: 0.4rem;
+  gap: 4px;
 }
 
 .role-tab {
@@ -1198,12 +1158,18 @@ body {
   background: transparent;
   border: none;
   border-radius: 5px;
-  padding: 0.45rem 0.5rem;
-  font-size: 0.78rem;
+  padding: 0.5rem 0.5rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
+  text-align: center;
+}
+
+.role-tab:hover:not(.active) {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .role-tab.active {
@@ -1216,7 +1182,8 @@ body {
   display: block;
   font-size: 0.75rem;
   color: var(--text-muted);
-  margin-top: 0.35rem;
+  margin-top: 0.4rem;
+  line-height: 1.4;
 }
 
 /* Password Input with eye */

@@ -337,12 +337,13 @@ enterprise-knowledge-navigator/
 ├── scripts/
 │   ├── capture_genuine_screenshots.py # Playwright automated screenshot capture utility
 │   └── comprehensive_final_audit.py   # Deep 29-check end-to-end verification script
-├── tests/                       # Complete automated pytest test suite (63 tests)
+├── tests/                       # Complete automated pytest test suite (67 tests)
 │   ├── test_accuracy_benchmark.py
 │   ├── test_auth_and_roles.py
 │   ├── test_edge_cases_and_resilience.py
 │   ├── test_foundation.py
 │   ├── test_full_pipeline_verification.py
+│   ├── test_graphrag_expansion.py
 │   ├── test_ml_engine.py
 │   ├── test_navigator_pipeline.py
 │   ├── test_security_and_access_control.py
@@ -478,7 +479,7 @@ During initial local database bootstrapping, the application initializes default
 
 The test suite validates database models, security, authorization, document processing, and hybrid retrieval.
 
-### Run Full Pytest Suite (63 Tests)
+### Run Full Pytest Suite (67 Tests)
 ```bash
 python -m pytest tests -v
 ```
@@ -504,7 +505,7 @@ The project follows a disciplined local engineering and version control workflow
                        ▼
 ┌──────────────────────────────────────────────┐
 │ Local Automated Quality & Verification Suite │
-│ - pytest tests -v (63 Unit & Security Tests) │
+│ - pytest tests -v (67 Unit & Security Tests) │
 │ - python scripts/comprehensive_final_audit.py│
 └──────────────────────┬───────────────────────┘
                        │ 2. Stage verified code (excluding secrets, DBs, uploads)
@@ -518,7 +519,7 @@ The project follows a disciplined local engineering and version control workflow
 ┌──────────────────────────────────────────────┐
 │ GitHub Actions Automated CI Pipeline         │
 │ - Compiles syntax across all modules         │
-│ - Executes full 63-test pytest suite         │
+│ - Executes full 67-test pytest suite         │
 │ - Runs 29-check comprehensive audit script   │
 └──────────────────────────────────────────────┘
 ```
@@ -552,7 +553,7 @@ The project follows a disciplined local engineering and version control workflow
 - **Access Control & Multi-Tenancy**: Document privacy tiers (`public`, `internal`, `confidential`, `restricted`), 11 RBAC capabilities, custom role lifecycle governance, and user assignment deletion protection.
 - **Knowledge Graph**: Rule-based regex entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`), relationship extraction, D3.js force-directed visualization, and 1-hop GraphRAG context expansion.
 - **User Authentication & OTP**: Salted bcrypt password hashing, signed JWT tokens, and cryptographically secure OTP password recovery.
-- **Automated Verification**: Complete 63-test pytest suite and 29-check end-to-end audit script.
+- **Automated Verification**: Complete 67-test pytest suite and 29-check end-to-end audit script.
 
 ### Implemented Optional Integrations
 - **Cloud LLM Integration**: Groq API integration (`llama-3.3-70b-versatile` via OpenAI-compatible endpoint) with automatic fallback to local deterministic extractive synthesis if the API key is omitted or validation fails.
