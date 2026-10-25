@@ -1,585 +1,616 @@
 # Enterprise Knowledge Navigator
 
 > **Enterprise Semantic Retrieval, GraphRAG & Institutional Intelligence Platform**  
-> *A modular, local-first enterprise knowledge platform bridging sparse statistical vector retrieval (TF-IDF + Cosine Similarity), lexical search, and interactive knowledge graph traversal.*
+> An enterprise document search and knowledge discovery platform that helps users find information in organizational documents, ask questions in natural language, explore knowledge relationships, and verify answers through source citations.
 
 ---
 
-## 1. Introduction
+## Table of Contents
 
-**Enterprise Knowledge Navigator** is a modular enterprise knowledge retrieval and synthesis platform. Modern organizations face cognitive overload and knowledge fragmentation across departments, operational manuals, and unstructured document silos. Traditional keyword searches frequently miss conceptual relevance, while generic Large Language Models (LLMs) often hallucinate answers and lack verifiable institutional attribution.
+- [1. Project Overview](#1-project-overview)
+- [2. Problem Statement](#2-problem-statement)
+- [3. Objectives](#3-objectives)
+- [4. Who Can Use This Project?](#4-who-can-use-this-project)
+- [5. Key Features](#5-key-features)
+  - [5.1 Document Management](#51-document-management)
+  - [5.2 Search and Retrieval](#52-search-and-retrieval)
+  - [5.3 Grounded Question Answering](#53-grounded-question-answering)
+  - [5.4 Knowledge Graph and GraphRAG](#54-knowledge-graph-and-graphrag)
+  - [5.5 User and Access Management](#55-user-and-access-management)
+  - [5.6 Evaluation and Export](#56-evaluation-and-export)
+  - [5.7 Additional Workspace Features](#57-additional-workspace-features)
+- [6. User Roles](#6-user-roles)
+  - [6.1 Administrator](#61-administrator)
+  - [6.2 Knowledge Worker](#62-knowledge-worker)
+  - [6.3 Analyst](#63-analyst)
+- [7. Technology Stack](#7-technology-stack)
+- [8. Machine Learning and Retrieval Techniques](#8-machine-learning-and-retrieval-techniques)
+  - [8.1 TF-IDF](#81-tf-idf)
+  - [8.2 Cosine Similarity](#82-cosine-similarity)
+  - [8.3 BM25](#83-bm25)
+  - [8.4 Reciprocal Rank Fusion](#84-reciprocal-rank-fusion)
+  - [8.5 Entity and Relationship Extraction](#85-entity-and-relationship-extraction)
+  - [8.6 Knowledge Graph and GraphRAG](#86-knowledge-graph-and-graphrag)
+- [9. How the System Works](#9-how-the-system-works)
+- [10. System Architecture](#10-system-architecture)
+- [11. Project Structure](#11-project-structure)
+- [12. Installation and Setup](#12-installation-and-setup)
+- [13. How to Use the Application](#13-how-to-use-the-application)
+- [14. Example Use Case](#14-example-use-case)
+- [15. Security and Access Control](#15-security-and-access-control)
+- [16. Testing and Evaluation](#16-testing-and-evaluation)
+- [17. Limitations](#17-limitations)
+- [18. Future Enhancements](#18-future-enhancements)
+- [19. Conclusion](#19-conclusion)
+- [Repository](#repository)
 
-Enterprise Knowledge Navigator addresses these challenges by combining:
-1. **Lexical Keyword Search** (frequency-density scoring and exact n-gram phrase matching) and **Sparse Statistical Vector Space Modeling** (Scikit-Learn TF-IDF with Cosine Similarity) fused via **Reciprocal Rank Fusion (RRF)**.
-2. **Interactive Knowledge Graph Traversal (GraphRAG)** for rule-based entity/relation extraction and 1-hop context expansion across corporate entities, policies, and products.
-3. **Deterministic, Zero-Key Grounded Extractive Synthesis** that verifies assertions against database passages and delivers page-precise citations `[Document Name, Page X]`.
-4. **Heuristic Abstention Protocols** that refuse to fabricate answers (`confidence: 0.0`, status: `abstained`) when supporting evidence is absent from the indexed corpus.
-5. **Multi-Tenant Role-Based Access Control (RBAC)** and **Custom Role Governance** tailored for Administrators, Knowledge Analysts, and Knowledge Workers.
+---
+
+## 1. Project Overview
+
+Organizations maintain important information in documents such as security policies, technical manuals, operational guidelines, and reports. Finding specific information across multiple documents can be time-consuming.
+
+**Enterprise Knowledge Navigator** provides a centralized way to upload supported documents, search their contents, ask questions, and view evidence from the indexed documentation.
+
+The application combines:
+- Document processing and text chunking
+- Information retrieval (lexical search and sparse vector modeling)
+- Evidence-based question answering with source citations
+- Knowledge graph entity-relationship visualization and context expansion
+- Role-based access control and administrative governance
+
+It provides three primary user roles:
+1. **Administrator**
+2. **Knowledge Worker**
+3. **Analyst**
+
+Each role has access to features appropriate to its permissions.
 
 ---
 
 ## 2. Problem Statement
 
-Enterprise internal knowledge bases suffer from three critical bottlenecks:
-- **Information Siloing & Unstructured Formats**: Critical operational data is trapped across disconnected PDFs, Word documents (`.docx`), and text manuals (`.txt`).
-- **Semantic Blindness of Classic Search**: Standard search engines fail when queries paraphrase source text or require cross-document concept linking.
-- **LLM Hallucination & Lack of Attribution**: Generative AI tools often fabricate plausible-sounding answers without verifiable sources, creating compliance, legal, and operational risks.
+Organizations often store knowledge across multiple documents and file formats. Employees may need to open several files and search manually to find a particular policy or answer.
+
+Traditional keyword searches can miss relevant information when users phrase their questions differently from the original document. Answers generated without supporting evidence may also be difficult to verify or prone to hallucinations.
+
+The project addresses these problems by providing:
+- Unified multi-format document indexing
+- Multiple complementary retrieval techniques (lexical and sparse statistical vector search)
+- Natural-language question answering
+- Explicit source citations with document names and page references
+- Knowledge relationship exploration through a knowledge graph
+
+### Example of the Problem
+
+Suppose an organization stores its security policies across several documents. An employee wants to know:
+
+> *"What encryption standard must be used for enterprise data at rest?"*
+
+- **Without this application**: The employee may need to open multiple files and search through them manually.
+- **With Enterprise Knowledge Navigator**: The employee can upload or search indexed documents, ask the question, and inspect the retrieved answer and its source citations.
+
+This makes it easier to locate information and verify where the answer came from.
 
 ---
 
 ## 3. Project Objectives
 
-1. **Verifiable Attribution**: Maximize factual grounding by verifying assertions directly against indexed enterprise passages with document, page, and chunk metadata.
-2. **Hallucination Mitigation**: Strictly abstain (`confidence: 0.0`, status: `abstained`) when answering questions that fall outside the indexed organizational corpus or fail retrieval confidence thresholds.
-3. **Operational Role Isolation**: Provide dedicated, secure interfaces tailored to Administrators, Knowledge Analysts, and Knowledge Workers.
-4. **Flexible & Extensible RBAC**: Support built-in system roles and enable administrators to configure dynamic custom roles with granular platform capabilities.
-5. **Zero-Key Local Capability with Cloud LLM Extension**: Provide deterministic local extractive synthesis out-of-the-box without requiring third-party API keys, while supporting optional cloud LLM providers (Groq implemented via OpenAI-compatible completions; Gemini and OpenAI settings configured as extensible hooks).
-6. **Portable Architecture**: Designed for containerized and reproducible execution with dependency isolation, automated test validation, and portable SQLite storage.
+- **Simplify access** to organizational knowledge across unstructured document silos.
+- **Support uploading and processing** supported document formats (PDF, DOCX, TXT).
+- **Extract text and divide it** into smaller passages (chunks) for effective retrieval.
+- **Retrieve relevant information** from indexed documents using hybrid search.
+- **Support natural-language questions** about document content.
+- **Display source document names and page references** where available.
+- **Reduce unsupported answers** by grounding responses in retrieved evidence and strictly abstaining when evidence is missing.
+- **Explore relationships** between extracted entities through knowledge graph functionality.
+- **Provide role-based access** to application features with privilege separation.
+- **Evaluate retrieval quality** using supported metrics (Precision@K, Recall@K, MRR).
+- **Allow users to save, revisit, or export** information where those features are available.
 
 ---
 
-## 4. Key Features
+## 4. Who Can Use This Project?
 
-- **Document Ingestion Engine**: Automated multi-format parsing for PDF (`pypdf` with `PyPDF2` fallback), Word DOCX (`python-docx`), and plain text (`.txt`) files, Unicode NFKC normalization, dynamic sliding-window chunking (400 tokens with 60-token overlap), and SHA-256 duplicate prevention.
-- **Hybrid Retrieval Engine**: Multi-mode retrieval supporting Keyword (Lexical frequency-density), Vector (TF-IDF sparse vector space with cosine similarity), and Reciprocal Rank Fusion (RRF) scoring with configurable weighting.
-- **Grounded AI Assistant & Citations**: Factual answer synthesis engine that cross-references assertions against physical SQLite chunks, outputs interactive citations, and falls back to local extractive synthesis when cloud keys are omitted.
-- **Interactive Knowledge Graph & GraphRAG**: Rule-based entity extraction (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relational link extraction rendered with D3.js force-directed physics, with 1-hop context expansion during RAG retrieval.
-- **Enterprise Role-Based Access Control**: Strict privilege separation across API endpoints and UI views, with public registration restricted to non-privileged roles.
-- **Dynamic Custom Role Governance**: Administrative UI and REST API for creating, editing, and safely deleting custom enterprise roles with granular capability sets and user assignment deletion protection.
-- **Password Recovery & OTP Security**: Cryptographically secure 6-digit OTP verification with rate limiting, attempt decrement, resend cooldown, and timing-safe SHA-256 hashing.
-- **Quality & Retrieval Benchmarks**: Built-in quantitative evaluation engine computing Precision@K, Recall@K, Mean Reciprocal Rank (MRR), and query latency with persistent historical tracking.
-- **Workspace Productivity Suite**: Document categorization collections, saved answers, bookmarked insights, persistent search audit history, and notification feeds.
-- **Data Export Center**: Instant export of catalog records, evaluation benchmarks, and operational audit logs into CSV and JSON formats.
+The application is intended for organizations and teams that need to search and manage information stored in documents:
+
+- **Educational institutions**: Find information in guidelines, manuals, and administrative documents.
+- **IT teams**: Search technical documentation and security policies.
+- **Business organizations**: Locate operational procedures and internal guidelines.
+- **Knowledge management teams**: Organize and explore information from multiple documents.
+- **Analysts**: Examine search results, knowledge relationships, and retrieval evaluation results.
+
+> *Actual suitability depends on the organization's security requirements, deployment configuration, and the features enabled in the application.*
 
 ---
 
-## 5. Intended Users & Built-in Roles
+## 5. Key Features
 
-Enterprise Knowledge Navigator provides three distinct built-in user roles, each with its own workflow and permissions:
+### 5.1 Document Management
+- Upload supported PDF, DOCX, and TXT files.
+- Extract readable text from uploaded documents.
+- Split extracted text into smaller chunks for retrieval.
+- Index processed content for searching.
+- Detect duplicate content using SHA-256 hashing where implemented.
+- View document information, processing status, and available actions.
+- Preview or download documents where supported.
+- Investigate processing errors and retry processing where available.
+
+### 5.2 Search and Retrieval
+- Search indexed documents using queries.
+- Retrieve relevant document passages.
+- Support keyword-based (lexical) and text-similarity (sparse vector) retrieval.
+- Combine rankings through Reciprocal Rank Fusion (RRF) in the hybrid retrieval pipeline.
+- Display relevant results to help users locate information.
+
+### 5.3 Grounded Question Answering
+- Ask questions using natural language.
+- Retrieve supporting passages from indexed documentation.
+- Present answers based on available document evidence.
+- Display source document names and page references where available.
+- Allow users to inspect citations and verify information.
+- Support heuristic abstention when the implemented retrieval and answering logic determines that sufficient evidence is unavailable.
+
+### 5.4 Knowledge Graph and GraphRAG
+- Extract supported entities from document text (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`).
+- Identify relationships using the implemented extraction logic.
+- Represent extracted entities and relationships as a knowledge graph rendered with D3.js force-directed physics.
+- Explore connections between related information.
+- Use graph-based context expansion (GraphRAG) where supported by the active answering pipeline.
+
+> *Graph-based retrieval can help connect related information, but its effectiveness depends on the quality of the extracted entities, relationships, and source documents.*
+
+### 5.5 User and Access Management
+- Support Administrator, Knowledge Worker, and Analyst roles.
+- Restrict features according to role permissions.
+- Provide administrative user-management functionality where authorized.
+- Support authentication and configured password-recovery functionality with cryptographically secure OTPs.
+
+### 5.6 Evaluation and Export
+- Evaluate retrieval quality using supported metrics (Precision@K, Recall@K, MRR, latency).
+- Inspect available evaluation results.
+- Export supported information through the application's export features (CSV and JSON formats).
+- Use evaluation results to identify areas for improvement.
+
+### 5.7 Additional Workspace Features
+Depending on the enabled implementation and user permissions, the application may also provide:
+- Saved answers
+- Collections and bookmarks
+- Search history
+- Notifications
+- Audit logs
+- Profile settings
+- System-health information
+
+---
+
+## 6. User Roles
+
+### 6.1 Administrator
+The Administrator manages users and authorized system-level functions.
+- **Main responsibilities**:
+  - View and manage user accounts.
+  - Activate or deactivate accounts where permitted.
+  - Manage custom roles and permissions where supported.
+  - Inspect available audit logs.
+  - Review system-health and technical information.
+  - Access administrative functions according to permissions.
+
+### 6.2 Knowledge Worker
+The Knowledge Worker uses organizational documents to find information and answer everyday questions.
+- **Main responsibilities**:
+  - Upload supported documents.
+  - Search indexed documentation.
+  - Ask questions in natural language.
+  - Read answers and source citations.
+  - Preview available document content.
+  - Save useful answers and use other permitted workspace features.
+
+### 6.3 Analyst
+The Analyst investigates information and evaluates retrieval performance.
+- **Main responsibilities**:
+  - Search the document repository.
+  - Ask questions and inspect supporting evidence.
+  - Explore the knowledge graph.
+  - Run available evaluation tools.
+  - Review retrieval metrics.
+  - Export supported results.
+
+> *The exact capabilities of each role are controlled by the permissions implemented in the application.*
+
+---
+
+## 7. Technology Stack
+
+The following technologies are part of the project's architecture:
+
+| Technology | Purpose |
+| :--- | :--- |
+| **Python** | Backend logic and document processing |
+| **FastAPI / Starlette** | Web backend and API services |
+| **Uvicorn** | Runs the backend application (ASGI server) |
+| **Pydantic** | Validates application data and settings |
+| **SQLAlchemy** | Database interaction and ORM mapping |
+| **SQLite** | Relational data storage |
+| **HTML5** | Web page structure |
+| **CSS3** | Styling and layout |
+| **JavaScript** | Frontend interactions (vanilla ES6+) |
+| **scikit-learn** | TF-IDF and cosine-similarity functionality |
+| **BM25** | Keyword-based retrieval and ranking |
+| **Reciprocal Rank Fusion (RRF)** | Combines rankings from multiple retrieval methods |
+| **pypdf / PyPDF2** | PDF text extraction |
+| **python-docx** | DOCX document processing |
+| **D3.js** | Knowledge graph visualization |
+| **JWT and password hashing** | Authentication (`python-jose`) and password protection (`passlib/bcrypt`) |
+
+> *Optional language-model services and external API integrations depend on environment configuration. They should not be assumed to be enabled unless they are configured and working.*
+
+---
+
+## 8. Machine Learning and Retrieval Techniques
+
+### 8.1 TF-IDF
+TF-IDF stands for **Term Frequency–Inverse Document Frequency**.  
+It assigns numerical importance to words based on their frequency in a document and how common they are across the document collection.
+- **Purpose**: Help represent document passages and search queries numerically for text retrieval.
+
+### 8.2 Cosine Similarity
+Cosine similarity measures the similarity between numerical text vectors:
+$$\text{Cosine Similarity}(\mathbf{u}, \mathbf{v}) = \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\|_2 \|\mathbf{v}\|_2}$$
+- **Purpose**: Compare a query with document passages and help retrieve passages with similar word-weight patterns.
+
+> *TF-IDF and cosine similarity are traditional sparse statistical information-retrieval techniques. They do not, by themselves, understand language in the same way as a modern neural language model.*
+
+### 8.3 BM25
+BM25 is a ranking technique that estimates how relevant a document is to a search query. It considers factors such as query-term frequency and document length.
+- **Purpose**: Retrieve and rank passages that contain useful query terms.
+
+### 8.4 Reciprocal Rank Fusion
+Reciprocal Rank Fusion (RRF) combines ranked results from different retrieval methods:
+$$\text{RRF Score}(d) = \sum_{m} \frac{w_m}{k + \text{rank}_m(d)}$$
+- **Purpose**: Produce a combined ranking that benefits from both lexical and vector search approaches.
+
+### 8.5 Entity and Relationship Extraction
+The described implementation uses rule-based logic to identify supported entities (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relationships (`REQUIRES`, `PROTECTED_BY`, `OWNS`, `MAINTAINS`, etc.).
+- **Purpose**: Build a structured representation of connections found in the document collection.
+
+### 8.6 Knowledge Graph and GraphRAG
+A knowledge graph represents entities and their relationships. Graph-based context expansion can use these relationships to retrieve additional context for a question.
+- **Purpose**: Help users explore connections between related information and support question answering when graph context is enabled.
+
+> *The knowledge graph does not automatically guarantee that a relationship is correct. Extracted information should be checked against its source documents.*
+
+---
+
+## 9. How the System Works
+
+The main application workflow proceeds through the following stages:
+
+1. **Upload**: An authorized user uploads a supported document (PDF, DOCX, TXT).
+2. **Text extraction**: The application extracts readable text from the document.
+3. **Chunking**: The extracted text is divided into smaller passages (400 tokens with 60-token overlap).
+4. **Indexing**: The application prepares the passages for retrieval by computing TF-IDF vectors and lexical indices.
+5. **Question or search**: The user enters a query or asks a natural-language question.
+6. **Retrieval**: The system finds relevant passages using the available retrieval techniques.
+7. **Context preparation**: Retrieved evidence and graph-related context, where enabled, are prepared for answering.
+8. **Answering**: The application produces a response using its configured answering logic (local extractive synthesis or optional configured cloud LLM).
+9. **Citation display**: Available source documents and page references are shown to help the user verify the response.
+10. **Evaluation**: Available evaluation tools can measure retrieval performance.
+
+> *The exact processing path depends on the selected search mode and configured application features.*
+
+---
+
+## 10. System Architecture
+
+The following diagram illustrates the main conceptual components of the project:
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        ROLE SEPARATION MATRIX                          │
-├───────────────────────┬───────────────────────┬────────────────────────┤
-│     Administrator     │   Knowledge Analyst   │    Knowledge Worker    │
-├───────────────────────┼───────────────────────┼────────────────────────┤
-│ • Full platform admin │ • Advanced analytics  │ • Daily operations     │
-│ • User provisioning   │ • Knowledge graph     │ • Document upload      │
-│ • Custom role manager │ • Quality benchmarks  │ • Hybrid search        │
-│ • Audit log inspector │ • Evaluation history  │ • Grounded Q&A         │
-│ • System telemetry    │ • Data exports        │ • Collections & saves  │
-│ • All 11 capabilities │ • 6 capabilities      │ • 5 capabilities       │
-└───────────────────────┴───────────────────────┴────────────────────────┘
+          USER
+           │
+           ▼
+     FRONTEND INTERFACE
+           │
+           ▼
+      BACKEND API
+           │
+     ┌─────┴───────────────┐
+     │                     │
+     ▼                     ▼
+USER AUTHENTICATION   DOCUMENT UPLOAD
+     │                     │
+     ▼                     ▼
+ROLE PERMISSIONS      TEXT EXTRACTION
+                           │
+                           ▼
+                        CHUNKING
+                           │
+                           ▼
+                        INDEXING
+                           │
+                           ▼
+                  SEARCH AND RETRIEVAL
+                           │
+                     ┌─────┴─────┐
+                     │           │
+                     ▼           ▼
+               RELEVANT TEXT   KNOWLEDGE GRAPH
+                     │           │
+                     └─────┬─────┘
+                           │
+                           ▼
+                     ANSWERING LOGIC
+                           │
+                           ▼
+                  ANSWER AND CITATIONS
 ```
-
-### 1. Administrator
-- **Persona**: Enterprise IT directors, compliance officers, and system administrators.
-- **Capabilities**: All 11 platform capabilities. Access to user directories, account activation/deactivation, password resets, custom role creation/deletion, tamper-evident audit logs, and technical telemetry.
-- **Guardrails**: Cannot delete or deactivate their own administrator account; protected against deletion of system built-in roles.
-
-### 2. Knowledge Analyst
-- **Persona**: Intelligence specialists, research analysts, and quality assurance engineers.
-- **Capabilities**: 6 analytics and intelligence capabilities (`search_retrieval`, `qa_citations`, `knowledge_graph`, `evaluation`, `export_center`, `profile_settings`).
-- **Dashboard Experience**: Tailored analytics overview with direct access to Knowledge Graph exploration, GraphRAG relationship topology, Precision/Recall/MRR benchmarking, and catalog exports.
-- **Guardrails**: Blocked with `HTTP 403 Forbidden` from administrative endpoints (`/auth/users`, `/auth/admin/roles`, `/auth/admin/audit-logs`).
-
-### 3. Knowledge Worker
-- **Persona**: General employees, business analysts, engineers, and operational staff.
-- **Capabilities**: 5 core operational capabilities (`doc_ingestion`, `doc_deletion`, `search_retrieval`, `qa_citations`, `profile_settings`).
-- **Dashboard Experience**: Operational overview focused on rapid document discovery, uploading departmental manuals, asking grounded questions, reviewing verified citations, and organizing research in personal collections.
-- **Guardrails**: System administration, custom role management, and deep evaluation suites are hidden and protected on the backend.
-
----
-
-## 6. Custom Role Management
-
-In addition to built-in roles, administrators can create and manage custom roles using standardized platform capabilities:
-
-| Capability ID | Name | Category | Description |
-| :--- | :--- | :--- | :--- |
-| `system_admin` | System Administration | Administration | Full platform governance, user provisioning, and role management |
-| `audit_logs` | Operational Audit Logs | Administration | Inspect system security logs and tamper-evident operational events |
-| `system_health` | System Diagnostics | Administration | Monitor storage persistence, vector space, and pipeline health |
-| `doc_ingestion` | Document Ingestion | Content & Search | Upload enterprise PDF, DOCX, and TXT files for indexing |
-| `doc_deletion` | Document Deletion | Content & Search | Permanently delete documents and purge relational graph edges |
-| `search_retrieval` | Hybrid Search | Content & Search | Execute lexical, dense vector, and hybrid rank queries |
-| `qa_citations` | Grounded AI Q&A | Content & Search | Ask natural language questions with verified page citations |
-| `knowledge_graph` | Knowledge Graph | Analytics & Intel | Explore semantic entity relationships and GraphRAG evidence |
-| `evaluation` | Quality Benchmarks | Analytics & Intel | Run Precision@K, Recall@K, and MRR evaluation suites |
-| `export_center` | Data Export Center | Analytics & Intel | Export catalog records, evaluation logs, and audit trails |
-| `profile_settings` | Profile Settings | General | Manage personal credentials, contact info, and preferences |
-
-**Safety Guardrails**:
-- Built-in roles (`admin`, `analyst`, `knowledge_worker`) cannot be renamed or deleted.
-- Custom roles assigned to active users cannot be deleted until users are reassigned (`HTTP 400 Bad Request`).
-- Public self-registration cannot select administrator or privileged roles (`HTTP 403 Forbidden`).
-
----
-
-## 7. Application Interface & Visual Showcase
-
-The platform provides a responsive, single-page web interface built with modern vanilla ES6+ JavaScript, CSS3 design tokens, and D3.js v7:
-
-| Application View | Interface Screenshot | Capabilities Demonstrated |
-| :--- | :--- | :--- |
-| **Public Landing Page** | ![Public Landing Page](docs/screenshots/01_landing_page.png) | Unified entry portal with interactive pipeline demonstration, architectural highlights, and direct role navigation. |
-| **Authentication & Role Selection** | ![Authentication Screen](docs/screenshots/02_login_portal.png) | Secure login portal with role quick-access selectors (Administrator, Knowledge Worker, Analyst) and password recovery. |
-| **Executive Operations Dashboard** | ![Executive Dashboard](docs/screenshots/03_worker_dashboard.png) | Real-time system telemetry, indexed document catalog, vector chunk metrics, and instant hybrid search interface. |
-| **Grounded AI Q&A Assistant** | ![Grounded Q&A Assistant](docs/screenshots/04_grounded_assistant.png) | Factual natural-language Q&A engine with toggleable GraphRAG expansion, compliance suggestions, and verified page citations. |
-| **Interactive D3.js Knowledge Graph** | ![Knowledge Graph](docs/screenshots/05_knowledge_graph.png) | Force-directed entity-relationship network visualizer mapping institutional policies, leadership, and cross-department links. |
-| **Administrative Governance & RBAC** | ![Admin Roles Matrix](docs/screenshots/06_admin_portal.png) | Fine-grained capability matrix across system roles, user provisioning, and tamper-evident audit logs. |
-
----
-
-## 8. Technical Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Client["Web Browser Client (SPA)"]
-        UI["Modern Vanilla ES6+ Single Page App"]
-        D3["D3.js v7 Force-Directed Graph Engine"]
-        CSS["Custom CSS Design System (#F8F9FF Lavender Theme)"]
-    end
-
-    subgraph API["FastAPI Application Server (ASGI)"]
-        Router["API Gateway / Routing (/api/v1)"]
-        AuthMiddleware["JWT Authentication & RBAC Middleware"]
-        DocController["Document Ingestion & ETL Controller"]
-        SearchController["Hybrid Retrieval & RRF Fusion Engine"]
-        RAGController["Grounded Answer Synthesis & Citations"]
-        GraphController["Entity & Relation Extractor (GraphRAG)"]
-        EvalController["Quantitative Evaluation Benchmarking"]
-    end
-
-    subgraph Engine["Machine Learning & NLP Services"]
-        VectorService["Scikit-Learn TF-IDF & Cosine Similarity (Sparse Vector Space)"]
-        BM25Service["Lexical Keyword Engine (Frequency-Density & N-Gram Matching)"]
-        RRF["Reciprocal Rank Fusion Ranking Engine (k=60)"]
-        ExtractiveRAG["Zero-Key Deterministic Extractive Synthesizer"]
-        CloudLLM["Optional Cloud LLM (Groq Implemented; Gemini/OpenAI Configured)"]
-    end
-
-    subgraph Storage["Persistence Layer"]
-        DB[("SQLite Database via SQLAlchemy ORM")]
-        VectorStore[("Persistent Vector Index (PKL & JSON)")]
-        DocStore[("Structured Document Filesystem (data/raw)")]
-        GraphStore[("Knowledge Graph Store (JSON)")]
-    end
-
-    UI -->|REST / JSON| Router
-    D3 -->|Graph Topology| Router
-    Router --> AuthMiddleware
-    AuthMiddleware --> DocController
-    AuthMiddleware --> SearchController
-    AuthMiddleware --> RAGController
-    AuthMiddleware --> GraphController
-    AuthMiddleware --> EvalController
-
-    DocController --> VectorService
-    DocController --> DocStore
-    DocController --> DB
-
-    SearchController --> VectorService
-    SearchController --> BM25Service
-    SearchController --> RRF
-    RRF --> DB
-
-    RAGController --> ExtractiveRAG
-    RAGController --> CloudLLM
-    RAGController --> GraphController
-
-    VectorService --> VectorStore
-    GraphController --> GraphStore
-    GraphController --> DB
-    EvalController --> DB
+    User["USER"] --> Frontend["FRONTEND INTERFACE (HTML5 / CSS3 / ES6 / D3.js)"]
+    Frontend --> API["BACKEND API (FastAPI / Starlette)"]
+    
+    API --> Auth["USER AUTHENTICATION & RBAC"]
+    Auth --> Permissions["ROLE PERMISSIONS"]
+    
+    API --> Upload["DOCUMENT UPLOAD"]
+    Upload --> Extract["TEXT EXTRACTION (pypdf, python-docx)"]
+    Extract --> Chunk["CHUNKING (Sliding Window)"]
+    Chunk --> Index["INDEXING (TF-IDF & BM25)"]
+    Index --> Search["SEARCH AND RETRIEVAL (RRF Fusion)"]
+    
+    Search --> RelevantText["RELEVANT TEXT PASSAGES"]
+    Search --> KnowledgeGraph["KNOWLEDGE GRAPH (Entities & Triples)"]
+    
+    RelevantText --> AnswerLogic["ANSWERING LOGIC (Extractive / GraphRAG)"]
+    KnowledgeGraph --> AnswerLogic
+    
+    AnswerLogic --> Output["ANSWER AND CITATIONS [File, Page]"]
 ```
 
----
-
-## 9. Technology Stack
-
-### Backend
-- **Framework**: Python 3.11+ / Python 3.14 on FastAPI (Starlette ASGI)
-- **ASGI Server**: Uvicorn with single-worker concurrency safety for SQLite
-- **Configuration & Validation**: Pydantic v2, Pydantic-Settings, Python-Dotenv
-- **Relational Database**: SQLite with SQLAlchemy ORM (SQLAlchemy provides architectural portability for PostgreSQL; verified primarily on SQLite)
-- **Logging**: Rotating file and console structured logging
-
-### Machine Learning, Retrieval & NLP
-- **Sparse Statistical Vector Retrieval**: Scikit-Learn `TfidfVectorizer` (sublinear TF scaling, n-grams 1-2, English stop-words) with Cosine Similarity
-- **Lexical Keyword Retrieval**: Frequency-density scoring with length normalization and exact multi-word n-gram phrase matching
-- **Hybrid Fusion**: Reciprocal Rank Fusion (RRF) with configurable modality weights ($w_{\text{semantic}}=0.7, w_{\text{keyword}}=0.3, k=60$)
-- **Optional Dense Embeddings**: Planned architectural extension (optional `sentence-transformers` hook)
-- **Document Processing**: `pypdf>=4.0.0` (primary modern reader) with `PyPDF2` fallback (PDF), `python-docx` (Word DOCX), UTF-8 / NFKC Unicode normalization, and optional OCR fallback hooks (`pytesseract`, `pdf2image` requiring system Tesseract binary)
-- **Knowledge Graph & GraphRAG**: Rule-based entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relational triple extraction with 1-hop context expansion during RAG
-- **Cloud AI Integration**: Groq API (`llama-3.3-70b-versatile` implemented via OpenAI-compatible endpoint); Google Gemini and OpenAI API keys configured in settings as planned provider hooks
-
-### Security & Authentication
-- **Password Hashing**: `passlib` with `bcrypt` salt generation (one-way cryptographic hashing)
-- **Session Tokens**: Signed Bearer JWTs via `python-jose` (HS256)
-- **Production Secret Validation**: Mandatory 32+ character non-default `SECRET_KEY` enforced in production environments
-- **Multi-Tenant Document Access Control**: Role and ownership-based document access isolation (`public`, `internal`, `confidential`, `restricted`) across search, RAG Q&A, and knowledge graph
-- **Demo Account Gating**: `ENABLE_DEMO_ACCOUNTS` setting (enabled in dev, strictly disabled in production)
-- **Prompt Injection Defense**: Multi-pattern regex filtering and strict isolation of embedded document instructions as untrusted data
-- **OTP Recovery**: Cryptographically secure numeric OTPs, timing-attack safe `secrets.compare_digest` verification
-
-### Frontend
-- **Architecture**: Single Page Application (SPA) served directly through FastAPI static files
-- **Languages**: Modern ES6+ JavaScript, Semantic HTML5, CSS3 Custom Properties
-- **Visualization**: D3.js v7 for force-directed dynamic knowledge graphs
-- **Theme**: Light lavender-blue enterprise palette (`#F8F9FF` background, `#7667D8` lavender, `#4F6BED` blue)
+> *This is a conceptual overview, not a claim that each component runs as an independent distributed microservice.*
 
 ---
 
-## 10. AI, NLP & Retrieval Methodologies
+## 11. Project Structure
 
-### Lexical Retrieval vs. Sparse Statistical Vector Retrieval
-Enterprise Knowledge Navigator distinguishes between complementary retrieval paradigms:
-- **Lexical Keyword Retrieval**: Matches query terms, acronyms, and multi-word n-gram phrases against indexed document passages using length-normalized frequency-density scoring. Effective for code identifiers, policy numbers, and verbatim phrases.
-- **Sparse Statistical Vector Space Modeling (TF-IDF)**: Projects text into a high-dimensional vocabulary vector space with sublinear term-frequency scaling and computes cosine similarity:
-  $$\text{Cosine Similarity}(\mathbf{u}, \mathbf{v}) = \frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\|_2 \|\mathbf{v}\|_2}$$
-  Captures thematic relevance locally without external API dependencies.
-- **Dense Neural Embeddings (Planned / Optional)**: Architectural hook for mapping queries and passages into dense continuous vector spaces using pre-trained sentence transformer models (`sentence-transformers/all-MiniLM-L6-v2`) when optional dependencies are installed.
-- **Hybrid Reciprocal Rank Fusion (RRF)**: Merges ranked candidate lists from both modalities:
-  $$\text{RRF Score}(d) = \sum_{m \in \{\text{semantic}, \text{keyword}\}} \frac{w_m}{k + \text{rank}_m(d)}$$
-  *(where $k = 60$, with default weights $w_{\text{semantic}} = 0.7$ and $w_{\text{keyword}} = 0.3$).*
-
-### Document Ingestion & Chunking
-1. **Extraction & Sanitization**: Text extraction from PDF (`pypdf` with `PyPDF2` fallback), Word DOCX (`python-docx`), and plain text files with Unicode NFKC normalization and control character stripping.
-2. **Duplicate Detection**: Computes SHA-256 hash before saving. Identical content returns `HTTP 409 Conflict`.
-3. **Sliding-Window Chunking**: Splits document text into chunks of 400 tokens with a 60-token overlap to preserve sentence boundaries.
-4. **Metadata Preservation**: Every chunk retains its `document_id`, `chunk_index`, `page_number`, token count, and access tenancy tags.
-
-### Grounded Answer Synthesis & Citations
-- **Zero-Key Deterministic Extractive Synthesis**: In default local mode, the engine selects top-scoring grounded assertions, cross-verifies sentences against SQLite source chunks, and appends explicit citations in `[Filename, Page X]` format.
-- **Optional Cloud Synthesis**: When `GROQ_API_KEY` is configured, queries can be synthesized via Groq (`llama-3.3-70b-versatile`) with evidence validation fallback.
-- **Heuristic Abstention**: If retrieved passage similarity falls below confidence thresholds or evidence is absent, the assistant strictly abstains: *"I could not find sufficient information in the indexed enterprise documents to answer this question."*
-
-### Multi-Tenant Access Control & Document Isolation
-- Documents are tagged with access tiers: `public`, `internal`, `confidential`, or `restricted`.
-- Access checks enforce that confidential and restricted documents are excluded from search results, retrieved chunks, RAG answers, citations, and Knowledge Graph visualizations for unauthorized roles.
-- Document deletion is restricted to document owners or system administrators.
-
-### Knowledge Graph & GraphRAG
-- Uses rule-based regex entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`) and relationship pattern matching (`MANAGES`, `DEVELOPS`, `OPERATES_IN`, `GOVERNS`, `INTEGRATES_WITH`).
-- During query synthesis, GraphRAG retrieves 1-hop connected facts from authorized documents to inject structural relational context into the prompt.
-
----
-
-## 11. Evaluation Benchmarking Metrics
-
-The system includes a dedicated evaluation pipeline (`evaluation_service.py`) measuring retrieval performance across standard information retrieval metrics:
-
-| Metric | Calculation Method | Target Threshold | Evaluated Benchmark |
-| :--- | :--- | :--- | :--- |
-| **Precision@K** | $\text{Precision@K} = \frac{|\text{Relevant Chunks in Top-K}|}{K}$ | $\ge 80\%$ | Measured on benchmark queries |
-| **Recall@K** | $\text{Recall@K} = \frac{|\text{Discovered Target Concepts}|}{|\text{Total Expected Concepts}|}$ | $\ge 85\%$ | Measured on benchmark queries |
-| **MRR (Mean Reciprocal Rank)** | $\text{MRR} = \frac{1}{|Q|} \sum_{i=1}^{|Q|} \frac{1}{\text{rank}_i}$ | $\ge 0.75$ | Evaluated across query suite |
-| **Groundedness Verification** | Percentage of synthesized claims backed by database passage evidence | High / Verified | Verified against source chunks |
-| **Query Latency** | End-to-end retrieval, fusion, and synthesis execution duration | $< 150\text{ ms}$ | Benchmarked on local test corpus |
-
-> **Benchmark Methodology**: Evaluation runs execute 4 standard enterprise domain test queries (remote work, healthcare benefits, quarterly revenue, container deployment) against indexed corporate documents in SQLite, calculating precision, recall, reciprocal ranks, and millisecond latency.
-
----
-
-## 12. Directory Structure
+The repository contains application code, frontend resources, supporting data, documentation, tests, and configuration:
 
 ```
 enterprise-knowledge-navigator/
 ├── .github/
-│   └── workflows/
-│       └── ci.yml               # GitHub Actions automated test & deployment trigger
+│   └── workflows/       # Automated CI checks and deployment workflows
 ├── backend/
-│   └── app/
-│       ├── api/v1/
-│       │   ├── __init__.py      # API router aggregator
-│       │   ├── auth.py          # Authentication, OTP, user management, custom roles
-│       │   ├── health.py        # System health and diagnostic probes
-│       │   ├── navigator.py     # Document ingestion, search, RAG Q&A, graph, evaluation
-│       │   └── workspace.py     # Collections, bookmarks, history, notifications, export
-│       ├── core/
-│       │   ├── config.py        # Pydantic BaseSettings, dynamic PORT and DATA_DIR
-│       │   ├── database.py      # SQLAlchemy engine, session maker, schema upgrades
-│       │   ├── logging.py       # Rotating file and console structured logging
-│       │   └── security.py      # Passlib bcrypt hashing, JWT token creation and decoding
-│       ├── models/
-│       │   ├── document.py      # DocumentRecord, ChunkRecord, EntityRecord, RelationRecord
-│       │   ├── user.py          # UserRecord, RoleRecord, PasswordResetOTPRecord, AuditLogRecord
-│       │   └── workspace_extras.py # CollectionRecord, SavedAnswerRecord, SearchHistoryRecord
-│       ├── schemas/
-│       │   ├── auth.py          # Pydantic schemas for authentication and custom roles
-│       │   ├── health.py        # Health and system info schemas
-│       │   ├── navigator.py     # Document, search, RAG, citations, and graph schemas
-│       │   └── workspace_extras.py # Collections, bookmarks, and preferences schemas
-│       ├── services/
-│       │   ├── document_processor.py # PDF/DOCX/TXT extraction, chunking, SHA-256 hash
-│       │   ├── evaluation_service.py # Precision@K, Recall@K, MRR evaluation benchmarks
-│       │   ├── knowledge_graph.py    # Rule-based entity & relation graph extractor
-│       │   ├── notification_delivery.py # OTP delivery and audit logging
-│       │   ├── rag_assistant.py      # Grounded answer synthesis, citation validation
-│       │   └── vector_index.py       # TF-IDF vectorization, hybrid fusion search
-│       └── main.py              # FastAPI application initialization and SPA routing
-├── data/
-│   ├── graph_store/             # Knowledge graph JSON artifacts
-│   ├── processed/               # Extracted clean text cache
-│   ├── raw/                     # Uploaded documents
-│   └── vector_store/            # Serialized TF-IDF indices and chunk metadata
-├── deploy/
-│   ├── Caddyfile                # Optional Caddy reverse proxy configuration
-│   └── nginx.conf               # Optional Nginx reverse proxy configuration
-├── docs/                        # Architecture guides, audit logs, and technical reports
-│   ├── diagrams/                # Architectural flowcharts and system diagrams
-│   └── screenshots/             # Genuine captures of the running web application
-├── frontend/
-│   ├── app.js                   # Client-side SPA controller and D3.js graph visualizer
-│   ├── index.html               # Semantic HTML5 layout and role-tailored dashboard shells
-│   └── style.css                # CSS custom properties and responsive stylesheet
-├── scripts/
-│   ├── capture_genuine_screenshots.py # Playwright automated screenshot capture utility
-│   └── comprehensive_final_audit.py   # Deep 29-check end-to-end verification script
-├── tests/                       # Complete automated pytest test suite (67 tests)
-│   ├── test_accuracy_benchmark.py
-│   ├── test_auth_and_roles.py
-│   ├── test_edge_cases_and_resilience.py
-│   ├── test_foundation.py
-│   ├── test_full_pipeline_verification.py
-│   ├── test_graphrag_expansion.py
-│   ├── test_ml_engine.py
-│   ├── test_navigator_pipeline.py
-│   ├── test_security_and_access_control.py
-│   └── test_workspace_features.py
-├── .env.example                 # Safe environment template with placeholder values
-├── .gitignore                   # Comprehensive exclusion of secrets, DBs, and runtime data
-├── Dockerfile                   # Multi-stage production container definition
-├── render.yaml                  # Application deployment blueprint (dormant reference)
-├── requirements.txt             # Pinned production Python dependencies
-└── run.py                       # Application startup launcher
+│   └── app/             # Backend application modules (FastAPI, models, services)
+├── data/                # Application data and supporting resources (SQLite, stores)
+├── deploy/              # Deployment-related files (Caddyfile, nginx.conf)
+├── docs/                # Project documentation and screenshots
+├── frontend/            # Frontend resources (index.html, app.js, style.css)
+├── scripts/             # Supporting verification and audit scripts
+├── tests/               # Automated test suite (67 unit and integration tests)
+├── requirements.txt     # Python project dependencies
+├── run.py               # Main application launcher
+└── README.md            # Project documentation
 ```
+
+> *This is an illustrative overview. Refer to the current repository for the complete directory structure.*  
+> **Security Reminder**: Do not commit secret files, private documents, local credentials, or databases containing confidential user information.
 
 ---
 
-## 13. Local Installation & Setup
-
-Enterprise Knowledge Navigator is designed to run seamlessly in a local development environment. Both the FastAPI backend and modern single-page frontend (HTML5/CSS3/JavaScript/D3.js) are served concurrently through a unified ASGI web server on localhost.
+## 12. Installation and Setup
 
 ### Prerequisites
-- **Python**: Version 3.11 or higher (Python 3.12, 3.13, and 3.14 fully supported)
-- **Git**: Version 2.30+
-- **Operating System**: Windows 10/11, macOS, or modern Linux distribution (Ubuntu 22.04+)
-- **Hardware**: Minimum 4 GB RAM (8 GB recommended for local vector indexing)
+Install the following before running the project:
+- **Python**: Version 3.11 or higher (3.11, 3.12, 3.13, 3.14 supported).
+- **Git**: If cloning the repository.
+- **Terminal**: Command Prompt or PowerShell on Windows; Terminal on macOS/Linux.
 
-### Step-by-Step Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/shweeta1015/enterprise-knowledge-navigator.git
-   cd enterprise-knowledge-navigator
-   ```
-
-2. **Create and activate a dedicated virtual environment:**
-   - **Linux / macOS:**
-     ```bash
-     python3 -m venv venv
-     source venv/bin/activate
-     ```
-   - **Windows (PowerShell):**
-     ```powershell
-     python -m venv venv
-     .\venv\Scripts\Activate.ps1
-     ```
-
-3. **Install pinned dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Initialize local environment configuration:**
-   Copy the safe `.env.example` template to `.env`:
-   - **Linux / macOS:**
-     ```bash
-     cp .env.example .env
-     ```
-   - **Windows (PowerShell):**
-     ```powershell
-     Copy-Item .env.example .env
-     ```
-   *(The default settings in `.env.example` are pre-configured for instant zero-key localhost execution with SQLite).*
-
-5. **Start the local server:**
-   Launch the unified application launcher:
-   ```bash
-   python run.py
-   ```
-   *Alternative direct Uvicorn command:*
-   ```bash
-   uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
-   ```
-
-6. **Localhost Application URLs & Health Verification:**
-   Once started, access the running application using the following local addresses:
-
-   | Destination | Localhost URL | Description |
-   | :--- | :--- | :--- |
-   | **Web Application UI** | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | Full single-page enterprise web application |
-   | **Alternative UI URL** | [http://localhost:8000/](http://localhost:8000/) | Same application interface via hostname |
-   | **Interactive Swagger API** | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) | OpenAPI interactive endpoint test console |
-   | **ReDoc API Documentation** | [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) | Clean offline API specification reference |
-   | **System Health Probe** | [http://127.0.0.1:8000/api/v1/health](http://127.0.0.1:8000/api/v1/health) | Real-time database and storage health status |
-
-7. **Verifying System Health via Terminal:**
-   You can verify that the local server is healthy and fully operational using `curl` or PowerShell:
-   - **PowerShell:**
-     ```powershell
-     Invoke-RestMethod -Uri "http://127.0.0.1:8000/api/v1/health" | ConvertTo-Json
-     ```
-   - **Bash / curl:**
-     ```bash
-     curl -s http://127.0.0.1:8000/api/v1/health | jq .
-     ```
-   Expected response:
-   ```json
-   {
-     "status": "healthy",
-     "version": "0.1.0",
-     "environment": "development",
-     "database_connected": true,
-     "storage_directories_ready": true,
-     "active_providers": {
-       "llm_provider": "groq",
-       "embedding_provider": "huggingface"
-     }
-   }
-   ```
-   > **Note on Active Providers**: The `active_providers` field displays the configured provider names in `config.py`. In zero-key local mode (without a `GROQ_API_KEY`), the RAG assistant automatically uses local deterministic extractive synthesis and sparse TF-IDF retrieval.
-
----
-
-## 14. Pre-Seeded Default Accounts & Access Roles
-
-During initial local database bootstrapping, the application initializes default accounts representing each built-in role to facilitate evaluation when `ENABLE_DEMO_ACCOUNTS=True`:
-
-| Role | Account Identifier | Access Level & Scope |
-| :--- | :--- | :--- |
-| **Administrator** | `admin@eknavigator.com` | Full platform administration, user directory, role governance, and audit logs |
-| **Knowledge Analyst** | `analyst@eknavigator.com` | Knowledge Graph navigation, evaluation benchmarks, and data export |
-| **Knowledge Worker** | `worker@eknavigator.com` | Document ingestion, multi-format catalog, hybrid search, and grounded Q&A |
-
-### Safe Local Setup & Authentication
-
-1. **Local Demonstration Login**: When running locally on localhost, the single-page login screen provides convenient role quick-fill buttons for rapid demonstration without requiring manual credential entry.
-2. **Self-Registration**: New local worker accounts can be created directly using the **Create an Account** portal on the login screen (`http://127.0.0.1:8000/`).
-3. **Password Management**: Passwords can be updated at any time through the **Profile & Settings** menu or reset via the cryptographically secure **Forgot Password** OTP flow.
-4. **Production Security Warning**:
-   > [!WARNING]
-   > Demo accounts are strictly intended for local demonstration and academic review. In production (`ENVIRONMENT=production`), always configure `ENABLE_DEMO_ACCOUNTS=False` and supply a strong random `SECRET_KEY` of at least 32 characters in your environment. The application will block startup if a default key is detected in production.
-
----
-
-## 15. Running Tests
-
-The test suite validates database models, security, authorization, document processing, and hybrid retrieval.
-
-### Run Full Pytest Suite (67 Tests)
+### Step 1: Clone the repository
 ```bash
-python -m pytest tests -v
+git clone https://github.com/shweeta1015/enterprise-knowledge-navigator.git
 ```
 
-### Run Comprehensive 29-Check Audit Script
+### Step 2: Open the project directory
 ```bash
-python scripts/comprehensive_final_audit.py
+cd enterprise-knowledge-navigator
 ```
 
----
+### Step 3: Create a virtual environment
+- **On Windows:**
+  ```powershell
+  python -m venv .venv
+  .venv\Scripts\activate
+  ```
+- **On Linux / macOS:**
+  ```bash
+  python3 -m venv .venv
+  source .venv/bin/activate
+  ```
 
-## 16. Local Development & Git Synchronization Workflow
-
-The project follows a disciplined local engineering and version control workflow:
-
-```
-┌──────────────────────────────────────────────┐
-│ Local Development in Antigravity Workspace   │
-│ - Backend: FastAPI, SQLAlchemy, Scikit-Learn │
-│ - Frontend: HTML5, CSS3, ES6 JS, D3.js       │
-└──────────────────────┬───────────────────────┘
-                       │ 1. Local Code Updates & Verification
-                       ▼
-┌──────────────────────────────────────────────┐
-│ Local Automated Quality & Verification Suite │
-│ - pytest tests -v (67 Unit & Security Tests) │
-│ - python scripts/comprehensive_final_audit.py│
-└──────────────────────┬───────────────────────┘
-                       │ 2. Stage verified code (excluding secrets, DBs, uploads)
-                       ▼
-┌──────────────────────────────────────────────┐
-│ Commit & Push to GitHub (main branch)        │
-│ git push origin main                         │
-└──────────────────────┬───────────────────────┘
-                       │ 3. Automated CI Validation on Ubuntu Linux
-                       ▼
-┌──────────────────────────────────────────────┐
-│ GitHub Actions Automated CI Pipeline         │
-│ - Compiles syntax across all modules         │
-│ - Executes full 67-test pytest suite         │
-│ - Runs 29-check comprehensive audit script   │
-└──────────────────────────────────────────────┘
+### Step 4: Install dependencies
+```bash
+pip install -r requirements.txt
 ```
 
-1. **Local Development**: Develop and test features directly against the local SQLite database and ASGI server on `http://127.0.0.1:8000/`.
-2. **Local Validation**: Run `pytest tests -v` and `python scripts/comprehensive_final_audit.py` to confirm zero regressions.
-3. **Data Protection**: Ensure private databases (`*.db`), `.env` files, logs, and user-uploaded raw files remain strictly untracked and excluded via `.gitignore`.
-4. **Git Synchronization**: Push clean commits to `https://github.com/shweeta1015/enterprise-knowledge-navigator.git`.
-5. **Continuous Integration**: GitHub Actions CI (`.github/workflows/ci.yml`) independently tests every pushed commit on an Ubuntu Linux container to guarantee portability.
+### Step 5: Configure environment variables
+Review the project's example configuration:
+- **On Windows (PowerShell):**
+  ```powershell
+  Copy-Item .env.example .env
+  ```
+- **On Linux / macOS:**
+  ```bash
+  cp .env.example .env
+  ```
+> *Use placeholder values in example files and never commit real API keys, passwords, tokens, or other secrets.*
+
+### Step 6: Start the application
+```bash
+python run.py
+```
+*(Or run directly via uvicorn: `uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload`)*
+
+### Step 7: Open the website
+Open the local address reported by the application:
+- **Web Application UI**: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+- **Interactive Swagger API Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **API Health Endpoint**: [http://127.0.0.1:8000/api/v1/health](http://127.0.0.1:8000/api/v1/health)
 
 ---
 
-## 17. Security & Privacy Notes
+## 13. How to Use the Application
 
-- **Password Hashing**: All user passwords are cryptographically hashed using salted bcrypt via passlib (one-way hashing, never stored or encrypted in reversible form).
-- **Signed Session Tokens**: JWT session tokens are signed with HS256 and subject to configurable expiration (`ACCESS_TOKEN_EXPIRE_MINUTES`).
-- **Production Secret Validation**: When `ENVIRONMENT=production`, the application requires a secure random `SECRET_KEY` of at least 32 characters, preventing deployment with insecure default credentials.
-- **Multi-Tenant Document Access Isolation**: Documents are protected by access tiers (`public`, `internal`, `confidential`, `restricted`) and role permissions, ensuring restricted records are excluded from search, RAG, and knowledge graph queries for unauthorized users.
-- **Privilege Escalation Defense**: Public self-registration is strictly restricted from assigning the `admin` role or privileged capabilities.
-- **Prompt Injection & Safety Defense**: Pattern-based heuristic filtering detects instruction override and delimiter injection attempts, treating retrieved document contents as untrusted data.
+### Step 1: Sign in
+Open the website and sign in with a valid account. Choose the appropriate role from the segmented role selector and use the credentials configured for that account:
+- **Administrator**: `admin@eknavigator.com` / `Admin123!`
+- **Knowledge Worker**: `worker@eknavigator.com` / `Worker123!`
+- **Analyst**: `analyst@eknavigator.com` / `Analyst123!`
+
+### Step 2: Upload a document
+1. Navigate to the document-upload section.
+2. Select a supported file (`.pdf`, `.docx`, `.txt`).
+3. Submit the upload.
+4. Wait for processing to complete.
+5. Check the document's status in the document repository.
+
+### Step 3: Verify document indexing
+1. Open the document repository and find the uploaded filename.
+2. Check its processing status and any available information about pages, chunks, and extracted entities.
+3. A successfully indexed document should be available to the retrieval pipeline. If processing fails, inspect the error and follow the available retry or troubleshooting options.
+
+### Step 4: Search for information
+1. Open the search feature and enter a term or question related to the document.
+2. Review the returned passages and source information.
+
+### Step 5: Ask the AI assistant
+1. Navigate to the question-answering interface and enter a question that can be answered from the uploaded document.
+   - For example: *"What encryption standard is required for enterprise data at rest?"*
+2. Read the answer and inspect its citations to identify the supporting document and page.
+
+### Step 6: Explore knowledge relationships
+1. If graph functionality is enabled, open the knowledge graph or enable the **Enable GraphRAG Relational Expansion** option in the question-answering interface.
+2. Ask a question that involves a relationship between two entities. Compare the returned evidence with the source document.
+
+### Step 7: Use role-specific features
+- **Administrator**: Review available user-management, custom roles, and administrative audit tools.
+- **Knowledge Worker**: Upload documents, search, and ask questions.
+- **Analyst**: Explore relationships, evaluate metrics, and export data.
 
 ---
 
-## 18. Implementation Status & Limitations
+## 14. Example Use Case
 
-### Implemented and Verified
-- **Document Ingestion**: Multi-format parsing for PDF (`pypdf` with `PyPDF2` fallback), Word DOCX, and TXT files with Unicode NFKC normalization and SHA-256 duplicate detection.
-- **Hybrid Search**: Lexical keyword search (frequency-density + n-gram phrase matching) and sparse statistical vector retrieval (Scikit-Learn TF-IDF + Cosine Similarity) fused via Reciprocal Rank Fusion ($k=60$).
-- **Grounded Answer Synthesis**: Deterministic zero-key extractive synthesis with SQLite passage verification, claim support validation, and page citations `[Filename, Page X]`.
-- **Heuristic Abstention**: Automated abstention (`confidence: 0.0`, status: `abstained`) when query similarity or supporting evidence falls below confidence thresholds.
-- **Access Control & Multi-Tenancy**: Document privacy tiers (`public`, `internal`, `confidential`, `restricted`), 11 RBAC capabilities, custom role lifecycle governance, and user assignment deletion protection.
-- **Knowledge Graph**: Rule-based regex entity recognition (`PERSON`, `ORG`, `TECH`, `PRODUCT`, `POLICY`), relationship extraction, D3.js force-directed visualization, and 1-hop GraphRAG context expansion.
-- **User Authentication & OTP**: Salted bcrypt password hashing, signed JWT tokens, and cryptographically secure OTP password recovery.
-- **Automated Verification**: Complete 67-test pytest suite and 29-check end-to-end audit script.
+Consider an organization that maintains a security policy in a DOCX document:
 
-### Implemented Optional Integrations
-- **Cloud LLM Integration**: Groq API integration (`llama-3.3-70b-versatile` via OpenAI-compatible endpoint) with automatic fallback to local deterministic extractive synthesis if the API key is omitted or validation fails.
+The policy states:
+> *"All enterprise data at rest must employ AES-256 encryption."*
 
-### Partially Implemented / Configured Hooks
-- **Alternative Cloud Providers**: Configuration settings for OpenAI and Google Gemini exist in `config.py`, with runtime routing currently directed through Groq or local extractive synthesis.
-- **Scanned PDF Handling**: Detects raster-only PDFs without digital text layers and returns descriptive error responses (`HTTP 422`); OCR processing hooks documented.
+1. A Knowledge Worker uploads the document and waits until it is indexed.
+2. The worker then asks:
+   - **Question**: *What encryption standard must be used for enterprise data at rest?*
+3. The application retrieves relevant passages and displays an answer based on the indexed documentation:
+   - **Expected evidence**: *AES-256 encryption, supported by the policy document and its corresponding page reference.*
+4. The user can inspect the citation to verify the original wording in the source document.
 
-### Planned Future Enhancements
-- **Native OCR Pipeline**: System-level Tesseract integration (`pytesseract`, `pdf2image`) for scanned physical archives.
-- **Dense Neural Semantic Embeddings**: Pre-trained transformer embeddings (`sentence-transformers/all-MiniLM-L6-v2`) and external vector database adapters (Qdrant, pgvector).
-- **Distributed Relational Clustering**: Managed PostgreSQL connection pooling for high-concurrency multi-instance deployments.
+> *This example describes the expected behavior when the uploaded document contains the stated policy and the retrieval pipeline processes it correctly. The actual response should always be checked against the source document.*
 
 ---
 
-## 19. Troubleshooting
+## 15. Security and Access Control
 
-| Symptom | Cause | Resolution |
+The project includes authentication and role-based access-control functionality.
+
+### Security-Related Components
+- **User authentication**: Secure session management.
+- **Role-based feature permissions**: Privilege separation across 11 granular platform capabilities.
+- **Password hashing**: Salted bcrypt hashing via `passlib`.
+- **JWT-based authentication**: Cryptographically signed tokens via HS256.
+- **Password-recovery functionality**: 6-digit OTP verification with timing-attack safe comparison (`secrets.compare_digest`).
+- **Administrative audit information**: Tamper-evident logging for operational security events.
+
+### Security Best Practices
+- **Never commit** API keys, passwords, JWT secrets, private keys, or real `.env` files.
+- **Do not upload** private organizational documents to a public repository.
+- **Use appropriate permissions** for user accounts.
+- **Keep dependencies updated**.
+- **Use HTTPS** and secure deployment configuration when deploying beyond a local development environment.
+- **Do not treat** source citations or a "grounded" status as absolute proof that every answer is correct—always verify high-stakes information against source files.
+- **Verify access-control behavior** before using the application with confidential information.
+
+> *The presence of a security feature in the project does not by itself establish that the entire application has been formally audited.*
+
+---
+
+## 16. Testing and Evaluation
+
+The project includes automated testing and evaluation functionality:
+
+### Evaluation Metrics
+
+| Metric | Meaning | Target / Evaluated |
 | :--- | :--- | :--- |
-| `HTTP 409 Conflict` on document upload | Document with identical SHA-256 hash already exists | Rename or verify whether file is already indexed in Document Library. |
-| `HTTP 422 Unprocessable` on PDF | PDF contains only raster images and no extractable text | Convert PDF with digital text layer or export from source Word processor. |
-| `HTTP 403 Forbidden` on admin endpoints | Authenticated caller lacks `system_admin` capability | Sign in with an Administrator account (`admin@eknavigator.com`). |
-| Port binding error on startup | Port 8000 already occupied by another service | Set `PORT=8080` in your `.env` or pass `--port <available_port>` to uvicorn. |
+| **Precision@K** | Measures how many of the top $K$ retrieved results are relevant. | Evaluated on test queries |
+| **Recall@K** | Measures how many of the relevant items are found among the top $K$ results. | Evaluated on test queries |
+| **Mean Reciprocal Rank (MRR)** | Measures how highly the first relevant result appears in the ranking. | Evaluated across query suite |
+| **Groundedness** | Evaluates how well an answer is supported by the available evidence, according to the evaluation method used. | Cross-referenced against chunks |
+| **Latency** | Measures the time taken to process a request. | Benchmarked in milliseconds |
+
+> *Metric values should be reported only when they have been obtained from actual evaluation runs. Results depend on the test dataset, queries, relevance labels, configuration, and evaluation method.*
+
+### Running Automated Tests
+- **Full Pytest Suite (67 tests)**:
+  ```bash
+  python -m pytest tests -v
+  ```
+- **Comprehensive End-to-End Audit (29 checks)**:
+  ```bash
+  python scripts/comprehensive_final_audit.py
+  ```
 
 ---
 
-## 20. License
+## 17. Limitations
 
-This project is licensed under the [MIT License](LICENSE).
+- **Document Dependency**: Answer quality depends on the accuracy and completeness of uploaded documents.
+- **Scanned Documents**: Scanned PDFs require OCR support if they do not contain extractable digital text.
+- **Retrieval Scope**: Retrieval techniques can miss relevant information or return passages that are only partially relevant when wording differs significantly.
+- **Rule-Based Extraction**: Rule-based entity extraction may fail to identify some complex entities or unconventional relationship formats.
+- **Graph Coverage**: Knowledge graph results depend on the quality and density of the extracted relationships.
+- **Verification Requirement**: Source citations help users verify answers but do not guarantee factual correctness.
+- **External Services**: External language-model functionality depends on the configured integration and availability of the third-party service.
+- **Operational Environment**: Performance and security depend on the environment, implementation, configuration, and workload.
+
+---
+
+## 18. Future Enhancements
+
+Potential future improvements include:
+- Improved support for scanned documents through native optical character recognition (OCR).
+- More advanced semantic retrieval using dense neural embedding models (`sentence-transformers`).
+- Improved entity and relationship extraction using named-entity recognition (NER) models.
+- More comprehensive automated evaluation and benchmarking datasets.
+- Better document-level and user-level access controls and tenant isolation.
+- Expanded support for additional document formats (e.g., Markdown, spreadsheets, HTML).
+- Improved monitoring, telemetry, and performance optimization.
+- More extensive automated testing and deployment validation across multiple database backends.
+
+> *These are potential enhancements and should not be interpreted as features that are already implemented.*
+
+---
+
+## 19. Conclusion
+
+**Enterprise Knowledge Navigator** aims to make organizational knowledge easier to discover and verify.
+
+By combining document processing, information retrieval, grounded question answering, knowledge graph functionality, source citations, and role-based access control, the application provides a unified interface for searching organizational information.
+
+The project demonstrates how information retrieval and structured knowledge relationships can help users find relevant evidence more efficiently while retaining the ability to check answers against their original sources.
+
+---
+
+## Repository
+
+- **GitHub Repository**: [https://github.com/shweeta1015/enterprise-knowledge-navigator](https://github.com/shweeta1015/enterprise-knowledge-navigator)
+- **Project**: Enterprise Knowledge Navigator
+- **Focus**: Document Retrieval, Grounded Question Answering, Knowledge Graphs, and Enterprise Knowledge Discovery
